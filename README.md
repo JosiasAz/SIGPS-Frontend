@@ -1,4 +1,9 @@
-# SIGPSFrontend
+# SIGPS-Frontend
+
+Este é o front-end do sistema SIGPS, desenvolvido em Angular.
+
+> [!TIP]
+> **Acesse a [Documentação Detalhada do Projeto (DOCS.md)](./DOCS.md)** para entender a estrutura e tecnologias utilizadas.
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
 
