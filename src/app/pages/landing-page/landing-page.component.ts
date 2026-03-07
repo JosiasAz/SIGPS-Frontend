@@ -35,17 +35,22 @@ export class LandingPageComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         if (!isPlatformBrowser(this.platformId)) return;
 
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            },
-            { threshold: 0.15 }
-        );
+        // Pequeno delay para garantir que o Angular renderizou os elementos
+        setTimeout(() => {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                        }
+                    });
+                },
+                { threshold: 0.1, rootMargin: '50px' }
+            );
 
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+        }, 300);
     }
 }
