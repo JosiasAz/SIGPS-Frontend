@@ -1,5 +1,5 @@
 {
-  "name": "sigps-frontend",
+  "name": "sis-frontend",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:SIGPS-Frontend": "node dist/SIGPS-Frontend/server/server.mjs"
+    "serve:ssr:SIS-Frontend": "node dist/SIS-Frontend/server/server.mjs"
   },
   "prettier": {
     "printWidth": 100,

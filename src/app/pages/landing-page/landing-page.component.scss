@@ -27,6 +27,22 @@
   }
 }
 
+.fade-in {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 0.4s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.4s cubic-bezier(0.2, 0, 0, 1);
+  will-change: opacity, transform;
+  pointer-events: auto;
+  /* Interatividade imediata */
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+
 @keyframes floatA {
 
   0%,
@@ -98,17 +114,6 @@
 
   50% {
     transform: rotate(3deg) scale(1.04);
-  }
-}
-
-.fade-in {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity .6s ease, transform .6s ease;
-
-  &.visible {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -307,24 +312,30 @@ header {
 }
 
 .nav-inner {
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 100%;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 32px;
-  padding: 16px 24px;
+  position: relative;
+  /* Base para o menu central */
+  padding: 16px 60px;
 }
 
 .logo {
   display: flex;
   align-items: center;
   gap: 9px;
+  flex: 1;
 
   .logo-text {
-    font-size: 1.3rem;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 1.8rem;
     font-weight: 800;
-    letter-spacing: -.03em;
-    color: var(--text);
+    letter-spacing: -2px;
+    color: var(--green-deep);
+    line-height: 1;
+    margin-left: -2px;
+    /* Ajuste fino para aproximar do ícone */
   }
 }
 
@@ -332,7 +343,11 @@ header {
   list-style: none;
   display: flex;
   gap: 4px;
-  margin-left: 8px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Centro absoluto da tela */
+  z-index: 10;
 
   li a {
     padding: 8px 14px;
@@ -350,10 +365,12 @@ header {
 }
 
 .nav-actions {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
+  /* Garante que ocupe o espaço restante na direita */
+  justify-content: flex-end;
 }
 
 .hamburger {
@@ -571,11 +588,10 @@ header {
 
 .problem-card {
   padding: 28px;
-  border-radius: var(--radius);
-  border: 1.5px solid var(--border);
-  background: white;
-  box-shadow: var(--shadow);
-  transition: transform .25s, box-shadow .25s, border-color .25s;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  transition: all .3s ease;
 
   h3 {
     margin: 16px 0 10px;
@@ -589,9 +605,22 @@ header {
   }
 
   &:hover {
+    border-color: var(--green-light);
+    box-shadow: 0 12px 32px rgba(46, 171, 110, 0.08);
     transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--green-mid);
+  }
+
+  /* Stagger Delay for cards in grid - Ultra Fast */
+  &:nth-child(1) {
+    transition-delay: 0.03s;
+  }
+
+  &:nth-child(2) {
+    transition-delay: 0.06s;
+  }
+
+  &:nth-child(3) {
+    transition-delay: 0.09s;
   }
 }
 
@@ -665,14 +694,38 @@ header {
 }
 
 .feature-card {
-  padding: 28px;
-  border-radius: var(--radius);
-  background: rgba(255, 255, 255, .08);
-  border: 1px solid rgba(255, 255, 255, .12);
-  backdrop-filter: blur(8px);
-  color: white;
-  transition: background .25s, transform .25s;
+  padding: 32px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  transition: all .4s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
+  overflow: hidden;
+
+  /* Stagger Delay for cards in grid - Ultra Fast */
+  &:nth-child(1) {
+    transition-delay: 0.03s;
+  }
+
+  &:nth-child(2) {
+    transition-delay: 0.06s;
+  }
+
+  &:nth-child(3) {
+    transition-delay: 0.09s;
+  }
+
+  &:nth-child(4) {
+    transition-delay: 0.12s;
+  }
+
+  &:nth-child(5) {
+    transition-delay: 0.15s;
+  }
+
+  &:nth-child(6) {
+    transition-delay: 0.18s;
+  }
 
   h3 {
     color: white;
