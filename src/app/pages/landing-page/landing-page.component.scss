@@ -10,32 +10,7 @@
 }
 
 :host {
-  /* ── Paleta Verde Saúde ── */
-  --green: #419640;
-  --green-dark: #1a7a4e;
-  --green-deep: #0d5438;
-  --green-light: #eaf7f0;
-  --green-mid: #b6e8ce;
-  --green-soft: #d4f0e2;
-
-  /* ── Neutros ── */
-  --bg: #f7fdf9;
-  --surface: #ffffff;
-  --text: #0d2018;
-  --text-muted: #4a6e5a;
-  --text-light: #82a894;
-  --border: #daf0e6;
-
-  /* ── Utility ── */
-  --radius: 16px;
-  --radius-sm: 10px;
-  --shadow: 0 4px 24px rgba(46, 171, 110, .07), 0 1px 4px rgba(0, 0, 0, .04);
-  --shadow-lg: 0 8px 48px rgba(46, 171, 110, .13), 0 2px 8px rgba(0, 0, 0, .06);
-
   display: block;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  color: var(--text);
-  background: var(--bg);
   overflow-x: hidden;
 }
 
