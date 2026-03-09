@@ -5,40 +5,53 @@ import { FormsModule } from '@angular/forms';
 import { AbstractAuthService } from '../../services/auth/abstract-auth.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-cadastro',
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule],
-  templateUrl: './login.html',
-  styleUrl: './login.scss',
+  templateUrl: './cadastro.html',
+  styleUrl: './cadastro.scss',
 })
-export class Login {
+export class Cadastro {
   private router = inject(Router);
   private authService = inject(AbstractAuthService);
 
-  credentials = {
+  userData = {
+    nome: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   };
 
   showPassword = signal(false);
+  showConfirmPassword = signal(false);
   isLoading = signal(false);
   errorMessage = signal('');
 
   togglePassword() {
-    this.showPassword.update(v => !v);
+    this.showPassword.set(!this.showPassword());
   }
 
-  onLogin(event: Event) {
+  toggleConfirmPassword() {
+    this.showConfirmPassword.set(!this.showConfirmPassword());
+  }
+
+  onRegister(event: Event) {
     event.preventDefault();
+
+    if (this.userData.password !== this.userData.confirmPassword) {
+      this.errorMessage.set('As senhas não coincidem.');
+      return;
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.authService.login(this.credentials).subscribe({
+    this.authService.register(this.userData).subscribe({
       next: () => {
         this.router.navigate(['/painel']);
       },
       error: (err) => {
-        this.errorMessage.set('Falha ao entrar. Verifique seus dados.');
+        this.errorMessage.set('Erro ao criar conta. Tente novamente.');
         this.isLoading.set(false);
       }
     });

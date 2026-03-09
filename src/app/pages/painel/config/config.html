@@ -1,0 +1,24 @@
+<section class="page-container">
+    <div class="content-header">
+        <div>
+            <h1>Configurações do Sistema</h1>
+            <p>Personalize os parâmetros da plataforma SIGPS.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="settings-list">
+            @for (setting of settings; track setting.label) {
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h4>{{ setting.label }}</h4>
+                    <p>{{ setting.description }}</p>
+                </div>
+                <div class="switch" [class.active]="setting.value">
+                    {{ setting.value ? 'Ativado' : 'Desativado' }}
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</section>

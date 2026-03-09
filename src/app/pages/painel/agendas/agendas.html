@@ -1,0 +1,58 @@
+<section class="page-container">
+    <div class="content-header">
+        <div>
+            <h1>Agendas Médicas</h1>
+            <p>Gerencie os horários e disponibilidades dos especialistas.</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary-dashboard">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Configurar Agenda
+            </button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-container">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Especialista</th>
+                        <th>Especialidade</th>
+                        <th>Horários Disponíveis</th>
+                        <th>Vagas</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (agenda of agendas; track agenda.especialista) {
+                    <tr>
+                        <td><strong>{{ agenda.especialista }}</strong></td>
+                        <td>{{ agenda.especialidade }}</td>
+                        <td>
+                            <div class="horarios-grid">
+                                @for (h of agenda.horarios; track h) {
+                                <span class="badge-mini">{{ h }}</span>
+                                }
+                            </div>
+                        </td>
+                        <td>{{ agenda.vagas }}</td>
+                        <td>
+                            <button class="icon-btn-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path d="M12 20h9"></path>
+                                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                </svg></button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

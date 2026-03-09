@@ -1,0 +1,64 @@
+<section class="page-container">
+    <div class="content-header">
+        <div>
+            <h1>Gestão de Pacientes</h1>
+            <p>Visualize e gerencie as informações de todos os pacientes cadastrados.</p>
+        </div>
+        <button class="btn-primary-dashboard">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <line x1="19" y1="8" x2="19" y2="14"></line>
+                <line x1="16" y1="11" x2="22" y2="11"></line>
+            </svg>
+            Adicionar Paciente
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="table-container">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Última Consulta</th>
+                        <th>Especialidade</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (paciente of pacientes; track paciente.cpf) {
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="avatar-sm">{{ paciente.nome.substring(0, 2).toUpperCase() }}</div>
+                                <span>{{ paciente.nome }}</span>
+                            </div>
+                        </td>
+                        <td>{{ paciente.cpf }}</td>
+                        <td>{{ paciente.ultimaConsulta }}</td>
+                        <td>{{ paciente.especialidade }}</td>
+                        <td>
+                            <span class="status-badge" [class]="paciente.status">
+                                {{ paciente.status === 'active' ? 'Ativo' : paciente.status === 'waiting' ? 'Aguardando'
+                                : 'Crítico' }}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="icon-btn-sm" title="Editar">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

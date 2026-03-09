@@ -1,14 +1,15 @@
-.login-container {
+.registration-container {
     display: flex;
-    min-height: 100vh;
+    height: 100vh;
     background-color: var(--bg);
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    overflow: hidden;
 }
 
 /* ══════════════════════════ VISUAL SIDE */
-.login-visual {
+.registration-visual {
     position: relative;
-    flex: 1.2;
+    flex: 1;
     display: flex;
     flex-direction: column;
     padding: 60px;
@@ -33,11 +34,6 @@
         align-items: center;
         gap: 12px;
 
-        .brand-logo {
-            height: 48px;
-            filter: brightness(0) invert(1);
-        }
-
         .brand-name {
             font-size: 1.8rem;
             font-weight: 800;
@@ -50,7 +46,7 @@
         margin-top: -100px;
 
         h1 {
-            font-size: 3.5rem;
+            font-size: 3.2rem;
             font-weight: 700;
             line-height: 1.1;
             margin-bottom: 24px;
@@ -113,51 +109,68 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, rgba(13, 84, 56, 0.95) 0%, rgba(26, 122, 78, 0.4) 100%);
+        background: linear-gradient(135deg, rgba(13, 84, 56, 0.95) 0%, rgba(26, 122, 78, 0.5) 100%);
         z-index: 2;
     }
 }
 
 /* ══════════════════════════ FORM SIDE */
-.login-form-area {
-    flex: 1;
+.registration-form-area {
+    flex: 1.2;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    padding: 40px;
+    padding: 24px;
     position: relative;
+    overflow-y: auto;
+    background: var(--bg);
 
     .form-card {
         width: 100%;
-        max-width: 440px;
+        max-width: 580px;
         background: white;
-        padding: 40px;
-        border-radius: 32px;
+        padding: 28px 32px;
+        border-radius: 28px;
         box-shadow: 0 10px 40px rgba(13, 84, 56, 0.05);
+        margin: auto 0;
 
         .form-header {
-            margin-bottom: 32px;
+            margin-bottom: 20px;
 
             h2 {
-                font-size: 2rem;
+                font-size: 1.6rem;
                 font-weight: 800;
                 color: var(--green-deep);
-                margin-bottom: 10px;
+                margin-bottom: 6px;
                 letter-spacing: -0.02em;
             }
 
             p {
                 color: var(--text-muted);
-                font-size: 1rem;
+                font-size: 0.95rem;
             }
         }
     }
 
-    .login-form {
+    .registration-form {
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 16px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+
+        @media (max-width: 640px) {
+            grid-template-columns: 1fr;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
     }
 
     .input-group {
@@ -166,7 +179,7 @@
         gap: 8px;
 
         label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             color: var(--green-deep);
             margin-left: 4px;
@@ -186,11 +199,11 @@
 
             input {
                 width: 100%;
-                padding: 16px 16px 16px 48px;
-                border-radius: 16px;
+                padding: 13px 16px 13px 48px;
+                border-radius: 12px;
                 border: 1.5px solid var(--border);
                 background: var(--bg);
-                font-size: 1rem;
+                font-size: 0.95rem;
                 font-family: inherit;
                 transition: all 0.2s ease;
                 color: var(--text);
@@ -228,19 +241,17 @@
 
     .form-options {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: -8px;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 8px;
 
-        .forgot-link {
-            font-size: 0.85rem;
-            font-weight: 600;
+        .terms-link {
             color: var(--green-dark);
+            font-weight: 600;
             text-decoration: none;
-            transition: opacity 0.2s;
 
             &:hover {
-                opacity: 0.8;
+                text-decoration: underline;
             }
         }
     }
@@ -255,23 +266,25 @@
         margin-bottom: 24px;
         border: 1px solid #feb2b2;
         text-align: center;
+        width: 100%;
     }
 
-    .btn-primary-login {
+    .btn-primary-registration {
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 12px;
-        padding: 18px;
+        padding: 15px;
         background: var(--green-deep);
         color: white;
         border: none;
-        border-radius: 18px;
-        font-size: 1.05rem;
+        border-radius: 12px;
+        font-size: 1rem;
         font-weight: 700;
         cursor: pointer;
         transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        margin-top: 8px;
+        margin-top: 4px;
+        width: 100%;
 
         &:hover:not(:disabled) {
             background: var(--green-dark);
@@ -291,7 +304,7 @@
     }
 
     .form-footer {
-        margin-top: 32px;
+        margin-top: 24px;
         text-align: center;
         font-size: 0.95rem;
         color: var(--text-muted);
@@ -309,8 +322,7 @@
     }
 
     .copyright {
-        position: absolute;
-        bottom: 24px;
+        margin-top: 24px;
         font-size: 0.85rem;
         color: var(--text-light);
     }
@@ -326,6 +338,7 @@
     font-weight: 500;
     color: var(--text-muted);
     user-select: none;
+    line-height: 1.4;
 
     input {
         position: absolute;
@@ -337,9 +350,8 @@
 
     .checkmark {
         position: absolute;
-        top: 50%;
+        top: 2px;
         left: 0;
-        transform: translateY(-50%);
         height: 18px;
         width: 18px;
         background-color: var(--bg);

@@ -15,7 +15,7 @@
     </ul>
     <div class="nav-actions">
       <a routerLink="login" class="btn-ghost">Entrar</a>
-      <a class="btn-primary" href="#">Cadastrar</a>
+      <a routerLink="cadastro" class="btn-primary">Cadastrar</a>
     </div>
     <button class="hamburger" (click)="toggleMenu()" [class.open]="menuOpen()">
       <span></span><span></span><span></span>
@@ -29,8 +29,8 @@
       <li><a href="#contato" (click)="toggleMenu()">Contato</a></li>
     </ul>
     <div class="mobile-actions">
-      <a class="btn-ghost" href="#">Entrar</a>
-      <a class="btn-primary" href="#">Cadastrar</a>
+      <a routerLink="login" class="btn-ghost">Entrar</a>
+      <a routerLink="cadastro" class="btn-primary">Cadastrar</a>
     </div>
   </div>
 </header>
@@ -426,7 +426,7 @@
     <h2>Comece agora<br />sem complicação.</h2>
     <p>Crie sua conta gratuitamente e conecte sua clínica ou consultório ao SIGPS em menos de 5 minutos.</p>
     <div class="cta-actions">
-      <a class="btn-white large" href="#">
+      <a routerLink="cadastro" class="btn-white large">
         Criar conta gratuita
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path d="M3 9h12M9 3l6 6-6 6" stroke="#1a7a4e" stroke-width="2" stroke-linecap="round"
