@@ -1,4 +1,5 @@
-import { Routes } from '@angular/router';
+import { Routes, Router } from '@angular/router';
+import { inject } from '@angular/core';
 import { LandingPageComponent } from '../pages/landing-page/landing-page.component';
 import { Login } from '../pages/login/login';
 import { Cadastro } from '../pages/cadastro/cadastro';
@@ -12,6 +13,10 @@ import { RelatoriosComponent } from '../pages/painel/relatorios/relatorios';
 import { ConfigComponent } from '../pages/painel/config/config';
 import { authGuard } from '../guards/auth.guard';
 import { roleGuard } from '../guards/role.guard';
+import { AbstractAuthService } from '../services/auth/abstract-auth.service';
+import { PortalPacienteComponent } from '../pages/painel/portal-paciente/portal-paciente';
+import { ExamesComponent } from '../pages/painel/exames/exames';
+import { ChatComponent } from '../pages/painel/chat/chat';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -23,7 +28,26 @@ export const routes: Routes = [
         canActivate: [authGuard],
         children: [
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-            { path: 'dashboard', component: DashboardComponent },
+            {
+                path: 'portal-paciente',
+                component: PortalPacienteComponent,
+                canActivate: [roleGuard(['paciente'])]
+            },
+            {
+                path: 'exames',
+                component: ExamesComponent,
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor'])]
+            },
+            {
+                path: 'chat',
+                component: ChatComponent,
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor'])]
+            },
+            { 
+                path: 'dashboard', 
+                component: DashboardComponent,
+                canActivate: [roleGuard(['admin', 'gestor', 'especialista', 'visualizador'])]
+            },
             {
                 path: 'pacientes',
                 component: PacientesComponent,

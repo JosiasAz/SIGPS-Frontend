@@ -1,0 +1,17 @@
+.horarios-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .badge-mini {
+        background-color: var(--green-soft, #e6fced);
+        color: var(--green-dark, #1a7a4e);
+        font-size: 0.85rem;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(26, 122, 78, 0.15);
+        display: inline-block;
+        white-space: nowrap;
+    }
+}

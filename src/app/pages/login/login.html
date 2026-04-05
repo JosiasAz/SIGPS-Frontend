@@ -1,16 +1,29 @@
-<div class="login-container">
-    <!-- ══════════════════════════ VISUAL SIDE (LEFT) -->
-    <div class="login-visual">
-        <div class="visual-content">
-            <div class="brand">
-                <img src="/logo.svg" alt="Logo SIGPS" style="height: 90px; width: 100px; display: block;" />
-                <span class="brand-name">SIGPS</span>
-            </div>
+<div class="auth-layout">
+    <nav class="auth-navbar">
+        <a routerLink="/" class="navbar-brand">
+            <span class="logo-icon">
+                <img src="/logo.svg" alt="Logo SIGPS" style="height: 50px; width: auto; display: block;" />
+            </span>
+            <span class="nav-title">SIGPS</span>
+        </a>
+        <a routerLink="/" class="back-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span class="back-text">Voltar para Início</span>
+        </a>
+    </nav>
 
-            <div class="hero-text">
-                <h1>Gestão inteligente<br />para uma saúde melhor.</h1>
-                <p>Acesse sua conta para gerenciar agendamentos, pacientes e otimizar o fluxo da sua clínica.</p>
-            </div>
+    <div class="login-container">
+        <!-- ══════════════════════════ VISUAL SIDE (LEFT) -->
+        <div class="login-visual">
+            <div class="visual-content">
+                <div class="hero-text">
+                    <h1>Gestão inteligente<br />para uma saúde melhor.</h1>
+                    <p>Acesse sua conta para gerenciar agendamentos, pacientes e otimizar o fluxo da sua clínica.</p>
+                </div>
 
             <div class="stats-glass">
                 <div class="stat-item">
@@ -25,9 +38,8 @@
             </div>
         </div>
 
-        <!-- Background Image with Overlay -->
+        <!-- Background Pattern -->
         <div class="visual-overlay"></div>
-        <img src="/login-bg.png" alt="Health Tech Visual" class="bg-image" />
     </div>
 
     <!-- ══════════════════════════ FORM SIDE (RIGHT) -->

@@ -1,0 +1,39 @@
+<section class="page-container chat-layout">
+    <div class="chat-card">
+        <div class="chat-header">
+            <a routerLink="/painel/portal-paciente" class="btn-back-icon" title="Voltar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </a>
+            <div class="avatar">
+                <img src="/logo.svg" alt="SIGPS" />
+            </div>
+            <div class="header-info">
+                <h3>Central de Atendimento</h3>
+                <span>Fale com seu profissional de saúde ou recepção</span>
+            </div>
+        </div>
+
+        <div class="chat-messages" #chatContainer>
+            @for (msg of messages(); track msg.id) {
+            <div class="message-bubble" [class.user]="isMyMessage(msg)">
+                <span class="sender-name">{{ msg.senderName }}</span>
+                <div class="text">{{ msg.text }}</div>
+                <span class="time">{{ msg.time }}</span>
+            </div>
+            }
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" #msgInput (keyup.enter)="sendMessage(msgInput.value); msgInput.value=''" placeholder="Digite sua mensagem aqui..." />
+            <button class="btn-send" (click)="sendMessage(msgInput.value); msgInput.value=''">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+</section>

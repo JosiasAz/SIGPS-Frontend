@@ -12,8 +12,11 @@ export const roleGuard = (allowedRoles: UserRole[]): CanActivateFn => {
             return true;
         }
 
-        // Redirect to dashboard or unauthorized page
-        router.navigate(['/painel/dashboard']);
+        if (authService.hasRole(['paciente'])) {
+            router.navigate(['/painel/portal-paciente']);
+        } else {
+            router.navigate(['/painel/dashboard']);
+        }
         return false;
     };
 };

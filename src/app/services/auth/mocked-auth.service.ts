@@ -13,7 +13,9 @@ export class MockedAuthService extends AbstractAuthService {
     private readonly AUTH_KEY = 'sigps_auth';
     private readonly USER_KEY = 'sigps_user';
 
-    private tokenState = signal<string | null>(localStorage.getItem(this.AUTH_KEY));
+    private tokenState = signal<string | null>(
+        typeof localStorage !== 'undefined' ? localStorage.getItem(this.AUTH_KEY) : null
+    );
     private userState = signal<User | null>(this.getStoredUser());
 
     isAuthenticated = computed(() => !!this.tokenState());
@@ -55,8 +57,10 @@ export class MockedAuthService extends AbstractAuthService {
     logout() {
         this.tokenState.set(null);
         this.userState.set(null);
-        localStorage.removeItem(this.AUTH_KEY);
-        localStorage.removeItem(this.USER_KEY);
+        if (typeof localStorage !== 'undefined') {
+            localStorage.removeItem(this.AUTH_KEY);
+            localStorage.removeItem(this.USER_KEY);
+        }
         this.router.navigate(['/login']);
     }
 
@@ -67,15 +71,17 @@ export class MockedAuthService extends AbstractAuthService {
 
     private setAuth(token: string) {
         this.tokenState.set(token);
-        localStorage.setItem(this.AUTH_KEY, token);
+        if (typeof localStorage !== 'undefined') localStorage.setItem(this.AUTH_KEY, token);
     }
 
     private setUser(user: User) {
         this.userState.set(user);
-        localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+        if (typeof localStorage !== 'undefined') localStorage.setItem(this.USER_KEY, JSON.stringify(user));
     }
 
     private getStoredUser(): User | null {
+        if (typeof localStorage === 'undefined') return null;
+        
         const stored = localStorage.getItem(this.USER_KEY);
         if (!stored) return null;
         try {
