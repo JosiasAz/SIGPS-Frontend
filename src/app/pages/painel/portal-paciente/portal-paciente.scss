@@ -83,9 +83,13 @@
             border: none;
             color: white;
 
-            h3, p { color: white; }
+            h3,
+            p {
+                color: white;
+            }
+
             .icon-circle {
-                background: rgba(255,255,255,0.15);
+                background: rgba(255, 255, 255, 0.15);
                 color: white;
             }
 
@@ -102,7 +106,10 @@
                 transform: none;
                 box-shadow: none;
                 border: 1px solid var(--border);
-                .icon-circle { background: var(--bg); }
+
+                .icon-circle {
+                    background: var(--bg);
+                }
             }
         }
 
@@ -145,11 +152,11 @@
         padding: 20px;
         background: var(--bg);
         border-radius: 20px;
-        
+
         &.empty {
             justify-content: center;
             padding: 32px;
-            
+
             p {
                 color: var(--text-muted);
                 font-size: 1.1rem;
@@ -165,7 +172,7 @@
             border-radius: 16px;
             width: 72px;
             height: 72px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 
             .month {
                 font-size: 0.8rem;
@@ -227,12 +234,12 @@
             }
         }
     }
-    
+
     @media (max-width: 768px) {
         .upcoming-card {
             flex-direction: column;
             text-align: center;
-            
+
             .btn-outline {
                 width: 100%;
             }

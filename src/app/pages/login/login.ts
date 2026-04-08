@@ -30,6 +30,22 @@ export class Login {
 
   onLogin(event: Event) {
     event.preventDefault();
+
+    if (!this.credentials.email.trim()) {
+      this.errorMessage.set('O campo de e-mail é obrigatório.');
+      return;
+    }
+
+    if (!this.credentials.password) {
+      this.errorMessage.set('A senha não pode estar vazia.');
+      return;
+    }
+
+    if (this.credentials.password.length < 6) {
+      this.errorMessage.set('A senha deve ter no mínimo 6 caracteres.');
+      return;
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set('');
 

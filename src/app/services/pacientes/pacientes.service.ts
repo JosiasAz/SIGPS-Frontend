@@ -24,4 +24,33 @@ export class PacientesService extends AbstractPacientesService {
             error: (err) => console.error('Erro ao buscar pacientes:', err)
         });
     }
+
+    adicionarPaciente(paciente: Omit<Paciente, 'id'>): void {
+        this.http.post<Paciente>(`${this.apiUrl}/api/v1/patients/`, paciente).subscribe({
+            next: (novoPaciente) => {
+                this.pacientes.update(pacientes => [...pacientes, novoPaciente]);
+            },
+            error: (err) => console.error('Erro ao adicionar paciente:', err)
+        });
+    }
+
+    atualizarPaciente(id: number, paciente: Partial<Paciente>): void {
+        this.http.put<Paciente>(`${this.apiUrl}/api/v1/patients/${id}`, paciente).subscribe({
+            next: (pacienteAtualizado) => {
+                this.pacientes.update(pacientes => 
+                    pacientes.map(p => p.id === id ? pacienteAtualizado : p)
+                );
+            },
+            error: (err) => console.error('Erro ao atualizar paciente:', err)
+        });
+    }
+
+    excluirPaciente(id: number): void {
+        this.http.delete(`${this.apiUrl}/api/v1/patients/${id}`).subscribe({
+            next: () => {
+                this.pacientes.update(pacientes => pacientes.filter(p => p.id !== id));
+            },
+            error: (err) => console.error('Erro ao excluir paciente:', err)
+        });
+    }
 }

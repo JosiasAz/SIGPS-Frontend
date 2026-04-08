@@ -24,20 +24,7 @@
                     <h1>Junte-se à revolução da saúde digital.</h1>
                     <p>Crie sua conta e comece a transformar a gestão da sua clínica com inteligência e eficiência.</p>
                 </div>
-
-            <div class="stats-glass">
-                <div class="stat-item">
-                    <strong>100%</strong>
-                    <span>Seguro</span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item">
-                    <strong>Cloud</strong>
-                    <span>Native</span>
-                </div>
             </div>
-        </div>
-
         <!-- Background Pattern -->
         <div class="visual-overlay"></div>
     </div>
@@ -95,7 +82,8 @@
                                 <line x1="7" y1="12" x2="17" y2="12" />
                                 <line x1="7" y1="16" x2="13" y2="16" />
                             </svg>
-                            <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" required />
+                            <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00"
+                                [(ngModel)]="userData.cpf" (input)="formatCpf($event)" required />
                         </div>
                     </div>
 

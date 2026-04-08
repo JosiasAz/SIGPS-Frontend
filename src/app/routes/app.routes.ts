@@ -17,6 +17,8 @@ import { AbstractAuthService } from '../services/auth/abstract-auth.service';
 import { PortalPacienteComponent } from '../pages/painel/portal-paciente/portal-paciente';
 import { ExamesComponent } from '../pages/painel/exames/exames';
 import { ChatComponent } from '../pages/painel/chat/chat';
+import { PerfilProfissionalComponent } from '../pages/painel/perfil-profissional/perfil-profissional';
+import { BuscaProfissionaisComponent } from '../pages/painel/busca-profissionais/busca-profissionais';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -42,6 +44,16 @@ export const routes: Routes = [
                 path: 'chat',
                 component: ChatComponent,
                 canActivate: [roleGuard(['paciente', 'admin', 'gestor'])]
+            },
+            {
+                path: 'perfil-profissional/:id',
+                component: PerfilProfissionalComponent,
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'visualizador'])]
+            },
+            {
+                path: 'busca-profissionais',
+                component: BuscaProfissionaisComponent,
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'visualizador'])]
             },
             { 
                 path: 'dashboard', 

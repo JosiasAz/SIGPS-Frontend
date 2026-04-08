@@ -12,7 +12,7 @@ import { AbstractAuthService } from '../../../services/auth/abstract-auth.servic
 })
 export class PortalPacienteComponent {
   private authService = inject(AbstractAuthService);
-  
+
   patientName = computed(() => {
     const user = this.authService.currentUser();
     if (!user || !user.name) return 'Paciente';

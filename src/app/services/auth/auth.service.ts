@@ -1,11 +1,19 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap, switchMap, catchError } from 'rxjs/operators';
-import { of, throwError } from 'rxjs';
+import { tap, switchMap, catchError, delay } from 'rxjs/operators';
+import { of, throwError, Observable } from 'rxjs';
 import { AuthResponse, User, UserRole } from '../../models/auth.model';
 import { AbstractAuthService } from './abstract-auth.service';
 import { environment } from '../../env/environment';
+
+const MOCK_USERS: Record<string, User> = {
+    'paciente@sigps.com': { id: 1, name: 'Wagner Beta Paciente', email: 'paciente@sigps.com', role: 'paciente' },
+    'visualizador@sigps.com': { id: 2, name: 'Olliver Beta Visualizador', email: 'visualizador@sigps.com', role: 'visualizador' },
+    'gestor@sigps.com': { id: 3, name: 'Matheus Beta Gestor', email: 'gestor@sigps.com', role: 'gestor' },
+    'especialista@sigps.com': { id: 4, name: 'Dr. Alan Beta Especialista', email: 'especialista@sigps.com', role: 'especialista' },
+    'admin@sigps.com': { id: 5, name: 'Josias Hacker Supremo Admin Master', email: 'admin@sigps.com', role: 'admin' }
+};
 
 @Injectable({
     providedIn: 'root'
@@ -24,39 +32,45 @@ export class AuthService extends AbstractAuthService {
     currentUser = computed(() => this.userState());
     userRole = computed(() => this.userState()?.role || null);
 
-    login(credentials: any) {
-        // Preparar o corpo da requisição para o formato OAuth2PasswordRequestForm (form-data)
-        const body = new HttpParams()
-            .set('username', credentials.email)
-            .set('password', credentials.password);
+    login(credentials: any): Observable<AuthResponse> {
+        // MOCK BEHAVIOR PARA APRESENTAÇÃO
+        return of(null).pipe(
+            delay(800),
+            switchMap(() => {
+                const email = (credentials.email || '').trim().toLowerCase();
+                let user = MOCK_USERS[email];
+                
+                // Se o email não constar nos mocks oficiais, gera um usuário genérico (paciente)
+                if (!user) {
+                    user = { id: 999, name: 'Usuário de Teste (' + email + ')', email: email, role: 'paciente' };
+                }
 
-        return this.http.post<AuthResponse>(`${this.apiUrl}/api/v1/auth/login`, body, {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        }).pipe(
-            tap(response => {
-                this.setAuth(response.access_token);
-            }),
-            // Após o login com sucesso, buscar os dados do usuário corrente (/me)
-            switchMap(response => this.fetchCurrentUser()),
-            tap(user => {
+                const token = 'mock-jwt-token-for-' + user.id;
+                this.setAuth(token);
                 this.setUser(user);
-            }),
-            // Retornar um objeto compatível com AuthResponse se necessário
-            switchMap(user => of({
-                access_token: this.tokenState()!,
-                token_type: 'bearer'
-            }))
+                
+                return of({ access_token: token, token_type: 'bearer' });
+            })
         );
     }
 
-    register(userData: any) {
-        // Ajustar os campos para o que o backend espera (name em vez de nome)
-        const userCreate = {
-            email: userData.email,
-            password: userData.password,
-            name: userData.nome
-        };
-        return this.http.post<any>(`${this.apiUrl}/api/v1/users/`, userCreate);
+    register(userData: any): Observable<any> {
+        // MOCK BEHAVIOR PARA APRESENTAÇÃO
+        return of(null).pipe(
+            delay(1000),
+            tap(() => {
+                const newUser: User = { 
+                    id: Math.floor(Math.random() * 1000) + 100, 
+                    name: userData.nome, 
+                    email: userData.email, 
+                    role: 'paciente' // Usuário recém-cadastrado cai como paciente
+                };
+                const token = 'mock-jwt-token-registered';
+                this.setAuth(token);
+                this.setUser(newUser);
+            }),
+            switchMap(() => of({ success: true }))
+        );
     }
 
     logout() {
@@ -72,8 +86,11 @@ export class AuthService extends AbstractAuthService {
         return !!userRole && roles.includes(userRole);
     }
 
-    private fetchCurrentUser() {
-        return this.http.get<User>(`${this.apiUrl}/api/v1/auth/me`);
+    private fetchCurrentUser(): Observable<User> {
+        // Se precisar buscar o current user em algum load
+        const user = this.getStoredUser();
+        if (user) return of(user).pipe(delay(300));
+        return throwError(() => new Error('No user found'));
     }
 
     private setAuth(token: string) {

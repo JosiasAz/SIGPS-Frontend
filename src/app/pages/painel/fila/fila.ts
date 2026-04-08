@@ -11,5 +11,17 @@ import { AbstractFilaService } from '../../../services/fila/abstract-fila.servic
 })
 export class FilaComponent {
   private filaService = inject(AbstractFilaService);
-  fila = this.filaService.fila();
+  fila = this.filaService.fila;
+
+  reordenar() {
+    this.filaService.reordenarFila();
+  }
+
+  analisarIA() {
+    this.filaService.analisarIA();
+  }
+
+  atender(paciente: string) {
+    this.filaService.atenderPaciente(paciente);
+  }
 }

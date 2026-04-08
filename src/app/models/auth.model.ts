@@ -12,3 +12,11 @@ export interface AuthResponse {
     access_token: string;
     token_type: string;
 }
+
+export interface Message {
+    id: string;
+    text: string;
+    senderType: 'user' | 'system';
+    senderId?: number;
+    createdAt: Date;
+}
