@@ -26,7 +26,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (exame of exames; track exame.title) {
+                    @for (exame of exames(); track exame.id) {
                     <tr>
                         <td>
                             <div class="exame-info">
@@ -48,14 +48,24 @@
                             <span class="status-badge" [class.active]="exame.status === 'Disponível'">{{ exame.status }}</span>
                         </td>
                         <td>
-                            <button class="btn-outline-sm">Visualizar</button>
-                            <button class="icon-btn-sm" title="Baixar PDF">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="7 10 12 15 17 10"></polyline>
-                                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                                </svg>
-                            </button>
+                            <div class="actions-group">
+                                <button class="btn-outline-sm" (click)="visualizarExame(exame)">Visualizar</button>
+                                <button class="icon-btn-sm" title="Baixar PDF" (click)="baixarPdf(exame)">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                </button>
+                                @if (isGestor()) {
+                                <button class="icon-btn-sm text-danger" title="Excluir" (click)="excluirExame(exame.id, $event)">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
+                                }
+                            </div>
                         </td>
                     </tr>
                     }
@@ -63,4 +73,65 @@
             </table>
         </div>
     </div>
+
+    <!-- Modal de Visualização de Exame -->
+    @if (currentExame(); as exame) {
+    <div class="modal-overlay" (click)="fecharModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Detalhes do Exame</h2>
+                <button class="modal-close" (click)="fecharModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="modal-scrollable-area" style="flex: 1; overflow-y: auto; padding: 32px; background: white;">
+                <div class="exame-header-detail">
+                    <div class="icon-lg">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>{{ exame.title }}</h3>
+                        <p>{{ exame.type }}</p>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Data de Realização</label>
+                        <p>{{ exame.date }}</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Médico Solicitante</label>
+                        <p>{{ exame.doctor }}</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Status</label>
+                        <p><span class="status-badge active">{{ exame.status }}</span></p>
+                    </div>
+                </div>
+
+                <div class="laudo-preview">
+                    <h4>Prévia do Laudo</h4>
+                    <div class="laudo-content">
+                        <p><strong>Conclusão:</strong> Os resultados do exame de {{ exame.title.toLowerCase() }} apresentam-se dentro dos limites da normalidade para a faixa etária do paciente.</p>
+                        <p>As estruturas analisadas não apresentam sinais de alterações morfológicas significativas ou processos inflamatórios agudos.</p>
+                        <p style="margin-top: 15px; font-style: italic; font-size: 0.85rem; color: #64748b;">Laudo assinado digitalmente por {{ exame.doctor }} em {{ exame.date }}.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="fecharModal()">Fechar</button>
+                <button class="btn-primary" (click)="baixarPdf(exame)">Baixar em PDF</button>
+            </div>
+        </div>
+    </div>
+    }
 </section>

@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AbstractFilaService } from './abstract-fila.service';
+import { AbstractFilaService, PacienteFila } from './abstract-fila.service';
 import { environment } from '../../env/environment';
 
 @Injectable({
@@ -9,7 +9,7 @@ import { environment } from '../../env/environment';
 export class FilaService extends AbstractFilaService {
     private http = inject(HttpClient);
     private apiUrl = environment.apiUrl;
-    fila = signal<any[]>([]);
+    fila = signal<PacienteFila[]>([]);
 
     constructor() {
         super();
@@ -17,13 +17,18 @@ export class FilaService extends AbstractFilaService {
     }
 
     private loadFila() {
-        this.http.get<any[]>(`${this.apiUrl}/fila`).subscribe({
+        this.http.get<PacienteFila[]>(`${this.apiUrl}/fila`).subscribe({
             next: (data) => this.fila.set(data),
             error: () => {
-                // Caso a API não responda, cria fila mockada temporária para não travar a apresentação
                 this.fila.set([
-                    { paciente: 'Carlos Silva', prioridade: 'Alta', tempoEspera: '20 min', especialidade: 'Cardiologia', status: 'Aguardando' },
-                    { paciente: 'Bruna Mendes', prioridade: 'Normal', tempoEspera: '40 min', especialidade: 'Pediatria', status: 'Aguardando' }
+                    { 
+                        id: 's1', paciente: 'Carlos Silva', prioridade: 'Alta', tempoEspera: '20 min', especialidade: 'Cardiologia', status: 'Aguardando',
+                        aiScore: 85, aiReasoning: 'Histórico de hipertensão com queixa de dor torácica.', riskTrend: 'up', vitals: { bpm: 95, spo2: 95, temp: 36.6 }
+                    },
+                    { 
+                        id: 's2', paciente: 'Bruna Mendes', prioridade: 'Normal', tempoEspera: '40 min', especialidade: 'Pediatria', status: 'Aguardando',
+                        aiScore: 30, aiReasoning: 'Consulta de rotina. Sem alterações agudas.', riskTrend: 'stable', vitals: { bpm: 105, spo2: 99, temp: 36.8 }
+                    }
                 ]);
             }
         });
@@ -40,24 +45,26 @@ export class FilaService extends AbstractFilaService {
     }
 
     analisarIA(): void {
-        const currentFila = [...this.fila()];
-        currentFila.unshift({ 
-            paciente: 'Roberto Silva (Anomalia Cardíaca identificada por IA)', 
+        this.fila.update(prev => [{ 
+            id: 'ia-99',
+            paciente: 'Roberto Silva', 
             prioridade: 'Extrema', 
             tempoEspera: '0 min', 
             especialidade: 'Cardiologia', 
-            status: 'Aguardando' 
-        });
-        this.fila.set(currentFila);
+            status: 'Aguardando',
+            aiScore: 99,
+            aiReasoning: 'Detecção de Padrão Isquêmico via monitoramento remoto. Intervenção imediata recomendada.',
+            riskTrend: 'up',
+            vitals: { bpm: 120, spo2: 89, temp: 36.5 }
+        }, ...prev]);
     }
 
     atenderPaciente(pacienteNome: string): void {
-        const currentFila = this.fila().map(p => {
+        this.fila.update(prev => prev.map(p => {
             if (p.paciente === pacienteNome) {
-                return { ...p, status: 'Em Atendimento', tempoEspera: '--' };
+                return { ...p, status: 'Em Atendimento' as const, tempoEspera: '--' };
             }
             return p;
-        });
-        this.fila.set(currentFila);
+        }));
     }
 }

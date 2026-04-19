@@ -14,6 +14,8 @@ import { EspecialistasProvider } from '../services/especialistas/especialistas.p
 import { FilaProvider } from '../services/fila/fila.provider.service';
 import { RelatoriosProvider } from '../services/relatorios/relatorios.provider.service';
 import { ConfigProvider } from '../services/config/config.provider.service';
+import { ChatProvider } from '../services/chat/chat.provider.service';
+import { ExamesProvider } from '../services/exames/exames.provider.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -28,6 +30,8 @@ export const appConfig: ApplicationConfig = {
     EspecialistasProvider,
     FilaProvider,
     RelatoriosProvider,
-    ConfigProvider
+    ConfigProvider,
+    ChatProvider,
+    ExamesProvider
   ]
 };

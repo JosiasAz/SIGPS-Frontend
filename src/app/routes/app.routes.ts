@@ -19,6 +19,7 @@ import { ExamesComponent } from '../pages/painel/exames/exames';
 import { ChatComponent } from '../pages/painel/chat/chat';
 import { PerfilProfissionalComponent } from '../pages/painel/perfil-profissional/perfil-profissional';
 import { BuscaProfissionaisComponent } from '../pages/painel/busca-profissionais/busca-profissionais';
+import { GestaoIAComponent } from '../pages/painel/gestao-ia/gestao-ia';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -79,6 +80,11 @@ export const routes: Routes = [
                 path: 'fila',
                 component: FilaComponent,
                 canActivate: [roleGuard(['admin', 'gestor', 'especialista', 'visualizador'])]
+            },
+            {
+                path: 'gestao-ia',
+                component: GestaoIAComponent,
+                canActivate: [roleGuard(['admin', 'gestor', 'especialista'])]
             },
             {
                 path: 'relatorios',

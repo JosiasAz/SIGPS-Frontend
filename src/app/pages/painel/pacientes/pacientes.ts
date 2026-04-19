@@ -27,8 +27,7 @@ export class PacientesComponent {
     this.pacienteForm = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(2)]],
       cpf: ['', [Validators.required, Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]],
-      especialidade: ['', Validators.required],
-      status: ['waiting', Validators.required]
+      especialidade: ['', Validators.required]
     });
 
     // Setup formatação automática de CPF
@@ -81,7 +80,7 @@ export class PacientesComponent {
 
   fecharModal(): void {
     this.addModal.nativeElement.close();
-    this.pacienteForm.reset({ status: 'waiting' });
+    this.pacienteForm.reset();
     this.editingPacienteId = null;
   }
 
@@ -94,8 +93,7 @@ export class PacientesComponent {
         const pacienteAtualizado: Partial<Paciente> = {
           nome: formValue.nome,
           cpf: formValue.cpf,
-          especialidade: formValue.especialidade,
-          status: formValue.status
+          especialidade: formValue.especialidade
         };
         this.pacientesService.atualizarPaciente(this.editingPacienteId, pacienteAtualizado);
       } else {
@@ -104,8 +102,7 @@ export class PacientesComponent {
           nome: formValue.nome,
           cpf: formValue.cpf,
           ultimaConsulta: 'Nunca', // Novo paciente ainda não teve consulta
-          especialidade: formValue.especialidade,
-          status: formValue.status || 'waiting'
+          especialidade: formValue.especialidade
         };
         this.pacientesService.adicionarPaciente(novoPaciente);
       }
@@ -124,8 +121,7 @@ export class PacientesComponent {
     this.pacienteForm.patchValue({
       nome: paciente.nome,
       cpf: paciente.cpf,
-      especialidade: paciente.especialidade,
-      status: paciente.status
+      especialidade: paciente.especialidade
     });
     this.abrirModal();
   }

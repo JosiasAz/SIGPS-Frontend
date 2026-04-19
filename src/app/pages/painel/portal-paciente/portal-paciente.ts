@@ -1,7 +1,10 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
+import { AbstractAgendasService } from '../../../services/agendas/abstract-agendas.service';
+import { AbstractExamesService } from '../../../services/exames/abstract-exames.service';
+import { AbstractChatService } from '../../../services/chat/abstract-chat.service';
 
 @Component({
   selector: 'app-portal-paciente',
@@ -10,8 +13,11 @@ import { AbstractAuthService } from '../../../services/auth/abstract-auth.servic
   templateUrl: './portal-paciente.html',
   styleUrl: './portal-paciente.scss',
 })
-export class PortalPacienteComponent {
+export class PortalPacienteComponent implements OnInit {
   private authService = inject(AbstractAuthService);
+  private agendasService = inject(AbstractAgendasService);
+  private examesService = inject(AbstractExamesService);
+  private chatService = inject(AbstractChatService);
 
   patientName = computed(() => {
     const user = this.authService.currentUser();
@@ -19,27 +25,32 @@ export class PortalPacienteComponent {
     return user.name.split(' ')[0];
   });
 
-  // MOCK DATA
-  upcomingAppointment = signal<{
-    month: string;
-    day: string;
-    title: string;
-    doctor: string;
-    location: string;
-    time: string;
-    receptionTime: string;
-  } | null>({
-    month: 'NOV',
-    day: '12',
-    title: 'Cardiologista - Avaliação de Rotina',
-    doctor: 'Dr. Carlos Renato',
-    location: 'Unidade Central SIGPS',
-    time: '14:30',
-    receptionTime: '14:15'
+  upcomingAppointment = computed(() => {
+    const consulta = this.agendasService.getProximaConsulta();
+    if (!consulta) return null;
+
+    const [dia, mes, ano] = consulta.data.split('/');
+    const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+    
+    return {
+      month: meses[parseInt(mes) - 1] || '---',
+      day: dia,
+      title: consulta.especialidade,
+      doctor: consulta.especialista,
+      location: consulta.local,
+      time: consulta.horario,
+      receptionTime: '15 min antes' // Simulação
+    };
   });
 
-  metrics = signal({
-    completedExams: 2,
-    unreadMessages: 1
+  ngOnInit() {
+    // No longer needed to set signal manually
+  }
+
+  metrics = computed(() => {
+    return {
+      completedExams: this.examesService.examesCount(),
+      unreadMessages: this.chatService.unreadCount()
+    };
   });
 }

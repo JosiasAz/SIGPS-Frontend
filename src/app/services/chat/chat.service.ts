@@ -1,46 +1,43 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, inject, computed } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { AbstractChatService, ChatMessage } from './abstract-chat.service';
+import { environment } from '../../env/environment';
 import { AbstractAuthService } from '../auth/abstract-auth.service';
-
-export interface ChatMessage {
-  id: number;
-  sender: 'user' | 'sistema';
-  senderName: string;
-  text: string;
-  time: string;
-}
 
 @Injectable({
   providedIn: 'root'
 })
-export class ChatService {
+export class ChatService extends AbstractChatService {
+  private http = inject(HttpClient);
   private authService = inject(AbstractAuthService);
+  private apiUrl = environment.apiUrl;
+
+  messages = signal<ChatMessage[]>([]);
   
-  messages = signal<ChatMessage[]>([
-    { id: 1, sender: 'sistema', senderName: 'Atendimento', text: 'Olá! Bem-vindo ao canal de mensagens do seu consultório / clínica no SIGPS. Como podemos ajudar hoje?', time: '09:00' },
-    { id: 2, sender: 'user', senderName: 'Você', text: 'Gostaria de tirar uma dúvida sobre a minha última receita do Dr. Carlos.', time: '09:05' },
-    { id: 3, sender: 'sistema', senderName: 'Atendimento', text: 'Claro! Vou transferir você para o profissional responsável. Só um minuto.', time: '09:06' },
-  ]);
+  unreadCount = computed(() => {
+    return 0; // Implement logic with backend
+  });
 
-  sendMessage(text: string) {
-    const userRole = this.authService.userRole();
-    const currentUser = this.authService.currentUser();
-    
-    // Se logado como 'paciente', a bolha é verde e vai pra direita ('user'). 
-    // Qualquer outro papel (médico, admin, etc.) responde como o consultório/sistema.
-    const senderFlow: 'user' | 'sistema' = userRole === 'paciente' ? 'user' : 'sistema';
-    
-    const now = new Date();
-    const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  constructor() {
+    super();
+    this.loadMessages();
+  }
 
-    this.messages.update(msgs => [
-      ...msgs, 
-      {
-        id: msgs.length + 1,
-        sender: senderFlow,
-        senderName: currentUser?.name || (senderFlow === 'user' ? 'Paciente' : 'Clínica'),
-        text: text,
-        time: timeString
-      }
-    ]);
+  private loadMessages() {
+    // Example endpoint - change to match real API
+    this.http.get<ChatMessage[]>(`${this.apiUrl}/api/v1/chat/messages`).subscribe({
+      next: (data) => this.messages.set(data),
+      error: (err) => console.error('Erro ao buscar mensagens do chat:', err)
+    });
+  }
+
+  sendMessage(text: string): void {
+    const payload = { text };
+    this.http.post<ChatMessage>(`${this.apiUrl}/api/v1/chat/messages`, payload).subscribe({
+      next: (sentMessage) => {
+        this.messages.update(msgs => [...msgs, sentMessage]);
+      },
+      error: (err) => console.error('Erro ao enviar mensagem:', err)
+    });
   }
 }

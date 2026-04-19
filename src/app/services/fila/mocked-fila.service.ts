@@ -1,15 +1,31 @@
 import { Injectable, signal } from '@angular/core';
-import { AbstractFilaService } from './abstract-fila.service';
+import { AbstractFilaService, PacienteFila } from './abstract-fila.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class MockedFilaService extends AbstractFilaService {
-    fila = signal([
-        { paciente: 'Maria Eduarda Costa', prioridade: 'Alta', tempoEspera: '15 min', especialidade: 'Pediatria', status: 'Aguardando' },
-        { paciente: 'João Pedro Santos', prioridade: 'Normal', tempoEspera: '25 min', especialidade: 'Clínico Geral', status: 'Aguardando' },
-        { paciente: 'Ana Paula Oliveira', prioridade: 'Normal', tempoEspera: '--', especialidade: 'Cardiologia', status: 'Em Atendimento' },
-        { paciente: 'Lucas Ferreira', prioridade: 'Baixa', tempoEspera: '45 min', especialidade: 'Dermatologia', status: 'Aguardando' }
+    fila = signal<PacienteFila[]>([
+        { 
+            id: '1', paciente: 'Maria Eduarda Costa', prioridade: 'Alta', tempoEspera: '15 min', especialidade: 'Pediatria', status: 'Aguardando',
+            aiScore: 88, aiReasoning: 'Início súbito de febre alta (39.5°C) em paciente pediátrico. Risco de convulsão febril.', 
+            riskTrend: 'up', vitals: { bpm: 110, spo2: 97, temp: 39.5 }
+        },
+        { 
+            id: '2', paciente: 'João Pedro Santos', prioridade: 'Normal', tempoEspera: '25 min', especialidade: 'Clínico Geral', status: 'Aguardando',
+            aiScore: 45, aiReasoning: 'Sintomas gripais leves. Estável sem sinais de desconforto respiratório.', 
+            riskTrend: 'stable', vitals: { bpm: 78, spo2: 99, temp: 37.2 }
+        },
+        { 
+            id: '3', paciente: 'Ana Paula Oliveira', prioridade: 'Normal', tempoEspera: '--', especialidade: 'Cardiologia', status: 'Em Atendimento',
+            aiScore: 92, aiReasoning: 'Pós-operatório imediato. Monitoramento contínuo de arritmia detectada via sensor.', 
+            riskTrend: 'down', vitals: { bpm: 88, spo2: 96, temp: 36.8 }
+        },
+        { 
+            id: '4', paciente: 'Lucas Ferreira', prioridade: 'Baixa', tempoEspera: '45 min', especialidade: 'Dermatologia', status: 'Aguardando',
+            aiScore: 20, aiReasoning: 'Reação alérgica cutânea localizada. Sem risco sistêmico identificado.', 
+            riskTrend: 'stable', vitals: { bpm: 72, spo2: 99, temp: 36.6 }
+        }
     ]);
 
     reordenarFila(): void {
@@ -24,13 +40,17 @@ export class MockedFilaService extends AbstractFilaService {
 
     analisarIA(): void {
         const currentFila = [...this.fila()];
-        // Criação de um caso extremo classificado pela IA do SIGPS
         currentFila.unshift({ 
-            paciente: 'Roberto Silva (Anomalia Cardíaca identificada por IA)', 
+            id: '99',
+            paciente: 'Roberto Silva', 
             prioridade: 'Extrema', 
             tempoEspera: '0 min', 
             especialidade: 'Cardiologia', 
-            status: 'Aguardando' 
+            status: 'Aguardando',
+            aiScore: 98,
+            aiReasoning: 'Anomalia Cardíaca Crítica: Bradicardia severa detectada via wearables integrados. Risco iminente de colapso.',
+            riskTrend: 'up',
+            vitals: { bpm: 38, spo2: 92, temp: 36.2 }
         });
         this.fila.set(currentFila);
     }
@@ -38,7 +58,7 @@ export class MockedFilaService extends AbstractFilaService {
     atenderPaciente(pacienteNome: string): void {
         const currentFila = this.fila().map(p => {
             if (p.paciente === pacienteNome) {
-                return { ...p, status: 'Em Atendimento', tempoEspera: '--' };
+                return { ...p, status: 'Em Atendimento' as const, tempoEspera: '--' };
             }
             return p;
         });

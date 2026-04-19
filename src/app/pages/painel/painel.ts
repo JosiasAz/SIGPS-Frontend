@@ -39,6 +39,7 @@ export class Painel {
     { icon: 'calendar', label: 'Agendas', route: '/painel/agendas', roles: ['admin', 'gestor', 'especialista'] as UserRole[] },
     { icon: 'activity', label: 'Especialistas', route: '/painel/especialistas', roles: ['admin', 'gestor'] as UserRole[] },
     { icon: 'list', label: 'Fila de Espera', route: '/painel/fila', roles: ['admin', 'gestor', 'especialista', 'visualizador'] as UserRole[] },
+    { icon: 'activity', label: 'Gestão por IA', route: '/painel/gestao-ia', roles: ['admin', 'gestor', 'especialista'] as UserRole[] },
     { icon: 'star', label: 'Perfil Médico', route: '/painel/perfil-profissional/1', roles: ['admin', 'gestor', 'especialista', 'visualizador', 'paciente'] as UserRole[] },
     { icon: 'message-square', label: 'Chat e Mensagens', route: '/painel/chat', roles: ['admin', 'gestor', 'especialista', 'visualizador', 'paciente'] as UserRole[] },
     { icon: 'pie-chart', label: 'Relatórios', route: '/painel/relatorios', roles: ['admin', 'gestor'] as UserRole[] },

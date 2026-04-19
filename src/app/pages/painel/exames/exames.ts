@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AbstractExamesService, Exame } from '../../../services/exames/abstract-exames.service';
+import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
 
 @Component({
   selector: 'app-exames',
@@ -10,9 +12,34 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['../painel.scss', './exames.scss']
 })
 export class ExamesComponent {
-  exames = [
-    { title: 'Hemograma Completo', date: '10/11/2026', doctor: 'Dra. Luiza Souza', status: 'Disponível', type: 'Sangue' },
-    { title: 'Raio-X do Tórax', date: '05/10/2026', doctor: 'Dr. Roberto Lins', status: 'Disponível', type: 'Imagem' },
-    { title: 'Eletrocardiograma (ECG)', date: '15/09/2026', doctor: 'Dr. Carlos Renato', status: 'Disponível', type: 'Exame' },
-  ];
+  private examesService = inject(AbstractExamesService);
+  private authService = inject(AbstractAuthService);
+  exames = this.examesService.exames;
+
+  currentExame = signal<Exame | null>(null);
+
+  isGestor = computed(() => {
+    const role = this.authService.userRole();
+    return role === 'admin' || role === 'gestor';
+  });
+
+  visualizarExame(exame: Exame) {
+    this.currentExame.set(exame);
+  }
+
+  fecharModal() {
+    this.currentExame.set(null);
+  }
+
+  baixarPdf(exame: Exame) {
+    // Mock download
+    alert(`Iniciando download do laudo: ${exame.title}_${exame.date.replace(/\//g, '-')}.pdf`);
+  }
+
+  excluirExame(id: number, event: Event) {
+    event.stopPropagation();
+    if (confirm('Tem certeza que deseja remover este registro de exame?')) {
+      this.examesService.excluirExame(id);
+    }
+  }
 }
