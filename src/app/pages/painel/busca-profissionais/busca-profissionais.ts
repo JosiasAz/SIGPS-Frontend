@@ -17,7 +17,7 @@ export class BuscaProfissionaisComponent {
   searchQuery = signal('');
   selectedEspecialidade = signal('Todas');
 
-  especialidades = ['Todas', 'Cardiologia', 'Dermatologia', 'Pediatria', 'Ortopedia', 'Neurologia', 'Psiquiatria'];
+  especialidades = ['Todas', 'Cardiologia', 'Dermatologia', 'Pediatria', 'Ortopedia', 'Neurologia', 'Psiquiatria', 'Gastroenterologia', 'Ginecologia', 'Urologia', 'Nutrologia'];
 
   profissionaisFiltrados = computed(() => {
     const query = this.searchQuery().toLowerCase();

@@ -12,9 +12,16 @@ export class MockedChatService implements AbstractChatService {
     { id: 3, sender: 'sistema', senderName: 'Atendimento', text: 'Claro! Vou transferir você para o profissional responsável. Só um minuto.', time: '09:06' },
   ]);
 
+  lastReadCount = signal(3);
+
   unreadCount = computed(() => {
-    return 1;
+    const total = this.messages().length;
+    return Math.max(0, total - this.lastReadCount());
   });
+
+  markAsRead(): void {
+    this.lastReadCount.set(this.messages().length);
+  }
 
   sendMessage(text: string): void {
     const userRole = this.authService.userRole();
@@ -37,5 +44,27 @@ export class MockedChatService implements AbstractChatService {
         time: timeString
       }
     ]);
+
+    // O usuário acabou de interagir, então leu tudo até aqui
+    this.markAsRead();
+
+    // Simular resposta automática após 3 segundos para demonstração do badge de notificação
+    setTimeout(() => {
+        const replyNow = new Date();
+        const replyTimeString = `${replyNow.getHours().toString().padStart(2, '0')}:${replyNow.getMinutes().toString().padStart(2, '0')}`;
+        const autoReplySender = senderFlow === 'user' ? 'sistema' : 'user';
+        const autoReplyName = autoReplySender === 'sistema' ? 'Atendimento' : 'Paciente';
+        
+        this.messages.update(msgs => [
+            ...msgs,
+            {
+                id: msgs.length + 1,
+                sender: autoReplySender,
+                senderName: autoReplyName,
+                text: 'Esta é uma mensagem automática. O profissional responderá em breve!',
+                time: replyTimeString
+            }
+        ]);
+    }, 3000);
   }
 }

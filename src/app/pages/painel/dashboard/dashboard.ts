@@ -16,7 +16,13 @@ export class DashboardComponent {
 
   stats = this.dashboardService.stats();
   recentActivities = this.dashboardService.recentActivities();
+  specialistPerformance = this.dashboardService.specialistPerformance();
   userRole = this.authService.userRole;
+
+  isGestorOrAdmin = computed(() => {
+    const role = this.userRole();
+    return role === 'admin' || role === 'gestor';
+  });
 
   headerAction = computed(() => {
     const role = this.userRole();

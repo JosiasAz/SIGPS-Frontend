@@ -20,6 +20,7 @@ export class AgendasComponent {
   consultas = this.agendasService.consultas;
   currentAgenda = signal<Agenda | null>(null);
   selectedConsulta = signal<Consulta | null>(null);
+  agendaParaAgendamento = signal<Agenda | null>(null);
   agendaForm: FormGroup;
 
   // Verifica se o usuário tem permissão para editar (Gestor, Admin ou Especialista)
@@ -112,15 +113,27 @@ export class AgendasComponent {
       if (agenda) {
         this.agendasService.atualizarAgenda(agenda.id, payload);
       } else {
-        // Mock add logic - normally handled by service
-        alert('Funcionalidade de adição enviada ao serviço (Simulado)');
+        this.agendasService.adicionarAgenda(payload as Omit<Agenda, 'id'>);
       }
       this.fecharModal();
     }
   }
 
   solicitarHorario(agenda: Agenda) {
-    // Simulação de solicitação de agendamento (redireciona para perfil para ver slots)
-    this.selectedConsulta.set(null);
+    this.agendaParaAgendamento.set(agenda);
+  }
+
+  fecharModalAgendamento() {
+    this.agendaParaAgendamento.set(null);
+  }
+
+  confirmarAgendamento(horario: string) {
+    const agenda = this.agendaParaAgendamento();
+    if (agenda) {
+      this.agendasService.agendarConsulta(agenda.id, horario);
+      this.fecharModalAgendamento();
+      // Optional: Give feedback
+      alert(`Agendamento confirmado para as ${horario}h com ${agenda.especialista}`);
+    }
   }
 }

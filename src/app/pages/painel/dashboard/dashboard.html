@@ -89,5 +89,27 @@
                 }
             </div>
         </div>
+
+        <!-- Chart for Gestor -->
+        @if (isGestorOrAdmin()) {
+        <div class="card charts-card">
+            <div class="card-header">
+                <h3>Desempenho dos Especialistas (Consultas/Semana)</h3>
+            </div>
+            <div class="chart-container" style="padding: 20px 0;">
+                <div class="bar-chart" style="display: flex; flex-direction: column; gap: 15px;">
+                    @for (spec of specialistPerformance; track spec.name) {
+                    <div class="bar-row" style="display: flex; align-items: center; gap: 15px;">
+                        <span style="width: 140px; font-size: 0.9rem; font-weight: 500; text-align: right;">{{ spec.name }}</span>
+                        <div class="bar-track" style="flex: 1; height: 12px; background: #e5e7eb; border-radius: 6px; overflow: hidden; position: relative;">
+                            <div class="bar-fill" [style.width.%]="(spec.consultations / spec.max) * 100" [style.background]="spec.color" style="height: 100%; border-radius: 6px; transition: width 0.5s ease-in-out;"></div>
+                        </div>
+                        <span style="width: 40px; font-size: 0.8rem; font-weight: 600; color: #4b5563;">{{ spec.consultations }}</span>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+        }
     </div>
 </section>

@@ -38,6 +38,13 @@ export class AgendasService extends AbstractAgendasService {
         });
     }
 
+    adicionarAgenda(agenda: Omit<Agenda, 'id'>): void {
+        this.http.post<Agenda>(`${this.apiUrl}/api/v1/schedules/`, agenda).subscribe({
+            next: (created) => this.agendas.update(prev => [...prev, created]),
+            error: (err) => console.error('Erro ao criar agenda:', err)
+        });
+    }
+
     atualizarAgenda(id: number, agenda: Partial<Agenda>): void {
         this.http.patch<Agenda>(`${this.apiUrl}/api/v1/schedules/${id}/`, agenda).subscribe({
             next: (updated) => this.agendas.update(prev => prev.map(a => a.id === id ? updated : a)),

@@ -210,4 +210,38 @@
         </div>
     </div>
     }
+
+    <!-- Modal de Solicitação de Horário (Paciente) -->
+    @if (agendaParaAgendamento() !== null) {
+    <div class="modal-overlay" (click)="fecharModalAgendamento()" [class.active]="agendaParaAgendamento() !== null">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Escolha um Horário</h2>
+                <button class="modal-close" (click)="fecharModalAgendamento()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Especialista: <strong>{{ agendaParaAgendamento()?.especialista }}</strong></p>
+                <p>Especialidade: <strong>{{ agendaParaAgendamento()?.especialidade }}</strong></p>
+                <div class="horarios-selecao-grid" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    @for (h of agendaParaAgendamento()?.horarios; track h) {
+                    <button class="badge-mini clickable" style="padding: 10px; font-size: 1rem; border: 1px solid #4f46e5; background: #e0e7ff; color: #3730a3; cursor: pointer; border-radius: 8px;" (click)="confirmarAgendamento(h)">
+                        {{ formatarHorarioSlot(h) }}
+                    </button>
+                    }
+                </div>
+                @if (agendaParaAgendamento()?.horarios?.length === 0) {
+                    <p class="text-danger" style="margin-top: 15px;">Não há horários disponíveis no momento.</p>
+                }
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="fecharModalAgendamento()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    }
 </section>

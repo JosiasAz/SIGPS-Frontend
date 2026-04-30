@@ -40,4 +40,13 @@ export class ChatService extends AbstractChatService {
       error: (err) => console.error('Erro ao enviar mensagem:', err)
     });
   }
+
+  markAsRead(): void {
+    this.http.post(`${this.apiUrl}/api/v1/chat/messages/read`, {}).subscribe({
+      next: () => {
+        // You can update unreadCount logic here later
+      },
+      error: (err) => console.error('Erro ao marcar mensagens como lidas:', err)
+    });
+  }
 }

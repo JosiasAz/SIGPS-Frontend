@@ -46,6 +46,14 @@ export class MockedAgendasService extends AbstractAgendasService {
         this.agendas.update(prev => prev.filter(a => a.id !== id));
     }
 
+    adicionarAgenda(agenda: Omit<Agenda, 'id'>): void {
+        const novaAgenda: Agenda = {
+            id: Math.floor(Math.random() * 1000) + 10,
+            ...agenda
+        } as Agenda;
+        this.agendas.update(prev => [...prev, novaAgenda]);
+    }
+
     atualizarAgenda(id: number, agenda: Partial<Agenda>): void {
         this.agendas.update(prev => prev.map(a => a.id === id ? { ...a, ...agenda } : a));
     }
