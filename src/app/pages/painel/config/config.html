@@ -14,7 +14,7 @@
                     <h4>{{ setting.label }}</h4>
                     <p>{{ setting.description }}</p>
                 </div>
-                <div class="switch" [class.active]="setting.value">
+                <div class="switch" [class.active]="setting.value" (click)="toggleSetting(setting.label)" style="cursor: pointer;">
                     {{ setting.value ? 'Ativado' : 'Desativado' }}
                 </div>
             </div>

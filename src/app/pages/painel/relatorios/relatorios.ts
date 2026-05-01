@@ -12,4 +12,8 @@ import { AbstractRelatoriosService } from '../../../services/relatorios/abstract
 export class RelatoriosComponent {
   private relatoriosService = inject(AbstractRelatoriosService);
   kpis = this.relatoriosService.kpis();
+
+  exportarPDF(): void {
+    alert('Relatório PDF gerado e baixado com sucesso! (Funcionalidade simulada)');
+  }
 }

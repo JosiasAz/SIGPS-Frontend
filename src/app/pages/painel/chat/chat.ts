@@ -1,7 +1,7 @@
-import { Component, inject, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, inject, ElementRef, ViewChild, AfterViewChecked, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { ChatService, ChatMessage } from '../../../services/chat/chat.service';
+import { AbstractChatService, ChatMessage } from '../../../services/chat/abstract-chat.service';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
 
 @Component({
@@ -11,8 +11,8 @@ import { AbstractAuthService } from '../../../services/auth/abstract-auth.servic
   templateUrl: './chat.html',
   styleUrls: ['../painel.scss', './chat.scss']
 })
-export class ChatComponent implements AfterViewChecked {
-  chatService = inject(ChatService);
+export class ChatComponent implements AfterViewChecked, OnInit {
+  chatService = inject(AbstractChatService);
   authService = inject(AbstractAuthService);
   messages = this.chatService.messages;
 
@@ -27,6 +27,10 @@ export class ChatComponent implements AfterViewChecked {
   sendMessage(text: string) {
     if (!text.trim()) return;
     this.chatService.sendMessage(text);
+  }
+
+  ngOnInit() {
+    this.chatService.markAsRead();
   }
 
   ngAfterViewChecked() {

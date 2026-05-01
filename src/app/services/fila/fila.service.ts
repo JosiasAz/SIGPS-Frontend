@@ -1,7 +1,8 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { AbstractFilaService } from './abstract-fila.service';
+import { AbstractFilaService, PacienteFila } from './abstract-fila.service';
 import { environment } from '../../env/environment';
+import { API_ENDPOINTS } from '../../config/endpoints';
 
 @Injectable({
     providedIn: 'root'
@@ -9,7 +10,7 @@ import { environment } from '../../env/environment';
 export class FilaService extends AbstractFilaService {
     private http = inject(HttpClient);
     private apiUrl = environment.apiUrl;
-    fila = signal<any[]>([]);
+    fila = signal<PacienteFila[]>([]);
 
     constructor() {
         super();
@@ -17,19 +18,14 @@ export class FilaService extends AbstractFilaService {
     }
 
     private loadFila() {
-        this.http.get<any[]>(`${this.apiUrl}/fila`).subscribe({
+        this.http.get<PacienteFila[]>(`${this.apiUrl}${API_ENDPOINTS.FILA.BASE}`).subscribe({
             next: (data) => this.fila.set(data),
-            error: () => {
-                // Caso a API não responda, cria fila mockada temporária para não travar a apresentação
-                this.fila.set([
-                    { paciente: 'Carlos Silva', prioridade: 'Alta', tempoEspera: '20 min', especialidade: 'Cardiologia', status: 'Aguardando' },
-                    { paciente: 'Bruna Mendes', prioridade: 'Normal', tempoEspera: '40 min', especialidade: 'Pediatria', status: 'Aguardando' }
-                ]);
-            }
+            error: (err) => console.error('Erro ao carregar fila:', err)
         });
     }
 
     reordenarFila(): void {
+        // This could be a backend call if preferred
         const priorityScore: Record<string, number> = { 'Extrema': 4, 'Alta': 3, 'Normal': 2, 'Baixa': 1 };
         const novaFila = [...this.fila()].sort((a, b) => {
             if (a.status === 'Em Atendimento' && b.status !== 'Em Atendimento') return -1;
@@ -40,24 +36,34 @@ export class FilaService extends AbstractFilaService {
     }
 
     analisarIA(): void {
-        const currentFila = [...this.fila()];
-        currentFila.unshift({ 
-            paciente: 'Roberto Silva (Anomalia Cardíaca identificada por IA)', 
-            prioridade: 'Extrema', 
-            tempoEspera: '0 min', 
-            especialidade: 'Cardiologia', 
-            status: 'Aguardando' 
+        this.http.get<PacienteFila>(`${this.apiUrl}${API_ENDPOINTS.FILA.IA_ANALYSIS}`).subscribe({
+            next: (newAnalysis) => {
+                this.fila.update(prev => [newAnalysis, ...prev]);
+            },
+            error: (err) => console.error('Erro na análise de IA:', err)
         });
-        this.fila.set(currentFila);
     }
 
     atenderPaciente(pacienteNome: string): void {
-        const currentFila = this.fila().map(p => {
-            if (p.paciente === pacienteNome) {
-                return { ...p, status: 'Em Atendimento', tempoEspera: '--' };
-            }
-            return p;
+        this.http.post(`${this.apiUrl}${API_ENDPOINTS.FILA.ATENDER}`, { pacienteNome }).subscribe({
+            next: () => {
+                this.fila.update(prev => prev.map(p => {
+                    if (p.paciente === pacienteNome) {
+                        return { ...p, status: 'Em Atendimento' as const, tempoEspera: '--' };
+                    }
+                    return p;
+                }));
+            },
+            error: (err) => console.error('Erro ao atender paciente:', err)
         });
-        this.fila.set(currentFila);
+    }
+
+    adicionarNaFila(paciente: Partial<PacienteFila>): void {
+        this.http.post<PacienteFila>(`${this.apiUrl}${API_ENDPOINTS.FILA.BASE}`, paciente).subscribe({
+            next: (novo) => {
+                this.fila.update(f => [...f, novo]);
+            },
+            error: (err) => console.error('Erro ao adicionar na fila:', err)
+        });
     }
 }

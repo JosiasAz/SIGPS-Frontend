@@ -1,7 +1,9 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
+import { AbstractEspecialistasService, Profissional } from '../../../services/especialistas/abstract-especialistas.service';
+import { AbstractAgendasService } from '../../../services/agendas/abstract-agendas.service';
 
 @Component({
   selector: 'app-perfil-profissional',
@@ -10,60 +12,55 @@ import { AbstractAuthService } from '../../../services/auth/abstract-auth.servic
   templateUrl: './perfil-profissional.html',
   styleUrls: ['./perfil-profissional.scss'],
 })
-export class PerfilProfissionalComponent {
+export class PerfilProfissionalComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private authService = inject(AbstractAuthService);
+  private especialistasService = inject(AbstractEspecialistasService);
+  private agendasService = inject(AbstractAgendasService);
 
   userRole = this.authService.userRole;
   isPaciente = computed(() => this.userRole() === 'paciente');
+  isEspecialista = computed(() => this.userRole() === 'especialista');
 
-  // Mock data — professional profile
-  profissional = {
-    id: 1,
-    nome: 'Dr. Roberto Lins',
-    especialidade: 'Cardiologia Clínica e Esportiva',
-    crm: 'CRM 12345-SP',
-    avaliacao: 4.9,
-    avaliacoesCount: 128,
-    consultasRealizadas: 1842,
-    anosExperiencia: 12,
-    taxaRetorno: 94,
-    sobre: 'Especialista em cardiologia esportiva com mais de 12 anos de experiência clínica. Foco no acompanhamento de atletas de alta performance e avaliações rigorosas de risco cardiovascular. Membro da Sociedade Brasileira de Cardiologia.',
-    formacao: [
-      { titulo: 'Residência em Cardiologia', instituicao: 'InCor - HC/FMUSP', ano: '2014' },
-      { titulo: 'Medicina', instituicao: 'Universidade de São Paulo (USP)', ano: '2012' }
-    ],
-    servicos: ['Consulta Cardiológica', 'Eletrocardiograma (ECG)', 'Risco Cirúrgico', 'Teste Ergométrico', 'Holter 24h', 'MAPA'],
-    avaliacoes: [
-      { nome: 'Maria S.', nota: 5, texto: 'Médico muito atencioso e competente. Explica tudo com calma.', data: 'Há 2 semanas' },
-      { nome: 'Carlos R.', nota: 5, texto: 'Acompanhamento excelente. Me sinto seguro sendo atendido por ele.', data: 'Há 1 mês' },
-      { nome: 'Ana P.', nota: 4, texto: 'Ótimo profissional! Consultório limpo e organizado.', data: 'Há 2 meses' }
-    ],
-    foto: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=1000&auto=format&fit=crop',
-    banner: 'https://images.unsplash.com/photo-1551076805-e1869043e560?q=80&w=2670&auto=format&fit=crop'
-  };
+  profissional!: Profissional;
+
+  ngOnInit() {
+    this.route.paramMap.subscribe(params => {
+      const id = Number(params.get('id')) || 1;
+      const prof = this.especialistasService.getProfissionalById(id);
+      
+      this.profissional = prof || this.especialistasService.getProfissionalById(1)!;
+
+      if (this.profissional) {
+        if (this.profissional.estatisticas) this.estatisticas.set(this.profissional.estatisticas);
+        if (this.profissional.agendaHoje) this.agendaHoje.set(this.profissional.agendaHoje);
+        if (this.profissional.diasDisponiveis) this.diasDisponiveis = this.profissional.diasDisponiveis;
+      }
+    });
+  }
+
+  calcularStatusVisao(last_seen?: Date | string | null, statusDefault?: string): string {
+    if (!last_seen) {
+        return statusDefault === 'online' ? 'Online' : 'Offline';
+    }
+    const lastSeenTime = new Date(last_seen).getTime();
+    const now = new Date().getTime();
+    const diffMinutes = (now - lastSeenTime) / (1000 * 60);
+    return diffMinutes <= 5 ? 'Online' : 'Offline';
+  }
 
   // Stats for the professional's own dashboard view
   estatisticas = signal({
-    pacientesHoje: 8,
-    consultasMes: 42,
-    faturamentoMes: 'R$ 18.900',
-    satisfacao: '98%'
+    pacientesHoje: 0,
+    consultasMes: 0,
+    faturamentoMes: 'R$ 0',
+    satisfacao: '0%'
   });
 
-  agendaHoje = signal([
-    { hora: '08:00', paciente: 'Maria Santos', tipo: 'Retorno', status: 'confirmado' },
-    { hora: '09:00', paciente: 'Carlos Ribeiro', tipo: 'Primeira Consulta', status: 'confirmado' },
-    { hora: '10:30', paciente: 'Ana Paula Costa', tipo: 'ECG', status: 'aguardando' },
-    { hora: '14:00', paciente: 'João Silva', tipo: 'Risco Cirúrgico', status: 'confirmado' },
-    { hora: '15:30', paciente: 'Fernanda Lima', tipo: 'Retorno', status: 'aguardando' },
-  ]);
+  agendaHoje = signal<any[]>([]);
 
-  diasDisponiveis = [
-    { data: 'Hoje', diasemana: 'Qui', slots: ['14:00', '15:30', '16:00'] },
-    { data: 'Amanhã', diasemana: 'Sex', slots: ['09:00', '10:00', '14:30', '17:00'] },
-    { data: '10/04', diasemana: 'Seg', slots: ['08:00', '11:00', '13:00', '15:00'] }
-  ];
+  diasDisponiveis: any[] = [];
 
   selectedSlot = signal<{ dia: string; slot: string } | null>(null);
 
@@ -74,12 +71,42 @@ export class PerfilProfissionalComponent {
   confirmarAgendamento() {
     const sel = this.selectedSlot();
     if (sel) {
-      alert(`✅ Agendamento confirmado!\n${sel.dia} às ${sel.slot} com ${this.profissional.nome}`);
+      // Tentar encontrar a agenda do profissional
+      const agendas = this.agendasService.agendas();
+      const agenda = agendas.find(a => a.especialista === this.profissional.nome);
+      
+      this.agendasService.agendarConsulta(agenda?.id || 1, sel.slot);
+      
+      alert(`✅ Agendamento realizado com sucesso!\nSua consulta com ${this.profissional.nome} no dia ${sel.dia} às ${sel.slot} foi registrada.`);
+      
       this.selectedSlot.set(null);
+      this.router.navigate(['/painel/portal-paciente']);
     }
   }
 
   cancelarSelecao() {
     this.selectedSlot.set(null);
+  }
+
+  // --- Funções do Prontuário Eletrônico (Especialista) ---
+  selectedPacienteProntuario = signal<any>(null);
+
+  abrirProntuario(item: any) {
+    this.selectedPacienteProntuario.set(item);
+  }
+
+  fecharProntuario() {
+    this.selectedPacienteProntuario.set(null);
+  }
+
+  enviarRelatorio() {
+    alert('Relatório clínico e arquivo anexado foram enviados ao paciente com sucesso!\nO paciente agora pode visualizar e baixar o PDF em "Meus Agendamentos" no portal dele.');
+    
+    // Simula a mudança de status da agenda para "concluida" localmente para feedback visual
+    this.agendaHoje.update(agendas => 
+      agendas.map(a => a === this.selectedPacienteProntuario() ? { ...a, status: 'concluida' } : a)
+    );
+    
+    this.fecharProntuario();
   }
 }

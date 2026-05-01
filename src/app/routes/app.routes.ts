@@ -11,14 +11,15 @@ import { EspecialistasComponent } from '../pages/painel/especialistas/especialis
 import { FilaComponent } from '../pages/painel/fila/fila';
 import { RelatoriosComponent } from '../pages/painel/relatorios/relatorios';
 import { ConfigComponent } from '../pages/painel/config/config';
-import { authGuard } from '../guards/auth.guard';
-import { roleGuard } from '../guards/role.guard';
+import { authGuard } from '../core/guards/auth.guard';
+import { roleGuard } from '../core/guards/role.guard';
 import { AbstractAuthService } from '../services/auth/abstract-auth.service';
 import { PortalPacienteComponent } from '../pages/painel/portal-paciente/portal-paciente';
 import { ExamesComponent } from '../pages/painel/exames/exames';
 import { ChatComponent } from '../pages/painel/chat/chat';
 import { PerfilProfissionalComponent } from '../pages/painel/perfil-profissional/perfil-profissional';
 import { BuscaProfissionaisComponent } from '../pages/painel/busca-profissionais/busca-profissionais';
+import { GestaoIAComponent } from '../pages/painel/gestao-ia/gestao-ia';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -38,22 +39,22 @@ export const routes: Routes = [
             {
                 path: 'exames',
                 component: ExamesComponent,
-                canActivate: [roleGuard(['paciente', 'admin', 'gestor'])]
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'especialista', 'visualizador'])]
             },
             {
                 path: 'chat',
                 component: ChatComponent,
-                canActivate: [roleGuard(['paciente', 'admin', 'gestor'])]
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'especialista', 'visualizador'])]
             },
             {
                 path: 'perfil-profissional/:id',
                 component: PerfilProfissionalComponent,
-                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'visualizador'])]
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'visualizador', 'especialista'])]
             },
             {
                 path: 'busca-profissionais',
                 component: BuscaProfissionaisComponent,
-                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'visualizador'])]
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'visualizador', 'especialista'])]
             },
             { 
                 path: 'dashboard', 
@@ -79,6 +80,11 @@ export const routes: Routes = [
                 path: 'fila',
                 component: FilaComponent,
                 canActivate: [roleGuard(['admin', 'gestor', 'especialista', 'visualizador'])]
+            },
+            {
+                path: 'gestao-ia',
+                component: GestaoIAComponent,
+                canActivate: [roleGuard(['admin', 'gestor', 'especialista'])]
             },
             {
                 path: 'relatorios',

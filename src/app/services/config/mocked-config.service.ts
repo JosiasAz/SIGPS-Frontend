@@ -11,4 +11,10 @@ export class MockedConfigService extends AbstractConfigService {
         { label: 'Modo Escuro Permanente', description: 'Forçar tema dark para todos os usuários', value: false },
         { label: 'Backup Automático', description: 'Realizar cópia de segurança a cada 24h', value: true }
     ]);
+
+    toggleSetting(label: string): void {
+        this.settings.update(s => s.map(setting => 
+            setting.label === label ? { ...setting, value: !setting.value } : setting
+        ));
+    }
 }

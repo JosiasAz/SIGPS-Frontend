@@ -16,7 +16,13 @@ export class DashboardComponent {
 
   stats = this.dashboardService.stats();
   recentActivities = this.dashboardService.recentActivities();
+  specialistPerformance = this.dashboardService.specialistPerformance();
   userRole = this.authService.userRole;
+
+  isGestorOrAdmin = computed(() => {
+    const role = this.userRole();
+    return role === 'admin' || role === 'gestor';
+  });
 
   headerAction = computed(() => {
     const role = this.userRole();
@@ -25,4 +31,15 @@ export class DashboardComponent {
     if (role === 'especialista') return { label: 'Nova Prescrição' };
     return null;
   });
+
+  executeAction(): void {
+    const action = this.headerAction();
+    if (action) {
+      alert(`Ação "${action.label}" será redirecionada na próxima versão (MVP)`);
+    }
+  }
+
+  verDetalhesIA(): void {
+    alert("Redirecionando para detalhes de inteligência artificial da fila...");
+  }
 }

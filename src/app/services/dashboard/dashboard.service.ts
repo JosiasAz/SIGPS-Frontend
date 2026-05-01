@@ -12,6 +12,7 @@ export class DashboardService extends AbstractDashboardService {
 
     stats = signal<any[]>([]);
     recentActivities = signal<any[]>([]);
+    specialistPerformance = signal<any[]>([]);
 
     constructor() {
         super();
@@ -24,6 +25,7 @@ export class DashboardService extends AbstractDashboardService {
             // Mapeamento caso os campos do backend real sejam diferentes
             if (data.stats) this.stats.set(data.stats);
             if (data.recent_activities) this.recentActivities.set(data.recent_activities);
+            if (data.specialist_performance) this.specialistPerformance.set(data.specialist_performance);
         });
     }
 }

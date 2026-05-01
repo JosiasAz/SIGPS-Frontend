@@ -1,0 +1,87 @@
+/* ── Grid de Estatísticas SIGPS ── */
+.stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 24px !important;
+    margin-bottom: 32px !important;
+}
+
+/* ── Sobrescrita de Botões (Garantia de Design) ── */
+.btn-primary-dashboard {
+    background: var(--green-deep) !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 24px !important;
+    border-radius: 14px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    box-shadow: 0 4px 12px rgba(13, 84, 56, 0.15) !important;
+}
+
+.btn-outline-dashboard {
+    background: white !important;
+    border: 1.5px solid var(--green-deep) !important;
+    color: var(--green-deep) !important;
+    padding: 8px 16px !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+
+    &:hover {
+        background: var(--green-deep) !important;
+        color: white !important;
+    }
+}
+
+/* ── Score e Análise Clinica ── */
+.ia-score-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100px;
+
+    .progress-mini {
+        width: 100%; height: 6px;
+        background: #f1f5f9;
+        border-radius: 100px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+
+        .progress-fill {
+            height: 100%; background: #10b981;
+            &.danger { background: #ef4444; }
+        }
+    }
+}
+
+.ai-reasoning-bubble {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: #475569;
+    line-height: 1.5;
+    margin: 0;
+    
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+/* ── Avatar e Identidade ── */
+.avatar-sm {
+    width: 36px; height: 36px;
+    background: var(--green-soft);
+    color: var(--green-deep);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}

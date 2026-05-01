@@ -1,46 +1,75 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, inject, computed } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { AbstractChatService, ChatMessage } from './abstract-chat.service';
+import { environment } from '../../env/environment';
 import { AbstractAuthService } from '../auth/abstract-auth.service';
-
-export interface ChatMessage {
-  id: number;
-  sender: 'user' | 'sistema';
-  senderName: string;
-  text: string;
-  time: string;
-}
+import { API_ENDPOINTS } from '../../config/endpoints';
+import { WebSocketService } from '../../core/services/websocket.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ChatService {
+export class ChatService extends AbstractChatService {
+  private http = inject(HttpClient);
   private authService = inject(AbstractAuthService);
+  private wsService = inject(WebSocketService);
+  private apiUrl = environment.apiUrl;
+
+  messages = signal<ChatMessage[]>([]);
   
-  messages = signal<ChatMessage[]>([
-    { id: 1, sender: 'sistema', senderName: 'Atendimento', text: 'Olá! Bem-vindo ao canal de mensagens do seu consultório / clínica no SIGPS. Como podemos ajudar hoje?', time: '09:00' },
-    { id: 2, sender: 'user', senderName: 'Você', text: 'Gostaria de tirar uma dúvida sobre a minha última receita do Dr. Carlos.', time: '09:05' },
-    { id: 3, sender: 'sistema', senderName: 'Atendimento', text: 'Claro! Vou transferir você para o profissional responsável. Só um minuto.', time: '09:06' },
-  ]);
+  unreadCount = computed(() => {
+    return this.messages().filter(m => !m.read && m.sender !== 'user' && m.sender !== 'me').length;
+  });
 
-  sendMessage(text: string) {
-    const userRole = this.authService.userRole();
-    const currentUser = this.authService.currentUser();
-    
-    // Se logado como 'paciente', a bolha é verde e vai pra direita ('user'). 
-    // Qualquer outro papel (médico, admin, etc.) responde como o consultório/sistema.
-    const senderFlow: 'user' | 'sistema' = userRole === 'paciente' ? 'user' : 'sistema';
-    
-    const now = new Date();
-    const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  constructor() {
+    super();
+    this.loadMessages();
+    this.initWebSocket();
+  }
 
-    this.messages.update(msgs => [
-      ...msgs, 
-      {
-        id: msgs.length + 1,
-        sender: senderFlow,
-        senderName: currentUser?.name || (senderFlow === 'user' ? 'Paciente' : 'Clínica'),
-        text: text,
-        time: timeString
-      }
-    ]);
+  private initWebSocket() {
+    // Only connect if not in mock mode and running in browser
+    if (!environment.useMock && typeof window !== 'undefined') {
+      const wsUrl = `${this.apiUrl.replace('http', 'ws')}${API_ENDPOINTS.CHAT.WS}`;
+      this.wsService.connect(wsUrl);
+      
+      this.wsService.getMessages().subscribe(msg => {
+        if (msg.type === 'chat_message') {
+          this.messages.update(msgs => [...msgs, msg.data]);
+        }
+      });
+    }
+  }
+
+  private loadMessages() {
+    this.http.get<ChatMessage[]>(`${this.apiUrl}${API_ENDPOINTS.CHAT.MESSAGES}`).subscribe({
+      next: (data) => this.messages.set(data),
+      error: (err) => console.error('Erro ao buscar mensagens do chat:', err)
+    });
+  }
+
+  sendMessage(text: string): void {
+    const payload = { text };
+    
+    // If WebSocket is connected, we might want to send via WS or keep HTTP for persistence
+    // For this implementation, we use HTTP and expect the WS to broadcast the message
+    this.http.post<ChatMessage>(`${this.apiUrl}${API_ENDPOINTS.CHAT.MESSAGES}`, payload).subscribe({
+      next: (sentMessage) => {
+        // If not using WS, we manually add to the list
+        if (environment.useMock) {
+          this.messages.update(msgs => [...msgs, sentMessage]);
+        }
+      },
+      error: (err) => console.error('Erro ao enviar mensagem:', err)
+    });
+  }
+
+  markAsRead(): void {
+    this.http.post(`${this.apiUrl}${API_ENDPOINTS.CHAT.READ}`, {}).subscribe({
+      next: () => {
+        this.messages.update(msgs => msgs.map(m => ({ ...m, read: true })));
+      },
+      error: (err) => console.error('Erro ao marcar mensagens como lidas:', err)
+    });
   }
 }

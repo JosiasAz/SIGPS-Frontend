@@ -19,4 +19,10 @@ export class ConfigService extends AbstractConfigService {
     private loadSettings() {
         this.http.get<any[]>(`${this.apiUrl}/config/settings`).subscribe(data => this.settings.set(data));
     }
+
+    toggleSetting(label: string): void {
+        this.settings.update(s => s.map(setting => 
+            setting.label === label ? { ...setting, value: !setting.value } : setting
+        ));
+    }
 }

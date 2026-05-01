@@ -2,6 +2,7 @@ import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AbstractAuthService } from '../../services/auth/abstract-auth.service';
+import { AbstractChatService } from '../../services/chat/abstract-chat.service';
 import { UserRole } from '../../models/auth.model';
 
 @Component({
@@ -13,6 +14,7 @@ import { UserRole } from '../../models/auth.model';
 })
 export class Painel {
   private authService = inject(AbstractAuthService);
+  private chatService = inject(AbstractChatService);
   private router = inject(Router);
 
   isSidebarCollapsed = signal(false);
@@ -39,6 +41,7 @@ export class Painel {
     { icon: 'calendar', label: 'Agendas', route: '/painel/agendas', roles: ['admin', 'gestor', 'especialista'] as UserRole[] },
     { icon: 'activity', label: 'Especialistas', route: '/painel/especialistas', roles: ['admin', 'gestor'] as UserRole[] },
     { icon: 'list', label: 'Fila de Espera', route: '/painel/fila', roles: ['admin', 'gestor', 'especialista', 'visualizador'] as UserRole[] },
+    { icon: 'activity', label: 'Gestão por IA', route: '/painel/gestao-ia', roles: ['admin', 'gestor', 'especialista'] as UserRole[] },
     { icon: 'star', label: 'Perfil Médico', route: '/painel/perfil-profissional/1', roles: ['admin', 'gestor', 'especialista', 'visualizador', 'paciente'] as UserRole[] },
     { icon: 'message-square', label: 'Chat e Mensagens', route: '/painel/chat', roles: ['admin', 'gestor', 'especialista', 'visualizador', 'paciente'] as UserRole[] },
     { icon: 'pie-chart', label: 'Relatórios', route: '/painel/relatorios', roles: ['admin', 'gestor'] as UserRole[] },
@@ -99,20 +102,34 @@ export class Painel {
   // NOTIFICATION FUNCTIONALITY
   isNotificationsOpen = signal(false);
 
+  chatNotifications = computed(() => {
+    const msgs = this.chatService.messages();
+    const role = this.authService.userRole();
+    const unreadCount = this.chatService.unreadCount();
+    const relevantMsgs = msgs.filter(m => role === 'paciente' ? m.sender !== 'user' : m.sender !== 'sistema');
+    
+    return relevantMsgs.map((m, i, arr) => {
+       const isUnread = (arr.length - 1 - i) < unreadCount;
+       return {
+           id: 1000 + i,
+           message: `Nova mensagem de: ${m.senderName}`,
+           time: m.time,
+           route: '/painel/chat',
+           read: !isUnread
+       };
+    }).reverse().slice(0, 3);
+  });
+
   notifications = computed(() => {
     const role = this.authService.userRole();
-    if (role === 'paciente') {
-      return [
-        { id: 1, message: 'Nova mensagem de: Clínica / Profissional', time: 'Agora', route: '/painel/chat', read: false },
+    const baseNotifs = role === 'paciente' ? [
         { id: 2, message: 'Seu Exame Raio-X Tórax está Disponível', time: 'Há 2h', route: '/painel/exames', read: false },
         { id: 3, message: 'Consulta com Dr. Silva confirmada', time: 'Ontem', route: '/painel/agendas', read: true }
-      ];
-    } else {
-      return [
-        { id: 1, message: 'Novo agendamento: Paciente Carlos (Hoje às 14:00)', time: 'Agora', route: '/painel/agendas', read: false },
-        { id: 2, message: 'Nova mensagem de Paciente (Chat)', time: 'Há 5m', route: '/painel/chat', read: false }
-      ];
-    }
+    ] : [
+        { id: 1, message: 'Novo agendamento: Paciente Carlos (Hoje às 14:00)', time: 'Agora', route: '/painel/agendas', read: false }
+    ];
+
+    return [...this.chatNotifications(), ...baseNotifs];
   });
 
   unreadNotifications = computed(() => this.notifications().filter(n => !n.read).length);
@@ -128,6 +145,7 @@ export class Painel {
   }
 
   markAllAsRead() {
-      // Mock, let's just ignore for now
+      this.chatService.markAsRead();
+      // baseNotifs stay as is for mock purposes, but chat unread badge will clear.
   }
 }
