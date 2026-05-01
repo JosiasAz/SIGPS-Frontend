@@ -14,6 +14,7 @@ export interface SimulatedUser {
 })
 export class SimulationService {
   private readonly DB_PREFIX = 'sigps_db_';
+  private readonly DB_VERSION = 'v2'; // Incrementada para v2 para forçar nomes 'Alan'
   
   // Lista inicial de usuários para o sistema não nascer vazio
   private initialUsers: SimulatedUser[] = [
@@ -24,9 +25,32 @@ export class SimulationService {
     { id: 4, nome: 'Admin Alan', email: 'admin@sigps.com', role: 'admin', senha: '123456' }
   ];
 
-  usuarios = signal<SimulatedUser[]>(this.load('users', this.initialUsers));
+  usuarios = signal<SimulatedUser[]>(this.initializeUsers());
 
   constructor() {}
+
+  private initializeUsers(): SimulatedUser[] {
+    if (typeof localStorage === 'undefined') return this.initialUsers;
+
+    const currentVersion = localStorage.getItem(this.DB_PREFIX + 'version');
+    
+    if (currentVersion !== this.DB_VERSION) {
+      // Limpa dados antigos para forçar nova versão
+      this.clearAllData();
+      localStorage.setItem(this.DB_PREFIX + 'version', this.DB_VERSION);
+      this.save('users', this.initialUsers);
+      return this.initialUsers;
+    }
+
+    return this.load('users', this.initialUsers);
+  }
+
+  private clearAllData() {
+    if (typeof localStorage === 'undefined') return;
+    Object.keys(localStorage)
+      .filter(key => key.startsWith(this.DB_PREFIX))
+      .forEach(key => localStorage.removeItem(key));
+  }
 
   // Métodos Genéricos de Persistência
   save(key: string, data: any) {

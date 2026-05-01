@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AbstractAgendasService, Agenda, Consulta } from '../../../services/agendas/abstract-agendas.service';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
@@ -8,7 +9,7 @@ import { AbstractFilaService } from '../../../services/fila/abstract-fila.servic
 @Component({
   selector: 'app-agendas',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './agendas.html',
   styleUrls: ['../painel.scss', './agendas.scss'],
 })
@@ -169,12 +170,20 @@ export class AgendasComponent {
   confirmarAgendamento(horario: string) {
     const agenda = this.agendaParaAgendamento();
     if (agenda) {
-      this.agendasService.agendarConsulta(agenda.id, horario);
+      const user = this.authService.currentUser();
+      const nomeParaSalvar = user?.name || (user as any)?.nome || 'Alan (Forçado)';
+      
+      // Diagnóstico temporário
+      console.log('Enviando agendamento para:', nomeParaSalvar);
+
+      this.agendasService.agendarConsulta(agenda.id, horario, {
+        id: user?.id || 0,
+        nome: nomeParaSalvar
+      });
 
       // Adicionar paciente à fila de espera do especialista
-      const user = this.authService.currentUser();
       this.filaService.adicionarNaFila({
-        paciente: user?.name || 'Paciente do Portal',
+        paciente: nomeParaSalvar,
         especialidade: agenda.especialidade,
         prioridade: 'Normal',
         status: 'Aguardando',

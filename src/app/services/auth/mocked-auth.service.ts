@@ -61,7 +61,7 @@ export class MockedAuthService extends AbstractAuthService {
 
         const mockUser: User = {
             id: simUser.id,
-            name: simUser.nome,
+            name: simUser.nome || 'Paciente Alan',
             email: simUser.email,
             role: simUser.role as UserRole
         };
@@ -116,7 +116,15 @@ export class MockedAuthService extends AbstractAuthService {
         const stored = localStorage.getItem(this.USER_KEY);
         if (!stored) return null;
         try {
-            return JSON.parse(stored);
+            const user = JSON.parse(stored);
+            // Auto-correção: Se o usuário logado não tiver nome, tenta recuperar do simulador
+            if (user && !user.name) {
+                const simUser = this.simulationService.usuarios().find(u => u.email === user.email);
+                user.name = simUser?.nome || 'Paciente Alan';
+                // Salva de volta para corrigir o localStorage definitivamente
+                localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+            }
+            return user;
         } catch {
             return null;
         }

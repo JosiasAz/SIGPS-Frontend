@@ -9,7 +9,7 @@ export abstract class AbstractAgendasService {
     abstract excluirAgenda(id: number): void;
     abstract adicionarAgenda(agenda: Omit<Agenda, 'id'>): void;
     abstract atualizarAgenda(id: number, agenda: Partial<Agenda>): void;
-    abstract agendarConsulta(agendaId: number, horario: string): void;
+    abstract agendarConsulta(agendaId: number, horario: string, paciente?: { id: number, nome: string }): void;
     abstract cancelarConsulta(id: number): void;
     abstract atualizarStatusConsulta(id: number, status: string): void;
 }

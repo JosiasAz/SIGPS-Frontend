@@ -54,11 +54,13 @@ export class MockedAgendasService extends AbstractAgendasService {
         this.agendas.update(prev => prev.map(a => a.id === id ? { ...a, ...agenda } : a));
     }
 
-    agendarConsulta(agendaId: number, horario: string): void {
+    agendarConsulta(agendaId: number, horario: string, paciente?: { id: number, nome: string }): void {
         const agenda = this.agendas().find(a => a.id === agendaId);
         if (agenda) {
             const novaConsulta: Consulta = {
                 id: Math.floor(Math.random() * 1000) + 200,
+                pacienteId: paciente?.id,
+                pacienteNome: paciente?.nome || 'Paciente Alan',
                 especialista: agenda.especialista,
                 especialidade: agenda.especialidade,
                 data: '15/04/2026',

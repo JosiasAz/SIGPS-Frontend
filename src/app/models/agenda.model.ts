@@ -8,6 +8,8 @@ export interface Agenda {
 
 export interface Consulta {
     id: number;
+    pacienteId?: number;
+    pacienteNome?: string;
     especialista: string;
     especialidade: string;
     data: string;

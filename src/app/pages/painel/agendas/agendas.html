@@ -77,7 +77,7 @@
                 </div>
                 <div class="card-main">
                     <h3>Atendimento: {{ con.especialidade }}</h3>
-                    <p>Paciente ID #{{ con.id }}</p>
+                    <p>Paciente: <strong>{{ con.pacienteNome || 'Não identificado' }}</strong></p>
                     <span class="location">{{ con.local }}</span>
                 </div>
                 <div class="card-actions" style="display: flex; gap: 8px;">

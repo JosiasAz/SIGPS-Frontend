@@ -25,14 +25,16 @@ export class PacientesComponent {
     const consultas = this.agendasService.consultas();
 
     // Gera pacientes "automáticos" a partir das consultas agendadas
-    const daCAgenda: (Paciente & { origem: string })[] = consultas.map((c, i) => ({
-      id: 9000 + i,
-      nome: `Paciente Consulta #${c.id}`,
-      cpf: '—',
-      ultimaConsulta: c.data,
-      especialidade: c.especialidade,
-      origem: 'agenda'
-    }));
+    const daCAgenda: (Paciente & { origem: string })[] = consultas
+      .filter(c => c.pacienteNome) // Só mostra se tiver nome
+      .map((c, i) => ({
+        id: c.pacienteId || (9000 + i),
+        nome: c.pacienteNome!,
+        cpf: '—',
+        ultimaConsulta: c.data,
+        especialidade: c.especialidade,
+        origem: 'agenda'
+      }));
 
     // Combina, removendo duplicatas por nome (mock simples)
     const cadastradosComOrigem = cadastrados.map(p => ({ ...p, origem: 'manual' }));
