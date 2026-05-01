@@ -32,7 +32,7 @@ export class EspecialistasComponent {
 
   constructor() {
     this.especialistaForm = this.fb.group({
-      nome: ['', [Validators.required, Validators.minLength(5), Validators.pattern(/^[A-Za-zÀ-ÿ\s]{5,}$/), this.nomeDuasPalavrasValidator]],
+      nome: ['', [Validators.required, Validators.minLength(5), Validators.pattern(/^[A-Za-zÀ-ÿ\s.]{5,}$/), this.nomeDuasPalavrasValidator]],
       crm: ['', [Validators.required, Validators.pattern(/^\d{4,6}-[A-Z]{2}$/), this.ufValidator.bind(this)]],
       especialidade: ['', Validators.required],
       situacao: ['Ativo', Validators.required]
@@ -145,14 +145,17 @@ export class EspecialistasComponent {
     if (this.especialistaForm.valid) {
       const formValue = this.especialistaForm.value;
       
+      const isEditing = this.editingEspecialistaId !== null;
+
       const payload: Partial<Profissional> = {
         nome: formValue.nome.trim(),
         crm: formValue.crm.toUpperCase(),
         uf: formValue.crm.split('-')[1]?.toUpperCase(),
         documento: formValue.crm.toUpperCase(),
         especialidade: formValue.especialidade,
-        situacao: formValue.situacao,
-        last_seen: new Date().toISOString() // Atualiza last_seen no cadastro/edição
+        // situacao só é alterada quando o gestor edita explicitamente um profissional existente
+        situacao: isEditing ? formValue.situacao : 'Ativo',
+        last_seen: isEditing ? undefined : new Date().toISOString()
       };
 
       if (this.editingEspecialistaId !== null) {

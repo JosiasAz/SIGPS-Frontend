@@ -4,12 +4,14 @@ import { of, throwError } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AuthResponse, User, UserRole } from '../../models/auth.model';
 import { AbstractAuthService } from './abstract-auth.service';
+import { AbstractEspecialistasService } from '../especialistas/abstract-especialistas.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class MockedAuthService extends AbstractAuthService {
     private router = inject(Router);
+    private especialistasService = inject(AbstractEspecialistasService);
     private readonly AUTH_KEY = 'sigps_auth';
     private readonly USER_KEY = 'sigps_user';
 
@@ -23,6 +25,25 @@ export class MockedAuthService extends AbstractAuthService {
     userRole = computed(() => this.userState()?.role || null);
 
     login(credentials: any) {
+        const role = this.determineRole(credentials.email);
+
+        // Verificar se é especialista com conta desabilitada
+        if (role === 'especialista') {
+            const emailNome = credentials.email.split('@')[0].toLowerCase();
+            const especialistas = this.especialistasService.especialistas();
+            const encontrado = especialistas.find(e =>
+                e.nome.toLowerCase().replace(/[^a-z]/g, '').includes(emailNome.replace(/[^a-z]/g, '')) ||
+                emailNome.includes(e.nome.split(' ')[1]?.toLowerCase() || '')
+            );
+
+            if (encontrado && encontrado.situacao === 'Inativo') {
+                return throwError(() => ({
+                    code: 'ACCOUNT_DISABLED',
+                    nome: encontrado.nome
+                }));
+            }
+        }
+
         const mockResponse: AuthResponse = {
             access_token: 'mock-jwt-token',
             token_type: 'bearer'
@@ -32,7 +53,7 @@ export class MockedAuthService extends AbstractAuthService {
             id: 1,
             name: credentials.email.split('@')[0],
             email: credentials.email,
-            role: this.determineRole(credentials.email)
+            role: role
         };
 
         return of(mockResponse).pipe(

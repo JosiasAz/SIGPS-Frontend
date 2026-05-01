@@ -23,6 +23,8 @@ export class Login {
   showPassword = signal(false);
   isLoading = signal(false);
   errorMessage = signal('');
+  isAccountDisabled = signal(false);
+  blockedAccountName = signal('');
 
   togglePassword() {
     this.showPassword.update(v => !v);
@@ -48,14 +50,20 @@ export class Login {
 
     this.isLoading.set(true);
     this.errorMessage.set('');
+    this.isAccountDisabled.set(false);
 
     this.authService.login(this.credentials).subscribe({
       next: () => {
         this.router.navigate(['/painel']);
       },
       error: (err) => {
-        this.errorMessage.set('Falha ao entrar. Verifique seus dados.');
         this.isLoading.set(false);
+        if (err?.code === 'ACCOUNT_DISABLED') {
+          this.isAccountDisabled.set(true);
+          this.blockedAccountName.set(err.nome || 'seu perfil');
+        } else {
+          this.errorMessage.set('Falha ao entrar. Verifique seus dados.');
+        }
       }
     });
   }

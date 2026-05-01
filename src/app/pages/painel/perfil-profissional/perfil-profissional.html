@@ -237,6 +237,11 @@
                         <div class="agenda-status" [class]="item.status">
                             {{ item.status === 'confirmado' ? '✓ Confirmado' : '⏳ Aguardando' }}
                         </div>
+                        @if (isEspecialista()) {
+                        <button class="btn-primary-dashboard btn-sm" style="margin-left: auto; padding: 6px 12px; font-size: 0.8rem; border-radius: 8px;" (click)="abrirProntuario(item)">
+                            Ver Prontuário
+                        </button>
+                        }
                     </div>
                     }
                 </div>
@@ -266,6 +271,59 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal de Prontuário (Visão Especialista) -->
+        @if (isEspecialista() && selectedPacienteProntuario()) {
+        <div class="modal-overlay active" (click)="fecharProntuario()">
+            <div class="modal-content" (click)="$event.stopPropagation()" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h2>Prontuário Eletrônico</h2>
+                    <button class="modal-close" (click)="fecharProntuario()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid var(--border);">
+                        <h3 style="margin: 0 0 8px 0; color: var(--text);">{{ selectedPacienteProntuario()?.paciente }}</h3>
+                        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
+                            Consulta: {{ selectedPacienteProntuario()?.tipo }} às {{ selectedPacienteProntuario()?.hora }}h
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Histórico Breve do Paciente</label>
+                        <div style="font-size: 0.9rem; color: var(--text-muted); padding: 12px; background: #fffbeb; border-radius: 8px; border: 1px solid #fde68a;">
+                            Paciente apresenta histórico de hipertensão leve controlada. Último hemograma realizado há 6 meses sem alterações significativas.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Anotações Clínicas da Consulta Atual</label>
+                        <textarea class="form-input" rows="4" placeholder="Descreva os sintomas, diagnóstico e recomendações..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Enviar Relatório / Exame (PDF)</label>
+                        <div style="border: 2px dashed var(--border); padding: 24px; text-align: center; border-radius: 12px; background: #fafafa; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="margin-bottom: 8px;">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">Clique para anexar arquivo (Ex: Hemograma.pdf) ou arraste aqui</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" (click)="fecharProntuario()">Cancelar</button>
+                    <button class="btn-primary" (click)="enviarRelatorio()">Concluir e Enviar Relatório</button>
+                </div>
+            </div>
+        </div>
+        }
     </div>
     }
 </section>

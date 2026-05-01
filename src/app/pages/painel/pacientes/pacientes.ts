@@ -1,7 +1,8 @@
-import { Component, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, ViewChild, ElementRef, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AbstractPacientesService, Paciente } from '../../../services/pacientes/abstract-pacientes.service';
+import { AbstractAgendasService } from '../../../services/agendas/abstract-agendas.service';
 
 @Component({
   selector: 'app-pacientes',
@@ -12,12 +13,35 @@ import { AbstractPacientesService, Paciente } from '../../../services/pacientes/
 })
 export class PacientesComponent {
   private pacientesService = inject(AbstractPacientesService);
+  private agendasService = inject(AbstractAgendasService);
   private fb = inject(FormBuilder);
 
   @ViewChild('addModal') addModal!: ElementRef<HTMLDialogElement>;
   @ViewChild('deleteModal') deleteModal!: ElementRef<HTMLDialogElement>;
 
-  pacientes = this.pacientesService.pacientes;
+  // Lista mesclada: pacientes cadastrados + derivados das consultas da agenda
+  pacientes = computed(() => {
+    const cadastrados = this.pacientesService.pacientes();
+    const consultas = this.agendasService.consultas();
+
+    // Gera pacientes "automáticos" a partir das consultas agendadas
+    const daCAgenda: (Paciente & { origem: string })[] = consultas.map((c, i) => ({
+      id: 9000 + i,
+      nome: `Paciente Consulta #${c.id}`,
+      cpf: '—',
+      ultimaConsulta: c.data,
+      especialidade: c.especialidade,
+      origem: 'agenda'
+    }));
+
+    // Combina, removendo duplicatas por nome (mock simples)
+    const cadastradosComOrigem = cadastrados.map(p => ({ ...p, origem: 'manual' }));
+    return [...cadastradosComOrigem, ...daCAgenda];
+  });
+
+  // Manter referência separada para o service CRUD (só pacientes manuais)
+  pacientesManuais = this.pacientesService.pacientes;
+
   deletingPacienteId: number | null = null;
   deletingPacienteNome: string = '';
   pacienteForm: FormGroup;

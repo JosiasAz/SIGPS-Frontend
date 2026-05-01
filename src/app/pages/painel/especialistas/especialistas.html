@@ -22,8 +22,11 @@
                         <th>Nome</th>
                         <th>CRM/CRP</th>
                         <th>Especialidade</th>
-                        <th>Situação</th>
-                        <th>Status (Sistema)</th>
+                        <th>Conta</th>
+                        <th>
+                            Presença
+                            <span style="font-size:0.7rem; font-weight:400; color:var(--text-muted); margin-left:4px;">(automático)</span>
+                        </th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -39,10 +42,15 @@
                         <td>{{ esp.crm || esp.documento }}</td>
                         <td>{{ esp.especialidade }}</td>
                         <td>
-                            <span [style.color]="esp.situacao === 'Inativo' ? '#64748b' : '#0f172a'" 
-                                  [style.fontWeight]="'500'">
-                                {{ esp.situacao || 'Ativo' }}
+                            @if (esp.situacao === 'Inativo') {
+                            <span class="status-badge" style="background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; font-size: 0.8rem;">
+                                Desabilitado
                             </span>
+                            } @else {
+                            <span class="status-badge active" style="font-size: 0.8rem;">
+                                Habilitado
+                            </span>
+                            }
                         </td>
                         <td>
                             <span class="status-badge" [class.active]="calcularStatusVisao(esp.last_seen, esp.status) === 'Online'"
@@ -127,13 +135,18 @@
                         <span class="error-message">Especialidade é obrigatória</span>
                     }
                 </div>
+                @if (editingEspecialistaId !== null) {
                 <div class="form-group">
-                    <label for="situacao">Situação do Profissional</label>
+                    <label for="situacao">Acesso ao Sistema</label>
                     <select id="situacao" formControlName="situacao" class="form-input">
-                        <option value="Ativo">Ativo</option>
-                        <option value="Inativo">Inativo</option>
+                        <option value="Ativo">Habilitado (pode fazer login)</option>
+                        <option value="Inativo">Desabilitado (sem acesso)</option>
                     </select>
+                    <p class="hint" style="margin-top: 6px; color: var(--text-muted); font-size: 0.82rem;">
+                        O status <strong>Online/Offline</strong> é detectado automaticamente pela atividade de login do profissional.
+                    </p>
                 </div>
+                }
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" (click)="fecharModal()">Cancelar</button>
                     <button type="submit" class="btn-primary" [disabled]="especialistaForm.invalid">{{ editingEspecialistaId !== null ? 'Atualizar' : 'Salvar' }}</button>

@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { AbstractAgendasService, Agenda, Consulta } from './abstract-agendas.service';
 
 @Injectable({
@@ -37,7 +37,6 @@ export class MockedAgendasService extends AbstractAgendasService {
     ]);
 
     getProximaConsulta() {
-        // Retorna a consulta mais próxima no tempo (mock simplificado)
         const scheduled = this.consultas().filter(c => c.status === 'agendada');
         return scheduled.length > 0 ? scheduled[0] : null;
     }
@@ -65,7 +64,7 @@ export class MockedAgendasService extends AbstractAgendasService {
                 id: Math.floor(Math.random() * 1000) + 200,
                 especialista: agenda.especialista,
                 especialidade: agenda.especialidade,
-                data: '15/04/2026', // Data fixa para o mock
+                data: '15/04/2026',
                 horario: horario,
                 local: 'Unidade Central SIGPS - Ala B',
                 instrucoes: 'Chegue 15 minutos antes.',
@@ -73,13 +72,17 @@ export class MockedAgendasService extends AbstractAgendasService {
                 status: 'agendada'
             };
             this.consultas.update(prev => [...prev, novaConsulta]);
-            
-            // Reduz vagas da agenda
             this.agendas.update(prev => prev.map(a => a.id === agendaId ? { ...a, vagas: a.vagas - 1 } : a));
         }
     }
 
     cancelarConsulta(id: number): void {
-        this.consultas.update(prev => prev.filter(c => c.id !== id));
+        this.consultas.update(consultas => consultas.filter(c => c.id !== id));
+    }
+
+    atualizarStatusConsulta(id: number, status: string): void {
+        this.consultas.update(consultas =>
+            consultas.map(c => c.id === id ? { ...c, status: status as Consulta['status'] } : c)
+        );
     }
 }

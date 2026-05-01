@@ -61,4 +61,10 @@ export class AgendasService extends AbstractAgendasService {
         // Mocked for now
         this.consultas.update(prev => prev.filter(c => c.id !== id));
     }
+
+    atualizarStatusConsulta(id: number, status: string): void {
+        this.consultas.update(prev =>
+            prev.map(c => c.id === id ? { ...c, status: status as Consulta['status'] } : c)
+        );
+    }
 }

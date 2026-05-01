@@ -11,4 +11,5 @@ export abstract class AbstractAgendasService {
     abstract atualizarAgenda(id: number, agenda: Partial<Agenda>): void;
     abstract agendarConsulta(agendaId: number, horario: string): void;
     abstract cancelarConsulta(id: number): void;
+    abstract atualizarStatusConsulta(id: number, status: string): void;
 }

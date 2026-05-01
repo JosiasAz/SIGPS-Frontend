@@ -21,6 +21,7 @@ export class PerfilProfissionalComponent implements OnInit {
 
   userRole = this.authService.userRole;
   isPaciente = computed(() => this.userRole() === 'paciente');
+  isEspecialista = computed(() => this.userRole() === 'especialista');
 
   profissional!: Profissional;
 
@@ -85,5 +86,27 @@ export class PerfilProfissionalComponent implements OnInit {
 
   cancelarSelecao() {
     this.selectedSlot.set(null);
+  }
+
+  // --- Funções do Prontuário Eletrônico (Especialista) ---
+  selectedPacienteProntuario = signal<any>(null);
+
+  abrirProntuario(item: any) {
+    this.selectedPacienteProntuario.set(item);
+  }
+
+  fecharProntuario() {
+    this.selectedPacienteProntuario.set(null);
+  }
+
+  enviarRelatorio() {
+    alert('Relatório clínico e arquivo anexado foram enviados ao paciente com sucesso!\nO paciente agora pode visualizar e baixar o PDF em "Meus Agendamentos" no portal dele.');
+    
+    // Simula a mudança de status da agenda para "concluida" localmente para feedback visual
+    this.agendaHoje.update(agendas => 
+      agendas.map(a => a === this.selectedPacienteProntuario() ? { ...a, status: 'concluida' } : a)
+    );
+    
+    this.fecharProntuario();
   }
 }

@@ -39,22 +39,22 @@ export const routes: Routes = [
             {
                 path: 'exames',
                 component: ExamesComponent,
-                canActivate: [roleGuard(['paciente', 'admin', 'gestor'])]
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'especialista', 'visualizador'])]
             },
             {
                 path: 'chat',
                 component: ChatComponent,
-                canActivate: [roleGuard(['paciente', 'admin', 'gestor'])]
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'especialista', 'visualizador'])]
             },
             {
                 path: 'perfil-profissional/:id',
                 component: PerfilProfissionalComponent,
-                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'visualizador'])]
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'visualizador', 'especialista'])]
             },
             {
                 path: 'busca-profissionais',
                 component: BuscaProfissionaisComponent,
-                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'visualizador'])]
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'visualizador', 'especialista'])]
             },
             { 
                 path: 'dashboard', 

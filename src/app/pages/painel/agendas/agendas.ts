@@ -23,13 +23,19 @@ export class AgendasComponent {
   agendaParaAgendamento = signal<Agenda | null>(null);
   agendaForm: FormGroup;
 
-  // Verifica se o usuário tem permissão para editar (Gestor, Admin ou Especialista)
+  // Verifica se o usuário tem permissão para configurar agendas (Gestor, Admin)
   isGestor = computed(() => {
     const role = this.authService.userRole();
-    return role === 'admin' || role === 'gestor' || role === 'especialista';
+    return role === 'admin' || role === 'gestor';
   });
 
   isPaciente = computed(() => this.authService.userRole() === 'paciente');
+  isEspecialista = computed(() => this.authService.userRole() === 'especialista');
+
+  consultasDoEspecialista = computed(() => {
+    // Simula que o especialista logado é o 'Dr. Roberto Lins' para fins do protótipo
+    return this.consultas().filter(c => c.especialista === 'Dr. Roberto Lins');
+  });
 
   constructor() {
     this.agendaForm = this.fb.group({
@@ -58,11 +64,37 @@ export class AgendasComponent {
     this.selectedConsulta.set(null);
   }
 
+  // ---- Prontuário Eletrônico do Especialista ----
+  selectedPacienteProntuario = signal<Consulta | null>(null);
+
+  abrirProntuario(consulta: Consulta) {
+    this.selectedPacienteProntuario.set(consulta);
+  }
+
+  fecharProntuario() {
+    this.selectedPacienteProntuario.set(null);
+  }
+
+  enviarRelatorio() {
+    alert('Relatório clínico e arquivo anexado foram enviados ao paciente com sucesso!\nO paciente agora pode visualizar e baixar o PDF em "Meus Agendamentos" no portal dele.');
+    
+    // Atualiza o status da consulta para "concluida"
+    const consulta = this.selectedPacienteProntuario();
+    if (consulta) {
+      this.agendasService.atualizarStatusConsulta(consulta.id, 'concluida');
+    }
+    this.fecharProntuario();
+  }
+
   cancelarAgendamento(id: number) {
     if (confirm('Deseja realmente cancelar este agendamento?')) {
       this.agendasService.cancelarConsulta(id);
       this.fecharModalConsulta();
     }
+  }
+
+  baixarRelatorioPDF(consulta: Consulta) {
+    alert(`Iniciando download do relatório da consulta com ${consulta.especialista}...\n(Isto simula o download de um arquivo PDF gerado pelo sistema)`);
   }
 
   abrirConfiguracao(agenda: Agenda | null = null) {
