@@ -11,8 +11,8 @@ import { EspecialistasComponent } from '../pages/painel/especialistas/especialis
 import { FilaComponent } from '../pages/painel/fila/fila';
 import { RelatoriosComponent } from '../pages/painel/relatorios/relatorios';
 import { ConfigComponent } from '../pages/painel/config/config';
-import { authGuard } from '../guards/auth.guard';
-import { roleGuard } from '../guards/role.guard';
+import { authGuard } from '../core/guards/auth.guard';
+import { roleGuard } from '../core/guards/role.guard';
 import { AbstractAuthService } from '../services/auth/abstract-auth.service';
 import { PortalPacienteComponent } from '../pages/painel/portal-paciente/portal-paciente';
 import { ExamesComponent } from '../pages/painel/exames/exames';
