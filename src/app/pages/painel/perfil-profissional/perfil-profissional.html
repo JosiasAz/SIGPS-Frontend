@@ -22,7 +22,7 @@
                 <div class="profile-header-info">
                     <div class="profile-avatar">
                         <img [src]="profissional.foto" alt="Foto do Médico">
-                        <span class="online-dot"></span>
+                        <span class="online-dot" [class.offline]="calcularStatusVisao(profissional.last_seen, profissional.status) === 'Offline'"></span>
                     </div>
                     <div class="profile-titles">
                         <h1>{{ profissional.nome }}</h1>

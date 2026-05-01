@@ -62,4 +62,29 @@ export class MockedEspecialistasService extends AbstractEspecialistasService {
     getProfissionalById(id: number): Profissional | undefined {
         return this.especialistas().find(p => p.id === id);
     }
+
+    addEspecialista(especialista: Partial<Profissional>): void {
+        const novo: Profissional = {
+            id: Date.now(),
+            nome: especialista.nome || '',
+            especialidade: especialista.especialidade || '',
+            crm: especialista.crm || '',
+            documento: especialista.documento || '',
+            situacao: especialista.situacao || 'Ativo',
+            last_seen: especialista.last_seen || new Date().toISOString(),
+            avaliacao: 5.0,
+            avaliacoesCount: 0,
+            foto: '',
+            proximaVaga: ''
+        } as Profissional;
+        this.especialistas.update(s => [...s, novo]);
+    }
+
+    updateEspecialista(id: number, especialista: Partial<Profissional>): void {
+        this.especialistas.update(s => s.map(e => e.id === id ? { ...e, ...especialista } : e));
+    }
+
+    removeEspecialista(id: number): void {
+        this.especialistas.update(s => s.filter(e => e.id !== id));
+    }
 }

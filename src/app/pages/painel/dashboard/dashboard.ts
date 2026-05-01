@@ -31,4 +31,15 @@ export class DashboardComponent {
     if (role === 'especialista') return { label: 'Nova Prescrição' };
     return null;
   });
+
+  executeAction(): void {
+    const action = this.headerAction();
+    if (action) {
+      alert(`Ação "${action.label}" será redirecionada na próxima versão (MVP)`);
+    }
+  }
+
+  verDetalhesIA(): void {
+    alert("Redirecionando para detalhes de inteligência artificial da fila...");
+  }
 }

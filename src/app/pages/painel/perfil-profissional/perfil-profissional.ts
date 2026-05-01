@@ -39,6 +39,16 @@ export class PerfilProfissionalComponent implements OnInit {
     });
   }
 
+  calcularStatusVisao(last_seen?: Date | string | null, statusDefault?: string): string {
+    if (!last_seen) {
+        return statusDefault === 'online' ? 'Online' : 'Offline';
+    }
+    const lastSeenTime = new Date(last_seen).getTime();
+    const now = new Date().getTime();
+    const diffMinutes = (now - lastSeenTime) / (1000 * 60);
+    return diffMinutes <= 5 ? 'Online' : 'Offline';
+  }
+
   // Stats for the professional's own dashboard view
   estatisticas = signal({
     pacientesHoje: 0,

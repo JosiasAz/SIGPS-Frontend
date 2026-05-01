@@ -8,7 +8,10 @@ export interface Profissional {
   foto?: string;
   proximaVaga?: string;
   documento?: string;
-  status?: string;
+  status?: string; // Mantido por retrocompatibilidade com UI antiga, mas agora computado
+  situacao?: 'Ativo' | 'Inativo';
+  last_seen?: Date | string;
+  uf?: string;
   consultasRealizadas?: number;
   anosExperiencia?: number;
   taxaRetorno?: number;

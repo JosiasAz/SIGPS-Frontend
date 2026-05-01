@@ -12,4 +12,8 @@ import { AbstractConfigService } from '../../../services/config/abstract-config.
 export class ConfigComponent {
   private configService = inject(AbstractConfigService);
   settings = this.configService.settings();
+
+  toggleSetting(label: string): void {
+    this.configService.toggleSetting(label);
+  }
 }
