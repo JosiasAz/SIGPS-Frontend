@@ -22,4 +22,5 @@ export abstract class AbstractFilaService {
     abstract reordenarFila(): void;
     abstract analisarIA(): void;
     abstract atenderPaciente(pacienteNome: string): void;
+    abstract adicionarNaFila(paciente: Partial<PacienteFila>): void;
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AbstractAgendasService, Agenda, Consulta } from '../../../services/agendas/abstract-agendas.service';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
+import { AbstractFilaService } from '../../../services/fila/abstract-fila.service';
 
 @Component({
   selector: 'app-agendas',
@@ -14,6 +15,7 @@ import { AbstractAuthService } from '../../../services/auth/abstract-auth.servic
 export class AgendasComponent {
   private agendasService = inject(AbstractAgendasService);
   private authService = inject(AbstractAuthService);
+  private filaService = inject(AbstractFilaService);
   private fb = inject(FormBuilder);
   
   agendas = this.agendasService.agendas;
@@ -33,8 +35,13 @@ export class AgendasComponent {
   isEspecialista = computed(() => this.authService.userRole() === 'especialista');
 
   consultasDoEspecialista = computed(() => {
-    // Simula que o especialista logado é o 'Dr. Roberto Lins' para fins do protótipo
-    return this.consultas().filter(c => c.especialista === 'Dr. Roberto Lins');
+    // Usa o nome do usuário logado para filtrar as consultas
+    const user = this.authService.currentUser();
+    const nomeLogado = user?.name?.toLowerCase() || '';
+    return this.consultas().filter(c => 
+      c.especialista.toLowerCase().includes(nomeLogado) ||
+      nomeLogado.includes(c.especialista.split(' ')[1]?.toLowerCase() || '_')
+    );
   });
 
   constructor() {
@@ -163,9 +170,19 @@ export class AgendasComponent {
     const agenda = this.agendaParaAgendamento();
     if (agenda) {
       this.agendasService.agendarConsulta(agenda.id, horario);
+
+      // Adicionar paciente à fila de espera do especialista
+      const user = this.authService.currentUser();
+      this.filaService.adicionarNaFila({
+        paciente: user?.name || 'Paciente do Portal',
+        especialidade: agenda.especialidade,
+        prioridade: 'Normal',
+        status: 'Aguardando',
+        aiReasoning: `Agendamento confirmado via portal para ${agenda.especialista} às ${horario}h.`
+      });
+
       this.fecharModalAgendamento();
-      // Optional: Give feedback
-      alert(`Agendamento confirmado para as ${horario}h com ${agenda.especialista}`);
+      alert(`Agendamento confirmado para as ${horario}h com ${agenda.especialista}\nVocê já aparece na fila de espera do profissional!`);
     }
   }
 }

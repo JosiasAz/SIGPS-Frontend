@@ -5,6 +5,7 @@ import { tap } from 'rxjs/operators';
 import { AuthResponse, User, UserRole } from '../../models/auth.model';
 import { AbstractAuthService } from './abstract-auth.service';
 import { AbstractEspecialistasService } from '../especialistas/abstract-especialistas.service';
+import { SimulationService, SimulatedUser } from '../simulation/simulation.service';
 
 @Injectable({
     providedIn: 'root'
@@ -12,6 +13,7 @@ import { AbstractEspecialistasService } from '../especialistas/abstract-especial
 export class MockedAuthService extends AbstractAuthService {
     private router = inject(Router);
     private especialistasService = inject(AbstractEspecialistasService);
+    private simulationService = inject(SimulationService);
     private readonly AUTH_KEY = 'sigps_auth';
     private readonly USER_KEY = 'sigps_user';
 
@@ -25,16 +27,24 @@ export class MockedAuthService extends AbstractAuthService {
     userRole = computed(() => this.userState()?.role || null);
 
     login(credentials: any) {
-        const role = this.determineRole(credentials.email);
+        // Tenta encontrar o usuário na base persistente
+        let simUser = this.simulationService.usuarios().find(u => u.email.toLowerCase() === credentials.email.toLowerCase());
 
-        // Verificar se é especialista com conta desabilitada
-        if (role === 'especialista') {
-            const emailNome = credentials.email.split('@')[0].toLowerCase();
+        // Se não existir, mas tiver o padrão, cria na hora para não quebrar testes rápidos
+        if (!simUser) {
+            const role = this.determineRole(credentials.email);
+            simUser = this.simulationService.adicionarUsuario({
+                nome: credentials.email.split('@')[0],
+                email: credentials.email,
+                role: role,
+                senha: credentials.password
+            });
+        }
+
+        // Verificar se é especialista com conta desabilitada (buscando no service de especialistas)
+        if (simUser.role === 'especialista') {
             const especialistas = this.especialistasService.especialistas();
-            const encontrado = especialistas.find(e =>
-                e.nome.toLowerCase().replace(/[^a-z]/g, '').includes(emailNome.replace(/[^a-z]/g, '')) ||
-                emailNome.includes(e.nome.split(' ')[1]?.toLowerCase() || '')
-            );
+            const encontrado = especialistas.find(e => e.nome.toLowerCase().includes(simUser!.nome.toLowerCase()));
 
             if (encontrado && encontrado.situacao === 'Inativo') {
                 return throwError(() => ({
@@ -50,10 +60,10 @@ export class MockedAuthService extends AbstractAuthService {
         };
 
         const mockUser: User = {
-            id: 1,
-            name: credentials.email.split('@')[0],
-            email: credentials.email,
-            role: role
+            id: simUser.id,
+            name: simUser.nome,
+            email: simUser.email,
+            role: simUser.role as UserRole
         };
 
         return of(mockResponse).pipe(

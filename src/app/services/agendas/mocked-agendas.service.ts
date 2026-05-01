@@ -1,40 +1,37 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject, effect } from '@angular/core';
 import { AbstractAgendasService, Agenda, Consulta } from './abstract-agendas.service';
+import { SimulationService } from '../simulation/simulation.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class MockedAgendasService extends AbstractAgendasService {
-    agendas = signal<Agenda[]>([
+    private simulationService = inject(SimulationService);
+
+    private initialAgendas: Agenda[] = [
         { id: 1, especialista: 'Dr. Roberto Lins', especialidade: 'Cardiologia', horarios: ['08:00', '09:00', '10:00'], vagas: 3 },
         { id: 2, especialista: 'Dra. Amanda Silva', especialidade: 'Dermatologia', horarios: ['14:00', '15:00', '16:00'], vagas: 2 },
         { id: 3, especialista: 'Dr. Carlos Mendes', especialidade: 'Pediatria', horarios: ['10:00', '11:00'], vagas: 1 },
-    ]);
+    ];
 
-    consultas = signal<Consulta[]>([
-        {
-            id: 101,
-            especialista: 'Dr. Roberto Lins',
-            especialidade: 'Cardiologia',
-            data: '15/04/2026',
-            horario: '14:30',
-            local: 'Unidade Central SIGPS - Sala 302',
-            instrucoes: 'Chegar com 15 minutos de antecedência. Não ingerir cafeína 4 horas antes do exame.',
-            recomendacoes: 'Trazer exames anteriores e lista de medicamentos em uso.',
-            status: 'agendada'
-        },
-        {
-            id: 102,
-            especialista: 'Dra. Amanda Silva',
-            especialidade: 'Dermatologia',
-            data: '18/04/2026',
-            horario: '10:00',
-            local: 'Anexo Clínico - Sala 12',
-            instrucoes: 'Sessão inicial de triagem.',
-            recomendacoes: 'Documento de identificação com foto.',
-            status: 'agendada'
-        }
-    ]);
+    private initialConsultas: Consulta[] = [
+        { id: 101, especialista: 'Dr. Roberto Lins', especialidade: 'Cardiologia', data: '15/04/2026', horario: '14:30', local: 'Unidade Central SIGPS - Sala 302', instrucoes: 'Chegar com 15 min de antecedência.', recomendacoes: 'Trazer exames.', status: 'agendada' },
+        { id: 102, especialista: 'Dra. Amanda Silva', especialidade: 'Dermatologia', data: '18/04/2026', horario: '10:00', local: 'Anexo Clínico - Sala 12', instrucoes: 'Triagem.', recomendacoes: 'ID com foto.', status: 'agendada' }
+    ];
+
+    agendas = signal<Agenda[]>(this.simulationService.load('agendas', this.initialAgendas));
+    consultas = signal<Consulta[]>(this.simulationService.load('consultas', this.initialConsultas));
+
+    constructor() {
+        super();
+        // Efeito para salvar automaticamente sempre que os sinais mudarem
+        effect(() => {
+            this.simulationService.save('agendas', this.agendas());
+        });
+        effect(() => {
+            this.simulationService.save('consultas', this.consultas());
+        });
+    }
 
     getProximaConsulta() {
         const scheduled = this.consultas().filter(c => c.status === 'agendada');

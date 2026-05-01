@@ -67,4 +67,20 @@ export class FilaService extends AbstractFilaService {
             return p;
         }));
     }
+
+    adicionarNaFila(paciente: Partial<PacienteFila>): void {
+        const novo: PacienteFila = {
+            id: Date.now().toString(),
+            paciente: paciente.paciente || 'Paciente',
+            prioridade: paciente.prioridade || 'Normal',
+            tempoEspera: '0 min',
+            especialidade: paciente.especialidade || '',
+            status: 'Aguardando',
+            aiScore: 50,
+            aiReasoning: 'Paciente agendado via portal. Aguardando triagem inicial.',
+            riskTrend: 'stable',
+            ...paciente
+        };
+        this.fila.update(f => [...f, novo]);
+    }
 }
