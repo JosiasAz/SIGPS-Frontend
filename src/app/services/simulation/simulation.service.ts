@@ -18,9 +18,10 @@ export class SimulationService {
   // Lista inicial de usuários para o sistema não nascer vazio
   private initialUsers: SimulatedUser[] = [
     { id: 1, nome: 'Dr. Roberto Lins', email: 'dr.roberto@sigps.com', role: 'especialista', senha: '123456', foto: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=1000' },
-    { id: 2, nome: 'Josias Gestor', email: 'gestor@sigps.com', role: 'gestor', senha: '123456' },
-    { id: 3, nome: 'Paciente Teste', email: 'paciente@sigps.com', role: 'paciente', senha: '123456' },
-    { id: 4, nome: 'Admin Master', email: 'admin@sigps.com', role: 'admin', senha: '123456' }
+    { id: 5, nome: 'Dra. Amanda Silva', email: 'dra.amanda@sigps.com', role: 'especialista', senha: '123456', foto: 'https://ui-avatars.com/api/?name=Amanda+Silva&background=419640&color=fff' },
+    { id: 2, nome: 'Gestor Alan', email: 'gestor@sigps.com', role: 'gestor', senha: '123456' },
+    { id: 3, nome: 'Paciente Alan', email: 'paciente@sigps.com', role: 'paciente', senha: '123456' },
+    { id: 4, nome: 'Admin Alan', email: 'admin@sigps.com', role: 'admin', senha: '123456' }
   ];
 
   usuarios = signal<SimulatedUser[]>(this.load('users', this.initialUsers));
