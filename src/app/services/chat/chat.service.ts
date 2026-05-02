@@ -72,4 +72,14 @@ export class ChatService extends AbstractChatService {
       error: (err) => console.error('Erro ao marcar mensagens como lidas:', err)
     });
   }
+
+  clearHistory(): void {
+    this.http.delete(`${this.apiUrl}${API_ENDPOINTS.CHAT.CLEAR}`).subscribe({
+      next: () => {
+        this.messages.set([]);
+        console.log('Histórico do chat apagado com sucesso');
+      },
+      error: (err) => console.error('Erro ao apagar histórico do chat:', err)
+    });
+  }
 }

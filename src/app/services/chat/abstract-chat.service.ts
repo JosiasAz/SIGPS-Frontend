@@ -7,4 +7,5 @@ export abstract class AbstractChatService {
   abstract unreadCount: Signal<number>;
   abstract sendMessage(text: string): void;
   abstract markAsRead(): void;
+  abstract clearHistory(): void;
 }

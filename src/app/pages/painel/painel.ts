@@ -20,6 +20,7 @@ export class Painel {
   isSidebarCollapsed = signal(false);
 
   currentUser = this.authService.currentUser;
+  unreadMessages = this.chatService.unreadCount;
 
   userRoleLabel = computed(() => {
     const role = this.authService.userRole();
@@ -101,6 +102,7 @@ export class Painel {
 
   // NOTIFICATION FUNCTIONALITY
   isNotificationsOpen = signal(false);
+  readNotificationIds = signal<number[]>([]);
 
   chatNotifications = computed(() => {
     const msgs = this.chatService.messages();
@@ -122,11 +124,13 @@ export class Painel {
 
   notifications = computed(() => {
     const role = this.authService.userRole();
+    const readIds = this.readNotificationIds();
+    
     const baseNotifs = role === 'paciente' ? [
-        { id: 2, message: 'Seu Exame Raio-X Tórax está Disponível', time: 'Há 2h', route: '/painel/exames', read: false },
-        { id: 3, message: 'Consulta com Dr. Silva confirmada', time: 'Ontem', route: '/painel/agendas', read: true }
+        { id: 2, message: 'Seu Exame Raio-X Tórax está Disponível', time: 'Há 2h', route: '/painel/exames', read: readIds.includes(2) },
+        { id: 3, message: 'Consulta com Dr. Silva confirmada', time: 'Ontem', route: '/painel/agendas', read: readIds.includes(3) }
     ] : [
-        { id: 1, message: 'Novo agendamento: Paciente Carlos (Hoje às 14:00)', time: 'Agora', route: '/painel/agendas', read: false }
+        { id: 1, message: 'Novo agendamento: Paciente Carlos (Hoje às 14:00)', time: 'Agora', route: '/painel/agendas', read: readIds.includes(1) }
     ];
 
     return [...this.chatNotifications(), ...baseNotifs];
@@ -145,7 +149,10 @@ export class Painel {
   }
 
   markAllAsRead() {
-      this.chatService.markAsRead();
-      // baseNotifs stay as is for mock purposes, but chat unread badge will clear.
+    this.chatService.markAsRead();
+    const unreadIds = this.notifications()
+      .filter(n => !n.read)
+      .map(n => n.id);
+    this.readNotificationIds.update(ids => [...ids, ...unreadIds]);
   }
 }

@@ -37,6 +37,12 @@ export class ChatComponent implements AfterViewChecked, OnInit {
     this.scrollToBottom();
   }
 
+  clearChatHistory() {
+    if (confirm('Tem certeza que deseja apagar todo o histórico do chat? Esta ação não pode ser desfeita.')) {
+      this.chatService.clearHistory();
+    }
+  }
+
   private scrollToBottom(): void {
     try {
       this.chatContainer.nativeElement.scrollTop = this.chatContainer.nativeElement.scrollHeight;

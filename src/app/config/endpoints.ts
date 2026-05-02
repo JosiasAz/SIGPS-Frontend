@@ -28,6 +28,7 @@ export const API_ENDPOINTS = {
     BASE: '/api/v1/chat',
     MESSAGES: '/api/v1/chat/messages',
     READ: '/api/v1/chat/messages/read',
+    CLEAR: '/api/v1/chat/messages/clear',
     WS: '/ws/chat',
   },
   EXAMES: {

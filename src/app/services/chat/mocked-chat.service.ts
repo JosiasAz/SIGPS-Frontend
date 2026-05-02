@@ -62,4 +62,9 @@ export class MockedChatService implements AbstractChatService {
 
     this.markAsRead();
   }
+
+  clearHistory(): void {
+    this.messages.set([]);
+    this.lastReadCount.set(0);
+  }
 }
