@@ -64,7 +64,7 @@
                             }
                         </td>
                         <td>
-                            @if ($any(paciente).origem !== 'agenda') {
+                            <!-- @if ($any(paciente).origem !== 'agenda') { -->
                             <button class="icon-btn-sm" title="Editar" (click)="editarPaciente(paciente)">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -77,9 +77,8 @@
                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                 </svg>
                             </button>
-                            } @else {
-                            <span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Via agenda</span>
-                            }
+                            <!-- } @else { -->
+                            <!-- } -->
                         </td>
                     </tr>
                     }
