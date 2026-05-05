@@ -1,0 +1,339 @@
+<section class="page-container">
+    <div class="content-header">
+        <div>
+            <h1>{{ isPaciente() ? 'Meus Agendamentos' : 'Agendas Médicas' }}</h1>
+            <p>{{ isPaciente() ? 'Confira suas consultas marcadas, locais e instruções.' : 'Gerencie os horários e disponibilidades dos especialistas.' }}</p>
+        </div>
+        <div class="header-actions">
+            @if (isGestor()) {
+            <button class="btn-primary-dashboard" (click)="abrirConfiguracao()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Configurar Agenda
+            </button>
+            }
+            @if (isPaciente()) {
+            <button class="btn-primary-dashboard" routerLink="/painel/busca-profissionais">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                Agendar Nova Consulta
+            </button>
+            }
+        </div>
+    </div>
+
+    @if (isPaciente()) {
+    <div class="consultas-grid">
+        @for (con of consultas(); track con.id) {
+        <div class="consulta-card" [class.done]="con.status === 'concluida'">
+            <div class="card-status-line" [class]="con.status"></div>
+            <div class="card-body">
+                <div class="card-date-time">
+                    <div class="date">{{ con.data }}</div>
+                    <div class="time">{{ con.horario }}h</div>
+                </div>
+                <div class="card-main">
+                    <h3>{{ con.especialidade }}</h3>
+                    <p>Com {{ con.especialista }}</p>
+                    <span class="location">{{ con.local }}</span>
+                </div>
+                <div class="card-actions" style="display: flex; gap: 8px;">
+                    <button class="btn-detail" (click)="verDetalhesConsulta(con)" style="flex: 1;">Ver Instruções</button>
+                    @if (con.status === 'concluida') {
+                    <button class="btn-outline-dashboard btn-sm" (click)="baixarRelatorioPDF(con)" style="flex: 1; border-color: var(--green); color: var(--green-dark); padding: 8px; border-radius: 8px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px; vertical-align: middle;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Relatório PDF
+                    </button>
+                    }
+                </div>
+            </div>
+        </div>
+        }
+        @if (consultas().length === 0) {
+            <div class="empty-state">
+                <p>Você ainda não possui consultas agendadas.</p>
+                <button class="btn-outline-sm" routerLink="/painel/busca-profissionais">Buscar Profissionais</button>
+            </div>
+        }
+    </div>
+    } @else if (isEspecialista()) {
+    <div class="consultas-grid">
+        @for (con of consultasDoEspecialista(); track con.id) {
+        <div class="consulta-card" [class.done]="con.status === 'concluida'">
+            <div class="card-status-line" [class]="con.status"></div>
+            <div class="card-body">
+                <div class="card-date-time">
+                    <div class="date">{{ con.data }}</div>
+                    <div class="time">{{ con.horario }}h</div>
+                </div>
+                <div class="card-main">
+                    <h3>Atendimento: {{ con.especialidade }}</h3>
+                    <p>Paciente: <strong>{{ con.pacienteNome || 'Não identificado' }}</strong></p>
+                    <span class="location">{{ con.local }}</span>
+                </div>
+                <div class="card-actions" style="display: flex; gap: 8px;">
+                    <button class="btn-primary-dashboard btn-sm" (click)="abrirProntuario(con)" style="flex: 1; padding: 8px; border-radius: 8px;">
+                        Ver Prontuário e Atender
+                    </button>
+                </div>
+            </div>
+        </div>
+        }
+        @if (consultasDoEspecialista().length === 0) {
+            <div class="empty-state">
+                <p>Você não possui pacientes agendados para hoje.</p>
+            </div>
+        }
+    </div>
+    } @else {
+    <div class="card">
+        <div class="table-container">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Especialista</th>
+                        <th>Especialidade</th>
+                        <th>Horários Disponíveis</th>
+                        <th>Vagas</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (agenda of agendas(); track agenda.id) {
+                    <tr>
+                        <td><strong>{{ agenda.especialista }}</strong></td>
+                        <td>{{ agenda.especialidade }}</td>
+                        <td>
+                            <div class="horarios-grid">
+                                @for (h of agenda.horarios; track h) {
+                                <span class="badge-mini" [class.clickable]="!isGestor()">{{ formatarHorarioSlot(h) }}</span>
+                                }
+                            </div>
+                        </td>
+                        <td>{{ agenda.vagas }}</td>
+                        <td>
+                            <div class="actions-group">
+                                @if (isGestor()) {
+                                <button class="icon-btn-sm" (click)="abrirConfiguracao(agenda)" title="Editar">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 20h9"></path>
+                                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                    </svg>
+                                </button>
+                                <button class="icon-btn-sm text-danger" (click)="excluirAgenda(agenda.id, $event)" title="Excluir">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M3 6h18"></path>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
+                                } @else {
+                                <button class="btn-primary-dashboard btn-sm" (click)="solicitarHorario(agenda)" style="padding: 6px 12px; font-size: 0.8rem; border-radius: 8px;">
+                                    Solicitar Horário
+                                </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+
+    <!-- Modal de Configuração de Agenda -->
+    @if (currentAgenda() !== null) {
+    <div class="modal-overlay" (click)="fecharModal()" [class.active]="currentAgenda() !== null">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>{{ currentAgenda() ? 'Editar Agenda' : 'Nova Agenda' }}</h2>
+                <button class="modal-close" (click)="fecharModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form [formGroup]="agendaForm" (ngSubmit)="salvarAgenda()">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Especialista</label>
+                        <input type="text" formControlName="especialista" class="form-input" placeholder="Ex: Dr. Roberto Lins">
+                    </div>
+                    <div class="form-group">
+                        <label>Especialidade</label>
+                        <input type="text" formControlName="especialidade" class="form-input" placeholder="Ex: Cardiologia">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Vagas Totais</label>
+                        <input type="number" formControlName="vagas" class="form-input" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Horários (separados por vírgula)</label>
+                        <textarea formControlName="horariosRaw" class="form-input" placeholder="Ex: 08:00, 09:30, 11:00"></textarea>
+                        <p class="hint">Digite os horários de início das janelas de atendimento.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" (click)="fecharModal()">Cancelar</button>
+                    <button type="submit" class="btn-primary" [disabled]="agendaForm.invalid">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    }
+
+    <!-- Modal de Detalhes da Consulta (Paciente) -->
+    @if (selectedConsulta(); as con) {
+    <div class="modal-overlay" (click)="fecharModalConsulta()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Detalhes do Agendamento</h2>
+                <button class="modal-close" (click)="fecharModalConsulta()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="modal-scrollable-area" style="flex: 1; overflow-y: auto; padding: 32px;">
+                <div class="appointment-header-detail">
+                    <div class="date-badge">
+                        <span class="d">{{ con.data.split('/')[0] }}</span>
+                        <span class="m">{{ con.data.split('/')[1] }}</span>
+                    </div>
+                    <div class="header-titles">
+                        <h3>{{ con.especialidade }}</h3>
+                        <p>Com {{ con.especialista }}</p>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-item">
+                        <label>Horário</label>
+                        <p>{{ con.horario }}h</p>
+                    </div>
+                    <div class="info-item">
+                        <label>Localização</label>
+                        <p>{{ con.local }}</p>
+                    </div>
+                </div>
+
+                <div class="important-box">
+                    <h4>Instruções Pré-Atendimento</h4>
+                    <p>{{ con.instrucoes }}</p>
+                </div>
+
+                <div class="recommendations">
+                    <h4>Recomendações</h4>
+                    <p>{{ con.recomendacoes }}</p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="fecharModalConsulta()">Fechar</button>
+                <button class="btn-outline-danger" (click)="cancelarAgendamento(con.id)">Cancelar Agendamento</button>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Modal de Solicitação de Horário (Paciente) -->
+    @if (agendaParaAgendamento() !== null) {
+    <div class="modal-overlay" (click)="fecharModalAgendamento()" [class.active]="agendaParaAgendamento() !== null">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Escolha um Horário</h2>
+                <button class="modal-close" (click)="fecharModalAgendamento()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Especialista: <strong>{{ agendaParaAgendamento()?.especialista }}</strong></p>
+                <p>Especialidade: <strong>{{ agendaParaAgendamento()?.especialidade }}</strong></p>
+                <div class="horarios-selecao-grid" style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    @for (h of agendaParaAgendamento()?.horarios; track h) {
+                    <button class="badge-mini clickable" style="padding: 10px; font-size: 1rem; border: 1px solid #4f46e5; background: #e0e7ff; color: #3730a3; cursor: pointer; border-radius: 8px;" (click)="confirmarAgendamento(h)">
+                        {{ formatarHorarioSlot(h) }}
+                    </button>
+                    }
+                </div>
+                @if (agendaParaAgendamento()?.horarios?.length === 0) {
+                    <p class="text-danger" style="margin-top: 15px;">Não há horários disponíveis no momento.</p>
+                }
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="fecharModalAgendamento()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Modal de Prontuário (Visão Especialista na tela de Agendas) -->
+    @if (selectedPacienteProntuario()) {
+    <div class="modal-overlay active" (click)="fecharProntuario()">
+        <div class="modal-content" (click)="$event.stopPropagation()" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>Prontuário Eletrônico</h2>
+                <button class="modal-close" (click)="fecharProntuario()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" style="display: flex; flex-direction: column; gap: 20px;">
+                <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid var(--border);">
+                    <h3 style="margin: 0 0 8px 0; color: var(--text);">Paciente #{{ selectedPacienteProntuario()?.id }}</h3>
+                    <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
+                        Agendado para {{ selectedPacienteProntuario()?.data }} às {{ selectedPacienteProntuario()?.horario }}h
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label>Histórico Breve do Paciente</label>
+                    <div style="font-size: 0.9rem; color: var(--text-muted); padding: 12px; background: #fffbeb; border-radius: 8px; border: 1px solid #fde68a;">
+                        Paciente não apresenta comorbidades no sistema.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Anotações Clínicas da Consulta Atual</label>
+                    <textarea class="form-input" rows="4" placeholder="Descreva os sintomas, diagnóstico e recomendações..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Enviar Relatório / Exame (PDF)</label>
+                    <div style="border: 2px dashed var(--border); padding: 24px; text-align: center; border-radius: 12px; background: #fafafa; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="margin-bottom: 8px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">Clique para anexar arquivo (Ex: Relatorio.pdf) ou arraste aqui</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="fecharProntuario()">Cancelar</button>
+                <button class="btn-primary" (click)="enviarRelatorio()">Concluir e Enviar Relatório</button>
+            </div>
+        </div>
+    </div>
+    }
+</section>
