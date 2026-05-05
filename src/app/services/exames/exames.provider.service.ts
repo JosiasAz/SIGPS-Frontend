@@ -6,5 +6,5 @@ import { ExamesService } from './exames.service';
 
 export const ExamesProvider: Provider = {
   provide: AbstractExamesService,
-  useClass: environment.useMock ? MockedExamesService : ExamesService
+  useClass: ExamesService
 };

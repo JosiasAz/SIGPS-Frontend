@@ -115,7 +115,7 @@ export class Cadastro {
 
     this.authService.register(this.userData).subscribe({
       next: () => {
-        this.router.navigate(['/painel']);
+        this.router.navigate(['/login']);
       },
       error: (err) => {
         this.errorMessage.set('Erro ao criar conta. Tente novamente.');

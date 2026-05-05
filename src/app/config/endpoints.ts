@@ -5,8 +5,8 @@ export const API_ENDPOINTS = {
     ME: '/api/v1/auth/me',
   },
   PACIENTES: {
-    BASE: '/api/v1/pacientes',
-    BY_ID: (id: number | string) => `/api/v1/pacientes/${id}`,
+    BASE: '/api/v1/patients',
+    BY_ID: (id: number | string) => `/api/v1/patients/${id}`,
   },
   ESPECIALISTAS: {
     BASE: '/api/v1/especialistas',
@@ -20,9 +20,9 @@ export const API_ENDPOINTS = {
     STATUS_CONSULTA: (id: number | string) => `/api/v1/agendas/consultas/${id}/status`,
   },
   FILA: {
-    BASE: '/api/v1/fila',
-    ATENDER: '/api/v1/fila/atender',
-    IA_ANALYSIS: '/api/v1/fila/analise-ia',
+    BASE: '/api/v1/queue',
+    ATENDER: '/api/v1/queue/check-in',
+    IA_ANALYSIS: '/api/v1/queue/ai-analysis',
   },
   CHAT: {
     BASE: '/api/v1/chat',
@@ -32,8 +32,8 @@ export const API_ENDPOINTS = {
     WS: '/ws/chat',
   },
   EXAMES: {
-    BASE: '/api/v1/exames',
-    UPLOAD: '/api/v1/exames/upload',
+    BASE: '/api/v1/exams',
+    UPLOAD: '/api/v1/exams/upload',
   },
   RELATORIOS: {
     KPIS: '/api/v1/relatorios/kpis',

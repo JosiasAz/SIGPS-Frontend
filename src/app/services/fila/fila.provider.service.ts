@@ -6,5 +6,5 @@ import { environment } from '../../env/environment';
 
 export const FilaProvider: Provider = {
     provide: AbstractFilaService,
-    useClass: environment.useMock ? MockedFilaService : FilaService
+    useClass: FilaService
 };

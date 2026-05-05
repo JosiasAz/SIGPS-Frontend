@@ -6,5 +6,5 @@ import { environment } from '../../env/environment';
 
 export const ConfigProvider: Provider = {
     provide: AbstractConfigService,
-    useClass: environment.useMock ? MockedConfigService : ConfigService
+    useClass: true || environment.useMock ? MockedConfigService : ConfigService // TODO: Remove true || once backend is ready
 };

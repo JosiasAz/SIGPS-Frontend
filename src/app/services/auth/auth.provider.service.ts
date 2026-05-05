@@ -7,7 +7,7 @@ import { environment } from '../../env/environment';
 
 export const AuthProvider: Provider = {
     provide: AbstractAuthService,
-    useClass: environment.useMock ? MockedAuthService : AuthService
+    useClass: AuthService
 };
 
 // Aliás para manter compatibilidade com nomes antigos se necessário

@@ -6,5 +6,5 @@ import { environment } from '../../env/environment';
 
 export const DashboardProvider: Provider = {
     provide: AbstractDashboardService,
-    useClass: environment.useMock ? MockedDashboardService : DashboardService
+    useClass: true || environment.useMock ? MockedDashboardService : DashboardService // TODO: Remove true || once backend is ready
 };

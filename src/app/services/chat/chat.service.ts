@@ -55,10 +55,9 @@ export class ChatService extends AbstractChatService {
     // For this implementation, we use HTTP and expect the WS to broadcast the message
     this.http.post<ChatMessage>(`${this.apiUrl}${API_ENDPOINTS.CHAT.MESSAGES}`, payload).subscribe({
       next: (sentMessage) => {
-        // If not using WS, we manually add to the list
-        if (environment.useMock) {
-          this.messages.update(msgs => [...msgs, sentMessage]);
-        }
+        // Como o backend em Flask (MVP) ainda não tem WebSocket,
+        // sempre adicionamos a mensagem manualmente para atualizar a interface imediatamente.
+        this.messages.update(msgs => [...msgs, sentMessage]);
       },
       error: (err) => console.error('Erro ao enviar mensagem:', err)
     });

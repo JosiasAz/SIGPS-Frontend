@@ -1,13 +1,61 @@
 <section class="page-container">
     <div class="content-header">
         <div>
-            <h1>Configurações do Sistema</h1>
-            <p>Personalize os parâmetros da plataforma SIGPS.</p>
+            <h1>Painel do Administrador</h1>
+            <p>Gerencie as configurações da plataforma e o nível de acesso dos usuários.</p>
         </div>
     </div>
 
+    <!-- Seção de Usuários -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Gestão de Usuários e Perfis</h3>
+            <p style="color: #64748b; font-size: 0.9rem;">Altere permissões e atribua papéis na plataforma SIGPS.</p>
+        </div>
+        <div class="card-body">
+            @if (isLoadingUsers()) {
+                <p>Carregando usuários...</p>
+            } @else {
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Perfil Atual</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (user of users(); track user.id) {
+                        <tr>
+                            <td>{{ user.nome }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <span class="badge" [ngClass]="user.perfil.toLowerCase()">{{ user.perfil }}</span>
+                            </td>
+                            <td>
+                                <select class="form-control" [ngModel]="user.perfil" (ngModelChange)="changeUserRole(user.id, $event)">
+                                    <option value="Paciente">Paciente</option>
+                                    <option value="Visualizador">Visualizador</option>
+                                    <option value="Especialista">Especialista</option>
+                                    <option value="Gestor">Gestor Clínico</option>
+                                    <option value="Admin">Administrador</option>
+                                </select>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <!-- Seção de Configurações -->
     <div class="card">
-        <div class="settings-list">
+        <div class="card-header">
+            <h3>Configurações Globais</h3>
+        </div>
+        <div class="settings-list mt-3">
             @for (setting of settings; track setting.label) {
             <div class="setting-item">
                 <div class="setting-info">
@@ -21,4 +69,4 @@
             }
         </div>
     </div>
-</section>
+</section>

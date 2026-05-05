@@ -28,11 +28,20 @@ export class AuthService extends AbstractAuthService {
     userRole = computed(() => this.userState()?.role || null);
 
     login(credentials: any): Observable<AuthResponse> {
-        return this.http.post<AuthResponse>(`${this.apiUrl}${API_ENDPOINTS.AUTH.LOGIN}`, credentials).pipe(
+        return this.http.post<any>(`${this.apiUrl}${API_ENDPOINTS.AUTH.LOGIN}`, credentials).pipe(
             tap(response => {
-                this.setAuth(response.access_token);
-                // After login, we usually need to fetch user details if not provided in response
-                this.fetchCurrentUser().subscribe(user => this.setUser(user));
+                this.setAuth(response.token);
+                if (response.user) {
+                    const mappedUser: User = {
+                        id: response.user.id,
+                        name: response.user.nome || response.user.name,
+                        email: response.user.email,
+                        role: (response.user.perfil || response.user.role).toLowerCase() as UserRole
+                    };
+                    this.setUser(mappedUser);
+                } else {
+                    this.fetchCurrentUser().subscribe();
+                }
             }),
             catchError(error => {
                 console.error('Login error', error);
@@ -69,8 +78,16 @@ export class AuthService extends AbstractAuthService {
     }
 
     private fetchCurrentUser(): Observable<User> {
-        return this.http.get<User>(`${this.apiUrl}${API_ENDPOINTS.AUTH.ME}`).pipe(
-            tap(user => this.setUser(user)),
+        return this.http.get<any>(`${this.apiUrl}${API_ENDPOINTS.AUTH.ME}`).pipe(
+            tap(user => {
+                const mappedUser: User = {
+                    id: user.id,
+                    name: user.nome || user.name,
+                    email: user.email,
+                    role: (user.perfil || user.role).toLowerCase() as UserRole
+                };
+                this.setUser(mappedUser);
+            }),
             catchError(error => {
                 console.error('Fetch user error', error);
                 return throwError(() => error);

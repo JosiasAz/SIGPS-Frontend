@@ -6,5 +6,5 @@ import { environment } from '../../env/environment';
 
 export const EspecialistasProvider: Provider = {
     provide: AbstractEspecialistasService,
-    useClass: environment.useMock ? MockedEspecialistasService : EspecialistasService
+    useClass: true || environment.useMock ? MockedEspecialistasService : EspecialistasService // TODO: Remove true || once backend is ready
 };

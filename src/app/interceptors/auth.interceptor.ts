@@ -2,25 +2,19 @@ import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const authKey = 'sigps_auth';
-    const storedAuth = localStorage.getItem(authKey);
+    // Pega o valor do localStorage. Se for apenas o token (string), não use JSON.parse
+    const token = localStorage.getItem(authKey);
 
-    if (storedAuth) {
-        try {
-            const authData = JSON.parse(storedAuth);
-            const token = authData.token;
-
-            if (token) {
-                const authReq = req.clone({
-                    setHeaders: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                return next(authReq);
+    // Se o token existe, clonamos a requisição e injetamos o Header
+    if (token) {
+        const authReq = req.clone({
+            setHeaders: {
+                Authorization: `Bearer ${token}`
             }
-        } catch (e) {
-            console.error('Error parsing auth data for interceptor', e);
-        }
+        });
+        return next(authReq);
     }
 
+    // Se não houver token, a requisição segue normal (para login/cadastro por exemplo)
     return next(req);
 };

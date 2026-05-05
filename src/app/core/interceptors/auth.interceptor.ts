@@ -5,20 +5,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const storedAuth = typeof localStorage !== 'undefined' ? localStorage.getItem(authKey) : null;
 
     if (storedAuth) {
-        try {
-            const authData = JSON.parse(storedAuth);
-            const token = authData.token || authData; // Handle both object and string
+        // O AuthService salva o token diretamente como string pura (ex: "eyJhbG..."),
+        // então não precisamos fazer JSON.parse. Se for um JSON stringificado, removemos as aspas.
+        const token = storedAuth.startsWith('{') ? JSON.parse(storedAuth).token : storedAuth.replace(/^"|"$/g, '');
 
-            if (token) {
-                const authReq = req.clone({
-                    setHeaders: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                return next(authReq);
-            }
-        } catch (e) {
-            console.error('Error parsing auth data for interceptor', e);
+        if (token) {
+            const authReq = req.clone({
+                setHeaders: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return next(authReq);
         }
     }
 

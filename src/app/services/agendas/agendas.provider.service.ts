@@ -6,5 +6,5 @@ import { environment } from '../../env/environment';
 
 export const AgendasProvider: Provider = {
     provide: AbstractAgendasService,
-    useClass: environment.useMock ? MockedAgendasService : AgendasService
+    useClass: AgendasService
 };
