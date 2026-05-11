@@ -67,6 +67,9 @@
             </header>
 
             <form class="login-form" (submit)="onLogin($event)">
+                <div class="success-feedback" *ngIf="successMessage()">
+                    {{ successMessage() }}
+                </div>
                 <div class="error-feedback" *ngIf="errorMessage()">
                     {{ errorMessage() }}
                 </div>
@@ -131,7 +134,7 @@
             </form>
 
             <div class="form-footer">
-                <p>Ainda não tem uma conta? <a routerLink="/cadastro">Solicite acesso</a></p>
+                <p>Ainda não tem uma conta? <a routerLink="/cadastro">Crie Agora!</a></p>
             </div>
             }
         </div>
