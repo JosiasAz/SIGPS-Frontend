@@ -1,7 +1,13 @@
 <section class="perfil-page">
 
+    @if (!profissional()) {
+    <div class="empty-state" style="padding: 60px; text-align: center;">
+        <p>Carregando perfil do profissional...</p>
+    </div>
+    }
+
     <!-- ══════════════════ VISÃO DO PACIENTE ══════════════════ -->
-    @if (isPaciente()) {
+    @if (isPaciente() && profissional()) {
     <div class="content-header">
         <button class="btn-back" routerLink="/painel/busca-profissionais">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -16,27 +22,27 @@
         <!-- Left: Profile Card -->
         <div class="profile-main">
             <div class="profile-card">
-                <div class="profile-banner" [style.backgroundImage]="'url(' + profissional.banner + ')'">
+                <div class="profile-banner" [style.backgroundImage]="'url(' + profissional()?.banner + ')'">
                     <div class="banner-overlay"></div>
                 </div>
                 <div class="profile-header-info">
                     <div class="profile-avatar">
-                        <img [src]="profissional.foto" alt="Foto do Médico">
-                        <span class="online-dot" [class.offline]="calcularStatusVisao(profissional.last_seen, profissional.status) === 'Offline'"></span>
+                        <img [src]="profissional()?.foto" alt="Foto do Médico">
+                        <span class="online-dot" [class.offline]="calcularStatusVisao(profissional()?.last_seen, profissional()?.status) === 'Offline'"></span>
                     </div>
                     <div class="profile-titles">
-                        <h1>{{ profissional.nome }}</h1>
-                        <p class="specialty">{{ profissional.especialidade }}</p>
+                        <h1>{{ profissional()?.nome }}</h1>
+                        <p class="specialty">{{ profissional()?.especialidade }}</p>
                         <div class="badges">
                             <span class="badge badge-crm">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                {{ profissional.crm }}
+                                {{ profissional()?.crm }}
                             </span>
                             <span class="badge badge-star">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="#ffc107" stroke="#ffc107" stroke-width="2">
                                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                                 </svg>
-                                {{ profissional.avaliacao }} ({{ profissional.avaliacoesCount }})
+                                {{ profissional()?.avaliacao }} ({{ profissional()?.avaliacoesCount }})
                             </span>
                         </div>
                     </div>
@@ -45,28 +51,28 @@
                 <!-- Quick Stats -->
                 <div class="profile-quick-stats">
                     <div class="quick-stat">
-                        <span class="qs-value">{{ profissional.consultasRealizadas }}</span>
+                        <span class="qs-value">{{ profissional()?.consultasRealizadas }}</span>
                         <span class="qs-label">Consultas</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="qs-value">{{ profissional.anosExperiencia }}+</span>
+                        <span class="qs-value">{{ profissional()?.anosExperiencia }}+</span>
                         <span class="qs-label">Anos Exp.</span>
                     </div>
                     <div class="quick-stat">
-                        <span class="qs-value">{{ profissional.taxaRetorno }}%</span>
+                        <span class="qs-value">{{ profissional()?.taxaRetorno }}%</span>
                         <span class="qs-label">Retorno</span>
                     </div>
                 </div>
 
                 <div class="profile-section">
                     <h3>Sobre o profissional</h3>
-                    <p class="bio">{{ profissional.sobre }}</p>
+                    <p class="bio">{{ profissional()?.sobre || 'Sem descrição cadastrada.' }}</p>
                 </div>
 
                 <div class="profile-section">
                     <h3>Formação Acadêmica</h3>
                     <div class="timeline">
-                        @for (f of profissional.formacao; track f.titulo) {
+                        @for (f of profissional()?.formacao || []; track f.titulo) {
                         <div class="timeline-item">
                             <div class="timeline-dot"></div>
                             <div class="timeline-content">
@@ -75,14 +81,20 @@
                             </div>
                         </div>
                         }
+                        @if (!profissional()?.formacao?.length) {
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Formação não cadastrada.</p>
+                        }
                     </div>
                 </div>
 
                 <div class="profile-section">
                     <h3>Serviços Oferecidos</h3>
                     <div class="tags-container">
-                        @for (servico of profissional.servicos; track servico) {
+                        @for (servico of profissional()?.servicos || []; track servico) {
                             <span class="tag">{{ servico }}</span>
+                        }
+                        @if (!profissional()?.servicos?.length) {
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Serviços não cadastrados.</p>
                         }
                     </div>
                 </div>
@@ -90,7 +102,7 @@
                 <div class="profile-section">
                     <h3>Avaliações de Pacientes</h3>
                     <div class="reviews-list">
-                        @for (av of profissional.avaliacoes; track av.nome) {
+                        @for (av of profissional()?.avaliacoes || []; track av.nome) {
                         <div class="review-item">
                             <div class="review-header">
                                 <div class="review-avatar">{{ av.nome.charAt(0) }}</div>
@@ -109,6 +121,9 @@
                             <p class="review-text">{{ av.texto }}</p>
                         </div>
                         }
+                        @if (!profissional()?.avaliacoes?.length) {
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Nenhuma avaliação ainda.</p>
+                        }
                     </div>
                 </div>
             </div>
@@ -116,15 +131,24 @@
 
         <!-- Right: Scheduling Sidebar -->
         <div class="profile-sidebar">
+            <!-- Botão de mensagem -->
+            <button class="btn-message-prof" (click)="iniciarChat()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Enviar Mensagem
+            </button>
+
             <div class="schedule-card">
                 <div class="schedule-header">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     <h3>Agendar Consulta</h3>
                 </div>
-                <p class="schedule-subtitle">Toque no horário desejado para agendar sua consulta:</p>
 
+                @if (diasDisponiveis().length > 0) {
+                <p class="schedule-subtitle">Toque no horário desejado para agendar sua consulta:</p>
                 <div class="calendar-days">
-                    @for (dia of diasDisponiveis; track dia.data) {
+                    @for (dia of diasDisponiveis(); track dia.agendaId) {
                     <div class="day-group">
                         <div class="day-header">
                             <span class="day-name">{{ dia.diasemana }}</span>
@@ -133,8 +157,8 @@
                         <div class="slots-grid">
                             @for (slot of dia.slots; track slot) {
                                 <button class="slot-btn"
-                                    [class.selected]="selectedSlot()?.dia === dia.data && selectedSlot()?.slot === slot"
-                                    (click)="selecionarHorario(dia.data, slot)">
+                                    [class.selected]="selectedSlot()?.agendaId === dia.agendaId && selectedSlot()?.slot === slot"
+                                    (click)="selecionarHorario(dia.agendaId, dia.data, slot)">
                                     {{ slot }}
                                 </button>
                             }
@@ -142,6 +166,12 @@
                     </div>
                     }
                 </div>
+                } @else {
+                <div style="padding: 24px; text-align: center; color: var(--text-muted);">
+                    <p>Nenhum horário disponível no momento.</p>
+                    <p style="font-size: 0.85rem; margin-top: 8px;">Entre em contato com a unidade de saúde para verificar disponibilidade.</p>
+                </div>
+                }
 
                 @if (selectedSlot()) {
                 <div class="booking-confirm">
@@ -161,16 +191,16 @@
     }
 
     <!-- ══════════════════ VISÃO DO PROFISSIONAL ══════════════════ -->
-    @if (!isPaciente()) {
+    @if (!isPaciente() && profissional()) {
     <div class="pro-dashboard">
         <div class="pro-header">
             <div class="pro-welcome">
                 <div class="pro-avatar-lg">
-                    <img [src]="profissional.foto" alt="Foto">
+                    <img [src]="profissional()?.foto" alt="Foto">
                 </div>
                 <div>
-                    <h1>{{ profissional.nome }}</h1>
-                    <p>{{ profissional.especialidade }} · {{ profissional.crm }}</p>
+                    <h1>{{ profissional()?.nome }}</h1>
+                    <p>{{ profissional()?.especialidade }} · {{ profissional()?.crm }}</p>
                 </div>
             </div>
             <button class="btn-edit-profile">
@@ -244,6 +274,9 @@
                         }
                     </div>
                     }
+                    @if (agendaHoje().length === 0) {
+                    <p style="color: var(--text-muted); font-size: 0.9rem; padding: 16px 0;">Nenhuma consulta agendada para hoje.</p>
+                    }
                 </div>
             </div>
 
@@ -252,11 +285,11 @@
                     <h3>Últimas Avaliações</h3>
                     <span class="pro-badge-star">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="#ffc107" stroke="#ffc107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                        {{ profissional.avaliacao }}
+                        {{ profissional()?.avaliacao }}
                     </span>
                 </div>
                 <div class="reviews-list compact">
-                    @for (av of profissional.avaliacoes; track av.nome) {
+                    @for (av of profissional()?.avaliacoes || []; track av.nome) {
                     <div class="review-item">
                         <div class="review-header">
                             <div class="review-avatar">{{ av.nome.charAt(0) }}</div>
@@ -267,6 +300,9 @@
                         </div>
                         <p class="review-text">{{ av.texto }}</p>
                     </div>
+                    }
+                    @if (!profissional()?.avaliacoes?.length) {
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Nenhuma avaliação ainda.</p>
                     }
                 </div>
             </div>
@@ -291,13 +327,6 @@
                         <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
                             Consulta: {{ selectedPacienteProntuario()?.tipo }} às {{ selectedPacienteProntuario()?.hora }}h
                         </p>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Histórico Breve do Paciente</label>
-                        <div style="font-size: 0.9rem; color: var(--text-muted); padding: 12px; background: #fffbeb; border-radius: 8px; border: 1px solid #fde68a;">
-                            Paciente apresenta histórico de hipertensão leve controlada. Último hemograma realizado há 6 meses sem alterações significativas.
-                        </div>
                     </div>
 
                     <div class="form-group">

@@ -43,7 +43,7 @@ export class Painel {
     { icon: 'activity', label: 'Especialistas', route: '/painel/especialistas', roles: ['admin', 'gestor'] as UserRole[] },
     { icon: 'list', label: 'Fila de Espera', route: '/painel/fila', roles: ['admin', 'gestor', 'especialista', 'visualizador'] as UserRole[] },
     { icon: 'activity', label: 'Gestão por IA', route: '/painel/gestao-ia', roles: ['admin', 'gestor', 'especialista'] as UserRole[] },
-    { icon: 'star', label: 'Perfil Médico', route: '/painel/perfil-profissional/1', roles: ['admin', 'gestor', 'especialista', 'visualizador', 'paciente'] as UserRole[] },
+    { icon: 'user', label: 'Meu Perfil', route: '/painel/meu-perfil', roles: ['admin', 'gestor', 'especialista', 'visualizador', 'paciente'] as UserRole[] },
     { icon: 'message-square', label: 'Chat e Mensagens', route: '/painel/chat', roles: ['admin', 'gestor', 'especialista', 'visualizador', 'paciente'] as UserRole[] },
     { icon: 'pie-chart', label: 'Relatórios', route: '/painel/relatorios', roles: ['admin', 'gestor'] as UserRole[] },
     { icon: 'settings', label: 'Configurações', route: '/painel/config', roles: ['admin'] as UserRole[] },
@@ -105,21 +105,18 @@ export class Painel {
   readNotificationIds = signal<number[]>([]);
 
   chatNotifications = computed(() => {
-    const msgs = this.chatService.messages();
-    const role = this.authService.userRole();
-    const unreadCount = this.chatService.unreadCount();
-    const relevantMsgs = msgs.filter(m => role === 'paciente' ? m.sender !== 'user' : m.sender !== 'sistema');
-    
-    return relevantMsgs.map((m, i, arr) => {
-       const isUnread = (arr.length - 1 - i) < unreadCount;
-       return {
-           id: 1000 + i,
-           message: `Nova mensagem de: ${m.senderName}`,
-           time: m.time,
-           route: '/painel/chat',
-           read: !isUnread
-       };
-    }).reverse().slice(0, 3);
+    // Notificações baseadas em conversas com mensagens não lidas
+    const convs = this.chatService.conversations();
+    return convs
+      .filter(c => c.unreadCount > 0)
+      .slice(0, 3)
+      .map((c, i) => ({
+        id: 2000 + i,
+        message: `Nova mensagem de: ${c.userName}`,
+        time: c.lastMessageTime,
+        route: '/painel/chat',
+        read: false
+      }));
   });
 
   notifications = computed(() => {

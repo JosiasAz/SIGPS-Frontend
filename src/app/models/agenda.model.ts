@@ -1,7 +1,9 @@
 export interface Agenda {
     id: number;
+    especialistaId?: number;
     especialista: string;
     especialidade: string;
+    data?: string;
     horarios: string[];
     vagas: number;
 }

@@ -20,6 +20,7 @@ import { ChatComponent } from '../pages/painel/chat/chat';
 import { PerfilProfissionalComponent } from '../pages/painel/perfil-profissional/perfil-profissional';
 import { BuscaProfissionaisComponent } from '../pages/painel/busca-profissionais/busca-profissionais';
 import { GestaoIAComponent } from '../pages/painel/gestao-ia/gestao-ia';
+import { MeuPerfilComponent } from '../pages/painel/meu-perfil/meu-perfil';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -44,6 +45,11 @@ export const routes: Routes = [
             {
                 path: 'chat',
                 component: ChatComponent,
+                canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'especialista', 'visualizador'])]
+            },
+            {
+                path: 'meu-perfil',
+                component: MeuPerfilComponent,
                 canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'especialista', 'visualizador'])]
             },
             {

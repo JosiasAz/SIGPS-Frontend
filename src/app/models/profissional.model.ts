@@ -22,5 +22,5 @@ export interface Profissional {
   banner?: string;
   estatisticas?: { pacientesHoje: number, consultasMes: number, faturamentoMes: string, satisfacao: string };
   agendaHoje?: { hora: string, paciente: string, tipo: string, status: string }[];
-  diasDisponiveis?: { data: string, diasemana: string, slots: string[] }[];
+  diasDisponiveis?: { agendaId: number, data: string, diasemana: string, slots: string[] }[];
 }

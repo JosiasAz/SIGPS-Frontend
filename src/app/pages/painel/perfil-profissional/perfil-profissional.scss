@@ -334,6 +334,30 @@
     }
 }
 
+/* ── Botão de Mensagem ── */
+.btn-message-prof {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 13px;
+    margin-bottom: 12px;
+    background: white;
+    color: var(--green-dark);
+    border: 1.5px solid var(--green);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: var(--green-soft);
+        transform: translateY(-1px);
+    }
+}
+
 /* ── Schedule Card (Sidebar) ── */
 .schedule-card {
     background: white;

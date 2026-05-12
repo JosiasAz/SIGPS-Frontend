@@ -23,34 +23,8 @@ export class PerfilProfissionalComponent implements OnInit {
   isPaciente = computed(() => this.userRole() === 'paciente');
   isEspecialista = computed(() => this.userRole() === 'especialista');
 
-  profissional!: Profissional;
+  profissional = signal<Profissional | null>(null);
 
-  ngOnInit() {
-    this.route.paramMap.subscribe(params => {
-      const id = Number(params.get('id')) || 1;
-      const prof = this.especialistasService.getProfissionalById(id);
-      
-      this.profissional = prof || this.especialistasService.getProfissionalById(1)!;
-
-      if (this.profissional) {
-        if (this.profissional.estatisticas) this.estatisticas.set(this.profissional.estatisticas);
-        if (this.profissional.agendaHoje) this.agendaHoje.set(this.profissional.agendaHoje);
-        if (this.profissional.diasDisponiveis) this.diasDisponiveis = this.profissional.diasDisponiveis;
-      }
-    });
-  }
-
-  calcularStatusVisao(last_seen?: Date | string | null, statusDefault?: string): string {
-    if (!last_seen) {
-        return statusDefault === 'online' ? 'Online' : 'Offline';
-    }
-    const lastSeenTime = new Date(last_seen).getTime();
-    const now = new Date().getTime();
-    const diffMinutes = (now - lastSeenTime) / (1000 * 60);
-    return diffMinutes <= 5 ? 'Online' : 'Offline';
-  }
-
-  // Stats for the professional's own dashboard view
   estatisticas = signal({
     pacientesHoje: 0,
     consultasMes: 0,
@@ -59,26 +33,84 @@ export class PerfilProfissionalComponent implements OnInit {
   });
 
   agendaHoje = signal<any[]>([]);
+  diasDisponiveis = signal<{ agendaId: number, data: string, diasemana: string, slots: string[] }[]>([]);
+  selectedSlot = signal<{ agendaId: number, dia: string, slot: string } | null>(null);
+  selectedPacienteProntuario = signal<any>(null);
 
-  diasDisponiveis: any[] = [];
+  ngOnInit() {
+    this.route.paramMap.subscribe(params => {
+      const id = Number(params.get('id')) || 0;
+      this.carregarProfissional(id);
+    });
+  }
 
-  selectedSlot = signal<{ dia: string; slot: string } | null>(null);
+  private carregarProfissional(id: number) {
+    // Tenta carregar pelo serviço real com dados completos (inclui diasDisponiveis do backend)
+    const realService = this.especialistasService as any;
+    if (typeof realService.getProfissionalByIdFromApi === 'function') {
+      realService.getProfissionalByIdFromApi(id).subscribe({
+        next: (prof: Profissional) => {
+          this.profissional.set(prof);
+          this.aplicarDadosProfissional(prof);
+        },
+        error: () => this.carregarDoSignal(id)
+      });
+    } else {
+      this.carregarDoSignal(id);
+    }
+  }
 
-  selecionarHorario(dia: string, slot: string) {
-    this.selectedSlot.set({ dia, slot });
+  private carregarDoSignal(id: number) {
+    const prof = this.especialistasService.getProfissionalById(id)
+      || this.especialistasService.getProfissionalById(this.especialistasService.especialistas()[0]?.id || 1);
+    if (prof) {
+      this.profissional.set(prof);
+      this.aplicarDadosProfissional(prof);
+    }
+  }
+
+  private aplicarDadosProfissional(prof: Profissional) {
+    if (prof.estatisticas) this.estatisticas.set(prof.estatisticas);
+    if (prof.agendaHoje) this.agendaHoje.set(prof.agendaHoje);
+
+    if (prof.diasDisponiveis && prof.diasDisponiveis.length > 0) {
+      this.diasDisponiveis.set(prof.diasDisponiveis as any);
+    } else {
+      // Fallback: busca agendas do profissional diretamente pelo serviço
+      this.carregarDiasDisponiveisViaAgendas(prof.id);
+    }
+  }
+
+  private carregarDiasDisponiveisViaAgendas(especialistaId: number) {
+    const agendas = this.agendasService.agendas();
+    const agendaDoEspecialista = agendas.filter(a => (a as any).especialistaId === especialistaId);
+    const dias = agendaDoEspecialista
+      .filter(a => a.horarios && a.horarios.length > 0 && a.data)
+      .map(a => ({
+        agendaId: a.id,
+        data: a.data as string,
+        diasemana: '',
+        slots: a.horarios
+      }));
+    this.diasDisponiveis.set(dias);
+  }
+
+  calcularStatusVisao(last_seen?: Date | string | null, statusDefault?: string): string {
+    if (!last_seen) return statusDefault === 'online' ? 'Online' : 'Offline';
+    const diff = (new Date().getTime() - new Date(last_seen).getTime()) / (1000 * 60);
+    return diff <= 5 ? 'Online' : 'Offline';
+  }
+
+  selecionarHorario(agendaId: number, dia: string, slot: string) {
+    this.selectedSlot.set({ agendaId, dia, slot });
   }
 
   confirmarAgendamento() {
     const sel = this.selectedSlot();
-    if (sel) {
-      // Tentar encontrar a agenda do profissional
-      const agendas = this.agendasService.agendas();
-      const agenda = agendas.find(a => a.especialista === this.profissional.nome);
-      
-      this.agendasService.agendarConsulta(agenda?.id || 1, sel.slot);
-      
-      alert(`✅ Agendamento realizado com sucesso!\nSua consulta com ${this.profissional.nome} no dia ${sel.dia} às ${sel.slot} foi registrada.`);
-      
+    const prof = this.profissional();
+    if (sel && prof) {
+      this.agendasService.agendarConsulta(sel.agendaId, sel.slot);
+      alert(`Agendamento realizado!\nConsulta com ${prof.nome} em ${sel.dia} às ${sel.slot} registrada.`);
       this.selectedSlot.set(null);
       this.router.navigate(['/painel/portal-paciente']);
     }
@@ -88,8 +120,12 @@ export class PerfilProfissionalComponent implements OnInit {
     this.selectedSlot.set(null);
   }
 
-  // --- Funções do Prontuário Eletrônico (Especialista) ---
-  selectedPacienteProntuario = signal<any>(null);
+  iniciarChat() {
+    const prof = this.profissional();
+    if (prof) {
+      this.router.navigate(['/painel/chat'], { queryParams: { with: prof.id } });
+    }
+  }
 
   abrirProntuario(item: any) {
     this.selectedPacienteProntuario.set(item);
@@ -100,13 +136,13 @@ export class PerfilProfissionalComponent implements OnInit {
   }
 
   enviarRelatorio() {
-    alert('Relatório clínico e arquivo anexado foram enviados ao paciente com sucesso!\nO paciente agora pode visualizar e baixar o PDF em "Meus Agendamentos" no portal dele.');
-    
-    // Simula a mudança de status da agenda para "concluida" localmente para feedback visual
-    this.agendaHoje.update(agendas => 
-      agendas.map(a => a === this.selectedPacienteProntuario() ? { ...a, status: 'concluida' } : a)
-    );
-    
+    const item = this.selectedPacienteProntuario();
+    if (item) {
+      this.agendaHoje.update(agendas =>
+        agendas.map(a => a === item ? { ...a, status: 'concluida' } : a)
+      );
+    }
     this.fecharProntuario();
+    alert('Relatório clínico enviado ao paciente com sucesso!');
   }
 }

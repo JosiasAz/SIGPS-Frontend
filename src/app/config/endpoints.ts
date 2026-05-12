@@ -26,9 +26,9 @@ export const API_ENDPOINTS = {
   },
   CHAT: {
     BASE: '/api/v1/chat',
-    MESSAGES: '/api/v1/chat/messages',
-    READ: '/api/v1/chat/messages/read',
-    CLEAR: '/api/v1/chat/messages/clear',
+    CONVERSATIONS: '/api/v1/chat/conversations',
+    MESSAGES: (otherId: number) => `/api/v1/chat/messages/${otherId}`,
+    READ: (otherId: number) => `/api/v1/chat/messages/${otherId}/read`,
     WS: '/ws/chat',
   },
   EXAMES: {

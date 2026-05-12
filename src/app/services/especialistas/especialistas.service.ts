@@ -27,23 +27,26 @@ export class EspecialistasService extends AbstractEspecialistasService {
         return this.especialistas().find(p => p.id === id);
     }
 
+    getProfissionalByIdFromApi(id: number) {
+        return this.http.get<Profissional>(`${this.apiUrl}/api/v1/specialists/${id}`);
+    }
+
     addEspecialista(especialista: Partial<Profissional>): void {
-        const novo: Profissional = {
-            id: Date.now(),
-            ...especialista,
-            avaliacao: 5.0,
-            avaliacoesCount: 0,
-            foto: '',
-            proximaVaga: ''
-        } as Profissional;
-        this.especialistas.set([...this.especialistas(), novo]);
+        // Criação de especialista é feita via auth/register com perfil Especialista.
+        // Após o cadastro, o perfil pode ser atualizado via PATCH /specialists/me.
+        console.warn('Use o fluxo de cadastro de usuário com perfil Especialista.');
     }
 
     updateEspecialista(id: number, especialista: Partial<Profissional>): void {
-        this.especialistas.update(s => s.map(e => e.id === id ? { ...e, ...especialista } : e));
+        this.http.patch(`${this.apiUrl}/api/v1/specialists/me`, especialista).subscribe({
+            next: (res: any) => {
+                this.especialistas.update(s => s.map(e => e.id === id ? { ...e, ...res.especialista } : e));
+            },
+            error: (err) => console.error('Erro ao atualizar especialista:', err)
+        });
     }
 
     removeEspecialista(id: number): void {
-        this.especialistas.update(s => s.filter(e => e.id !== id));
+        console.warn('Remoção de especialista deve ser feita via painel administrativo.');
     }
 }

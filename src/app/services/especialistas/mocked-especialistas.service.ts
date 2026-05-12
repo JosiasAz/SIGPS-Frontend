@@ -23,9 +23,9 @@ export class MockedEspecialistasService extends AbstractEspecialistasService {
                 { hora: '15:30', paciente: 'Fernanda Lima', tipo: 'Retorno', status: 'aguardando' }
             ],
             diasDisponiveis: [
-                { data: 'Hoje', diasemana: 'Qui', slots: ['14:00', '15:30', '16:00'] },
-                { data: 'Amanhã', diasemana: 'Sex', slots: ['09:00', '10:00', '14:30', '17:00'] },
-                { data: '10/04', diasemana: 'Seg', slots: ['08:00', '11:00', '13:00', '15:00'] }
+                { agendaId: 101, data: 'Hoje', diasemana: 'Qui', slots: ['14:00', '15:30', '16:00'] },
+                { agendaId: 102, data: 'Amanhã', diasemana: 'Sex', slots: ['09:00', '10:00', '14:30', '17:00'] },
+                { agendaId: 103, data: '10/04', diasemana: 'Seg', slots: ['08:00', '11:00', '13:00', '15:00'] }
             ]
         },
         { id: 2, nome: 'Dra. Amanda Silva', especialidade: 'Dermatologia', crm: '54321-SP', avaliacao: 4.8, avaliacoesCount: 95, foto: 'https://ui-avatars.com/api/?name=Mariana+Alves&background=419640&color=fff&size=200', proximaVaga: 'Amanhã, 09:00',
@@ -44,9 +44,9 @@ export class MockedEspecialistasService extends AbstractEspecialistasService {
                 { hora: '15:30', paciente: 'Fernanda Lima', tipo: 'Retorno', status: 'aguardando' }
             ],
             diasDisponiveis: [
-                { data: 'Hoje', diasemana: 'Qui', slots: ['14:00', '15:30', '16:00'] },
-                { data: 'Amanhã', diasemana: 'Sex', slots: ['09:00', '10:00', '14:30', '17:00'] },
-                { data: '10/04', diasemana: 'Seg', slots: ['08:00', '11:00', '13:00', '15:00'] }
+                { agendaId: 201, data: 'Hoje', diasemana: 'Qui', slots: ['14:00', '15:30', '16:00'] },
+                { agendaId: 202, data: 'Amanhã', diasemana: 'Sex', slots: ['09:00', '10:00', '14:30', '17:00'] },
+                { agendaId: 203, data: '10/04', diasemana: 'Seg', slots: ['08:00', '11:00', '13:00', '15:00'] }
             ]
          },
         { id: 3, nome: 'Dr. Carlos Mendes', especialidade: 'Pediatria', crm: '98765-SP', avaliacao: 5.0, avaliacoesCount: 210, foto: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?q=80&w=1000&auto=format&fit=crop', proximaVaga: 'Dia 12/04, 10:30', status: 'offline' },
