@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AbstractAuthService } from '../../services/auth/abstract-auth.service';
 import { AbstractChatService } from '../../services/chat/abstract-chat.service';
+import { AbstractNotificationsService } from '../../services/notifications/abstract-notifications.service';
 import { UserRole } from '../../models/auth.model';
 
 @Component({
@@ -15,6 +16,7 @@ import { UserRole } from '../../models/auth.model';
 export class Painel {
   private authService = inject(AbstractAuthService);
   private chatService = inject(AbstractChatService);
+  private notificationsService = inject(AbstractNotificationsService);
   private router = inject(Router);
 
   isSidebarCollapsed = signal(false);
@@ -42,7 +44,6 @@ export class Painel {
     { icon: 'calendar', label: 'Agendas', route: '/painel/agendas', roles: ['admin', 'gestor', 'especialista'] as UserRole[] },
     { icon: 'activity', label: 'Especialistas', route: '/painel/especialistas', roles: ['admin', 'gestor'] as UserRole[] },
     { icon: 'list', label: 'Fila de Espera', route: '/painel/fila', roles: ['admin', 'gestor', 'especialista', 'visualizador'] as UserRole[] },
-    { icon: 'activity', label: 'Gestão por IA', route: '/painel/gestao-ia', roles: ['admin', 'gestor', 'especialista'] as UserRole[] },
     { icon: 'user', label: 'Meu Perfil', route: '/painel/meu-perfil', roles: ['admin', 'gestor', 'especialista', 'visualizador', 'paciente'] as UserRole[] },
     { icon: 'message-square', label: 'Chat e Mensagens', route: '/painel/chat', roles: ['admin', 'gestor', 'especialista', 'visualizador', 'paciente'] as UserRole[] },
     { icon: 'pie-chart', label: 'Relatórios', route: '/painel/relatorios', roles: ['admin', 'gestor'] as UserRole[] },
@@ -102,7 +103,6 @@ export class Painel {
 
   // NOTIFICATION FUNCTIONALITY
   isNotificationsOpen = signal(false);
-  readNotificationIds = signal<number[]>([]);
 
   chatNotifications = computed(() => {
     // Notificações baseadas em conversas com mensagens não lidas
@@ -120,23 +120,21 @@ export class Painel {
   });
 
   notifications = computed(() => {
-    const role = this.authService.userRole();
-    const readIds = this.readNotificationIds();
-    
-    const baseNotifs = role === 'paciente' ? [
-        { id: 2, message: 'Seu Exame Raio-X Tórax está Disponível', time: 'Há 2h', route: '/painel/exames', read: readIds.includes(2) },
-        { id: 3, message: 'Consulta com Dr. Silva confirmada', time: 'Ontem', route: '/painel/agendas', read: readIds.includes(3) }
-    ] : [
-        { id: 1, message: 'Novo agendamento: Paciente Carlos (Hoje às 14:00)', time: 'Agora', route: '/painel/agendas', read: readIds.includes(1) }
-    ];
-
-    return [...this.chatNotifications(), ...baseNotifs];
+    // Carrega as notificações em tempo real sempre que o menu abrir
+    if (this.isNotificationsOpen()) {
+      this.notificationsService.loadNotifications();
+    }
+    return [...this.chatNotifications(), ...this.notificationsService.notifications()];
   });
 
-  unreadNotifications = computed(() => this.notifications().filter(n => !n.read).length);
+  unreadNotifications = computed(() => this.chatNotifications().length + this.notificationsService.unreadCount());
 
   toggleNotifications() {
-    this.isNotificationsOpen.set(!this.isNotificationsOpen());
+    const nextState = !this.isNotificationsOpen();
+    this.isNotificationsOpen.set(nextState);
+    if (nextState) {
+      this.notificationsService.loadNotifications();
+    }
   }
 
   onNotificationBlur() {
@@ -145,11 +143,17 @@ export class Painel {
     }, 200);
   }
 
+  clickNotification(notif: any) {
+    if (!notif.read) {
+      if (notif.id < 2000) {
+        this.notificationsService.markAsRead(notif.id);
+      }
+    }
+    this.goToResult(notif.route);
+  }
+
   markAllAsRead() {
     this.chatService.markAsRead();
-    const unreadIds = this.notifications()
-      .filter(n => !n.read)
-      .map(n => n.id);
-    this.readNotificationIds.update(ids => [...ids, ...unreadIds]);
+    this.notificationsService.markAllAsRead();
   }
 }

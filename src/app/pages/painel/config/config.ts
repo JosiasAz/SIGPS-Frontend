@@ -17,7 +17,7 @@ interface UserData {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './config.html',
-  styleUrls: ['../painel.scss'],
+  styleUrls: ['./config.scss'],
 })
 export class ConfigComponent implements OnInit {
   private configService = inject(AbstractConfigService);

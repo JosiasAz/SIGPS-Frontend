@@ -82,3 +82,20 @@ body {
 .sidebar::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.25);
 }
+
+/* ── Custom input fixes (Double Eye and Text Overlap) ── */
+
+/* Remove native browser password reveal/clear button in Edge/IE to prevent double eye bug */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none !important;
+}
+
+/* Ensure typed text doesn't overlap absolute-positioned toggle buttons (password eye, date picker calendar) */
+.input-wrapper {
+    input#password,
+    input#confirmPassword,
+    input[type="text"]#dataNascimento {
+        padding-right: 48px !important;
+    }
+}

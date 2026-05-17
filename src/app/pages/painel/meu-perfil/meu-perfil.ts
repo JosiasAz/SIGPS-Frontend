@@ -132,6 +132,7 @@ export class MeuPerfilComponent implements OnInit {
   private http = inject(HttpClient);
   private authService = inject(AbstractAuthService);
   private fb = inject(FormBuilder);
+  private router = inject(Router);
   private api = environment.apiUrl;
 
   readonly tiposProfissional = TIPOS_PROFISSIONAL;
@@ -143,6 +144,11 @@ export class MeuPerfilComponent implements OnInit {
   carregando = signal(true);
   salvando = signal(false);
   toast = signal<{tipo: 'sucesso'|'erro'; msg: string} | null>(null);
+
+  // ── Transição de upgrade ──────────────────────────────────────────────────
+  transicaoAtiva = signal(false);
+  transicaoStatus = signal('Processando...');
+  transicaoProgresso = signal(0);
 
   get isPaciente() { return this.perfil()?.perfil === 'Paciente'; }
   get isEspecialista() { return this.perfil()?.perfil === 'Especialista'; }
@@ -206,7 +212,7 @@ export class MeuPerfilComponent implements OnInit {
       cep: [''], rua: [''], numero: [''], complemento: [''],
       bairro: [''], cidade: [''], estado: ['']
     });
-    this.step4Form = this.fb.group({ sobre: [''], concordaTermos: [false, Validators.requiredTrue] });
+    this.step4Form = this.fb.group({ sobre: ['', [Validators.required, Validators.minLength(20)]], concordaTermos: [false, Validators.requiredTrue] });
 
     this.step1ClinicaForm = this.fb.group({
       tipo:  ['Clínica', Validators.required],
@@ -315,8 +321,38 @@ export class MeuPerfilComponent implements OnInit {
   wizardAnterior() { this.etapaWizard.update(e => Math.max(1, e - 1)); }
   wizardProximo() {
     const e = this.etapaWizard();
+    if (e === 1 && this.step1Form.invalid) { this.step1Form.markAllAsTouched(); return; }
     if (e === 2 && this.step2Form.invalid) { this.step2Form.markAllAsTouched(); return; }
+    if (e === 3) {
+      const cep = this.step3Form.get('cep')?.value;
+      const rua = this.step3Form.get('rua')?.value;
+      const numero = this.step3Form.get('numero')?.value;
+      const bairro = this.step3Form.get('bairro')?.value;
+      const cidade = this.step3Form.get('cidade')?.value;
+      const estado = this.step3Form.get('estado')?.value;
+      
+      if (cep || rua || numero || bairro || cidade || estado) {
+        let temErro = false;
+        ['cep', 'rua', 'numero', 'bairro', 'cidade', 'estado'].forEach(field => {
+          const ctrl = this.step3Form.get(field);
+          if (!ctrl?.value) {
+            ctrl?.setErrors({ required: true });
+            ctrl?.markAsTouched();
+            temErro = true;
+          }
+        });
+        if (temErro) return;
+      }
+    }
     this.etapaWizard.update(e => Math.min(4, e + 1));
+  }
+
+  pularEtapa3() {
+    this.step3Form.reset({
+      cep: '', rua: '', numero: '', complemento: '',
+      bairro: '', cidade: '', estado: ''
+    });
+    this.etapaWizard.set(4);
   }
 
   concluirUpgrade() {
@@ -332,12 +368,43 @@ export class MeuPerfilComponent implements OnInit {
     this.http.post<any>(`${this.api}/api/v1/perfil/tornar-especialista`, payload).subscribe({
       next: (res) => {
         this.salvando.set(false);
-        this.perfil.set(res.perfil);
-        this.showToast('sucesso', 'Perfil profissional criado! Agora envie seu documento de verificação.');
-        this.etapaWizard.set(4);
+        this.iniciarTransicaoUpgrade(res.perfil);
       },
       error: (e) => { this.salvando.set(false); this.showToast('erro', e.error?.message || 'Erro ao criar perfil.'); }
     });
+  }
+
+  iniciarTransicaoUpgrade(perfilUpgrade: any) {
+    this.transicaoAtiva.set(true);
+    this.transicaoStatus.set('Salvando perfil profissional...');
+    this.transicaoProgresso.set(15);
+
+    // Phase 2: Update database role & local session
+    setTimeout(() => {
+      this.transicaoStatus.set('Atualizando permissões de acesso...');
+      this.transicaoProgresso.set(45);
+      this.authService.updateUserRole('especialista');
+    }, 800);
+
+    // Phase 3: Setup dashboard settings
+    setTimeout(() => {
+      this.transicaoStatus.set('Preparando seu painel de especialista...');
+      this.transicaoProgresso.set(75);
+      this.perfil.set(perfilUpgrade);
+    }, 1600);
+
+    // Phase 4: Finalizing & routing
+    setTimeout(() => {
+      this.transicaoStatus.set('Concluído! Carregando...');
+      this.transicaoProgresso.set(100);
+    }, 2400);
+
+    // Redirect to Specialist dashboard!
+    setTimeout(() => {
+      this.transicaoAtiva.set(false);
+      this.router.navigate(['/painel/dashboard']);
+      this.showToast('sucesso', 'Parabéns! Seu perfil de Especialista foi criado com sucesso.');
+    }, 3000);
   }
 
   private _montarEnderecoLocal(): string {

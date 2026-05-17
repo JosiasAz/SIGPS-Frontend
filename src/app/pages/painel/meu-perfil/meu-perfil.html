@@ -232,6 +232,9 @@
                             @if (buscandoCep()) { <span class="input-spinner"></span> }
                         </div>
                         @if (erroCep()) { <div class="field-error">{{ erroCep() }}</div> }
+                        @if (step3Form.get('cep')?.invalid && step3Form.get('cep')?.touched) {
+                        <div class="field-error">CEP é obrigatório</div>
+                        }
                         <div class="field-hint">Digite o CEP para preencher o endereço automaticamente</div>
                     </div>
                 </div>
@@ -239,10 +242,16 @@
                     <div class="field-group" style="flex:3">
                         <label class="field-label">Rua / Logradouro</label>
                         <input type="text" formControlName="rua" class="field-input" placeholder="Rua, Av., Alameda...">
+                        @if (step3Form.get('rua')?.invalid && step3Form.get('rua')?.touched) {
+                        <div class="field-error">Rua é obrigatória</div>
+                        }
                     </div>
                     <div class="field-group field-group--sm">
                         <label class="field-label">Número</label>
                         <input type="text" formControlName="numero" class="field-input" placeholder="123">
+                        @if (step3Form.get('numero')?.invalid && step3Form.get('numero')?.touched) {
+                        <div class="field-error">Obrigatório</div>
+                        }
                     </div>
                     <div class="field-group">
                         <label class="field-label">Complemento</label>
@@ -253,10 +262,16 @@
                     <div class="field-group">
                         <label class="field-label">Bairro</label>
                         <input type="text" formControlName="bairro" class="field-input" placeholder="Bairro">
+                        @if (step3Form.get('bairro')?.invalid && step3Form.get('bairro')?.touched) {
+                        <div class="field-error">Bairro é obrigatório</div>
+                        }
                     </div>
                     <div class="field-group" style="flex:2">
                         <label class="field-label">Cidade</label>
                         <input type="text" formControlName="cidade" class="field-input" placeholder="São Paulo">
+                        @if (step3Form.get('cidade')?.invalid && step3Form.get('cidade')?.touched) {
+                        <div class="field-error">Cidade é obrigatória</div>
+                        }
                     </div>
                     <div class="field-group field-group--sm">
                         <label class="field-label">Estado</label>
@@ -264,12 +279,15 @@
                             <option value="">UF</option>
                             @for (uf of ufs; track uf) { <option [value]="uf">{{ uf }}</option> }
                         </select>
+                        @if (step3Form.get('estado')?.invalid && step3Form.get('estado')?.touched) {
+                        <div class="field-error">UF é obrigatória</div>
+                        }
                     </div>
                 </div>
             </form>
             <div class="step-actions">
                 <button class="btn-ghost" (click)="wizardAnterior()">← Voltar</button>
-                <button class="btn-ghost" (click)="wizardProximo()">Pular →</button>
+                <button class="btn-ghost" (click)="pularEtapa3()">Pular →</button>
                 <button class="btn-primary" (click)="wizardProximo()">Continuar →</button>
             </div>
         </div>
@@ -281,16 +299,20 @@
             <h3 class="step-title">Verificação de Identidade Profissional</h3>
             <p class="step-subtitle">Para aparecer publicamente e receber agendamentos, é necessário enviar um documento de verificação.</p>
 
-            @if (!perfil()?.id) {
+            @if (isPaciente) {
             <!-- Ainda não criou o perfil — exibe revisão e botão de concluir -->
             <div class="review-box">
                 <div class="review-item"><span>Tipo</span><strong>{{ step1Form.value.tipoProfissional }}</strong></div>
                 <div class="review-item"><span>Conselho</span><strong>{{ step2Form.value.conselho }} {{ step2Form.value.numeroRegistro }}-{{ step2Form.value.uf }}</strong></div>
                 <div class="review-item"><span>Especialidade</span><strong>{{ step2Form.value.especialidade }}</strong></div>
             </div>
-            <div class="field-group" style="margin-top:20px;">
-                <label class="field-label">Sobre você</label>
-                <textarea [formControl]="$any(step4Form.get('sobre'))" class="field-input field-textarea" rows="3" placeholder="Experiência, formação, abordagem..."></textarea>
+             <div class="field-group" style="margin-top:20px;">
+                <label class="field-label">Sobre você <span class="req">*</span></label>
+                <textarea [formControl]="$any(step4Form.get('sobre'))" class="field-input field-textarea" rows="4" placeholder="Escreva um breve resumo sobre sua formação, experiência, abordagem de atendimento..."></textarea>
+                <div class="field-hint">Mínimo de 20 caracteres. Esse resumo será exibido publicamente no seu perfil para os pacientes.</div>
+                @if (step4Form.get('sobre')?.invalid && step4Form.get('sobre')?.touched) {
+                <div class="field-error">Escreva pelo menos 20 caracteres descrevendo seu perfil profissional.</div>
+                }
             </div>
             <label class="checkbox-label">
                 <input type="checkbox" [formControl]="$any(step4Form.get('concordaTermos'))">
@@ -757,3 +779,25 @@
         <div class="skeleton card-skeleton short"></div>
     </div>
 </ng-template>
+
+<!-- Upgrade Transition Screen -->
+@if (transicaoAtiva()) {
+<div class="transicao-overlay">
+    <div class="transicao-content">
+        <div class="transicao-logo">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
+        <h2>Parabéns!</h2>
+        <p class="transicao-sub">Você agora é um Especialista na plataforma SIGPS.</p>
+        
+        <div class="transicao-progress-track">
+            <div class="transicao-progress-fill" [style.width.%]="transicaoProgresso()"></div>
+        </div>
+        
+        <div class="transicao-status-text">
+            <span>{{ transicaoStatus() }}</span>
+            <span>{{ transicaoProgresso() }}%</span>
+        </div>
+    </div>
+</div>
+}

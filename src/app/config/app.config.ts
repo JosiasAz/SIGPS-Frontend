@@ -16,6 +16,7 @@ import { RelatoriosProvider } from '../services/relatorios/relatorios.provider.s
 import { ConfigProvider } from '../services/config/config.provider.service';
 import { ChatProvider } from '../services/chat/chat.provider.service';
 import { ExamesProvider } from '../services/exames/exames.provider.service';
+import { NotificationsProvider } from '../services/notifications/notifications.provider.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -32,6 +33,7 @@ export const appConfig: ApplicationConfig = {
     RelatoriosProvider,
     ConfigProvider,
     ChatProvider,
-    ExamesProvider
+    ExamesProvider,
+    NotificationsProvider
   ]
 };

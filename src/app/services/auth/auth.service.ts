@@ -77,6 +77,14 @@ export class AuthService extends AbstractAuthService {
         return !!userRole && roles.includes(userRole);
     }
 
+    updateUserRole(role: UserRole): void {
+        const current = this.userState();
+        if (current) {
+            const updated = { ...current, role };
+            this.setUser(updated);
+        }
+    }
+
     private fetchCurrentUser(): Observable<User> {
         return this.http.get<any>(`${this.apiUrl}${API_ENDPOINTS.AUTH.ME}`).pipe(
             tap(user => {

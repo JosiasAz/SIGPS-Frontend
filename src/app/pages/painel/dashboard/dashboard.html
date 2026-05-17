@@ -1,13 +1,14 @@
-<!-- Page Header -->
+<!-- Layout do Dashboard Clínico Premium do SIGPS -->
 <section class="page-container">
-    <div class="content-header">
+    <!-- Header principal -->
+    <div class="content-header" style="margin-bottom: 24px;">
         <div>
-            <h1>Visão Geral</h1>
-            <p>Bem-vindo de volta! Aqui está o resumo de hoje.</p>
+            <h1 class="dashboard-title">Dashboard Clínico</h1>
+            <p class="dashboard-subtitle">Visão operacional completa e inteligência de atendimento da clínica.</p>
         </div>
         @if (headerAction()) {
         <button class="btn-primary-dashboard" (click)="executeAction()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
@@ -16,100 +17,229 @@
         }
     </div>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-        @for (stat of stats; track stat.label) {
-        <div class="stat-card">
-            <div class="stat-icon-wrapper" [class]="stat.icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" *ngIf="stat.icon === 'users'"></path>
-                    <circle cx="9" cy="7" r="4" *ngIf="stat.icon === 'users'"></circle>
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" *ngIf="stat.icon === 'calendar'"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6" *ngIf="stat.icon === 'calendar'"></line>
-                    <line x1="8" y1="2" x2="8" y2="6" *ngIf="stat.icon === 'calendar'"></line>
-                    <line x1="3" y1="10" x2="21" y2="10" *ngIf="stat.icon === 'calendar'"></line>
-                    <line x1="8" y1="6" x2="21" y2="6" *ngIf="stat.icon === 'list'"></line>
-                    <line x1="8" y1="12" x2="21" y2="12" *ngIf="stat.icon === 'list'"></line>
-                    <line x1="8" y1="18" x2="21" y2="18" *ngIf="stat.icon === 'list'"></line>
-                    <polygon
-                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                        *ngIf="stat.icon === 'star'"></polygon>
+    <!-- Banner de Inteligência Artificial (Triagem Inteligente) -->
+    <div class="ai-banner-container">
+        <div class="ai-banner">
+            <div class="ai-banner-icon">
+                <div class="pulse-ring"></div>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
                 </svg>
             </div>
-            <div class="stat-details">
-                <span class="stat-label">{{ stat.label }}</span>
-                <div class="stat-value-group">
-                    <h3 class="stat-value">{{ stat.value }}</h3>
-                    <span class="stat-badge" [class.up]="stat.trend === 'up'" [class.down]="stat.trend === 'down'">
-                        {{ stat.change }}
-                    </span>
-                </div>
+            <div class="ai-banner-content">
+                <span class="ai-badge">Futura Implementação</span>
+                <p class="ai-banner-text">O módulo de <strong>Triagem Inteligente com IA</strong> é uma futura implementação planejada para o SIGPS. Em breve, a inteligência artificial analisará queixas e comorbidades para organizar as prioridades clínicas na fila automaticamente.</p>
             </div>
+            <button class="ai-banner-btn" (click)="verDetalhesIA()">Saiba Mais</button>
         </div>
-        }
     </div>
 
-    <div class="dashboard-grid">
-        <!-- AI Insights Card -->
-        <div class="card ai-card">
-            <div class="card-header">
-                <h3>Priorização por IA</h3>
-                <span class="badge-ai">Ativa</span>
-            </div>
-            <div class="ai-content">
-                <div class="ai-illustration">
-                    <div class="pulse-ring"></div>
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+    <!-- Grid Superior: KPIs, Pacientes Recentes e Sala de Espera -->
+    <div class="dashboard-top-grid">
+        
+        <!-- Coluna 1: Stack de KPIs Verticais -->
+        <div class="kpis-stack">
+            @for (stat of stats(); track stat.label) {
+            <div class="mini-kpi-card">
+                <div class="kpi-icon-container" [class]="stat.icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" *ngIf="stat.icon === 'users'"></path>
+                        <circle cx="9" cy="7" r="4" *ngIf="stat.icon === 'users'"></circle>
+                        
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" *ngIf="stat.icon === 'calendar'"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6" *ngIf="stat.icon === 'calendar'"></line>
+                        <line x1="8" y1="2" x2="8" y2="6" *ngIf="stat.icon === 'calendar'"></line>
+                        <line x1="3" y1="10" x2="21" y2="10" *ngIf="stat.icon === 'calendar'"></line>
+                        
+                        <line x1="8" y1="6" x2="21" y2="6" *ngIf="stat.icon === 'list'"></line>
+                        <line x1="8" y1="12" x2="21" y2="12" *ngIf="stat.icon === 'list'"></line>
+                        <line x1="8" y1="18" x2="21" y2="18" *ngIf="stat.icon === 'list'"></line>
+                        
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" *ngIf="stat.icon === 'star'"></polygon>
                     </svg>
                 </div>
-                <div class="ai-text">
-                    <p>A inteligência artificial detectou <strong>3 pacientes</strong> em estado crítico na fila de
-                        espera. Recomendamos a readequação da agenda.</p>
-                    <button class="btn-outline-dashboard" (click)="verDetalhesIA()">Ver Detalhes</button>
+                <div class="kpi-info-wrapper">
+                    <span class="kpi-label">{{ stat.label }}</span>
+                    <div class="kpi-value-group">
+                        <span class="kpi-value">{{ stat.value }}</span>
+                        <span class="kpi-trend" [class.up]="stat.trend === 'up'" [class.down]="stat.trend === 'down'">
+                            {{ stat.change }}
+                        </span>
+                    </div>
                 </div>
             </div>
+            }
         </div>
 
-        <!-- Recent Activities -->
-        <div class="card activities-card">
+        <!-- Coluna 2: Pacientes Recentes -->
+        <div class="card recent-patients-card">
             <div class="card-header">
-                <h3>Atividades Recentes</h3>
-                <a href="#" class="view-all">Ver tudo</a>
+                <h3>Pacientes Recentes</h3>
+                <span class="header-tag">Últimos Cadastros</span>
             </div>
-            <div class="activities-list">
-                @for (activity of recentActivities; track activity.time) {
-                <div class="activity-item">
-                    <div class="activity-status" [class]="activity.type"></div>
-                    <div class="activity-info">
-                        <p><strong>{{ activity.user }}</strong> {{ activity.action }}</p>
-                        <span>{{ activity.time }}</span>
+            <div class="recent-patients-list">
+                @for (patient of recentPatients(); track patient.id) {
+                <div class="patient-row-item">
+                    <div class="patient-avatar-wrapper">
+                        <img [src]="patient.foto" [alt]="patient.nome" class="patient-avatar-img">
+                        <span class="status-indicator" [class.online]="patient.status === 'online'"></span>
                     </div>
+                    <div class="patient-metadata">
+                        <span class="patient-name">{{ patient.nome }}</span>
+                        <span class="patient-subtext">{{ patient.especialidade }}</span>
+                    </div>
+                    <div class="patient-time-badge">
+                        <span>{{ patient.data }}</span>
+                    </div>
+                </div>
+                }
+                @if (recentPatients().length === 0) {
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #94a3b8; padding: 20px 0;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 8px; opacity: 0.5;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span style="font-size: 0.82rem; font-weight: 600;">Sem pacientes cadastrados</span>
                 </div>
                 }
             </div>
         </div>
 
-        <!-- Chart for Gestor -->
-        @if (isGestorOrAdmin()) {
-        <div class="card charts-card">
-            <div class="card-header">
-                <h3>Desempenho dos Especialistas (Consultas/Semana)</h3>
+        <!-- Coluna 3: Sala de Espera (Indicador Visual Progressivo) -->
+        <div class="card waiting-room-card">
+            <div class="card-header-centered">
+                <h3>Sala de Espera</h3>
+                <p>Status atual da fila de triagem</p>
             </div>
-            <div class="chart-container" style="padding: 20px 0;">
-                <div class="bar-chart" style="display: flex; flex-direction: column; gap: 15px;">
-                    @for (spec of specialistPerformance; track spec.name) {
-                    <div class="bar-row" style="display: flex; align-items: center; gap: 15px;">
-                        <span style="width: 140px; font-size: 0.9rem; font-weight: 500; text-align: right;">{{ spec.name }}</span>
-                        <div class="bar-track" style="flex: 1; height: 12px; background: #e5e7eb; border-radius: 6px; overflow: hidden; position: relative;">
-                            <div class="bar-fill" [style.width.%]="(spec.consultations / spec.max) * 100" [style.background]="spec.color" style="height: 100%; border-radius: 6px; transition: width 0.5s ease-in-out;"></div>
+            <div class="waiting-room-content">
+                <div class="circular-progress-container">
+                    <svg viewBox="0 0 100 100" class="circular-progress-svg">
+                        <!-- Círculo de Background -->
+                        <circle cx="50" cy="50" r="40" class="circle-bg"></circle>
+                        <!-- Círculo de Progresso Ativo -->
+                        <circle cx="50" cy="50" r="40" class="circle-indicator" 
+                            [style.strokeDashoffset]="calcularOffsetFila(waitingQueue().total)" 
+                            [attr.stroke-dashoffset]="calcularOffsetFila(waitingQueue().total)"></circle>
+                    </svg>
+                    <div class="circular-progress-inner">
+                        <span class="waiting-number">{{ waitingQueue().total }}</span>
+                        <span class="waiting-label">pacientes<br>aguardando</span>
+                    </div>
+                </div>
+                <div class="waiting-queue-status">
+                    <div class="status-metric">
+                        <span class="metric-value">{{ waitingQueue().tempoMedio }}</span>
+                        <span class="metric-label">Tempo médio</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-metric">
+                        <span class="metric-value" [class]="obterClasseCarga(waitingQueue().total)">
+                            {{ obterCargaFila(waitingQueue().total) }}
+                        </span>
+                        <span class="metric-label">Carga da fila</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid Inferior: Gráficos de Agendamentos e Distribuição de Convênios -->
+    @if (isGestorOrAdmin()) {
+    <div class="dashboard-bottom-grid">
+        <!-- Card Gráfico 1: Consultas por Mês (HTML Bar Chart) -->
+        <div class="card chart-card-large">
+            <div class="card-header">
+                <h3>Agendamentos de Consultas</h3>
+                <div class="period-selector-pills">
+                    <button class="pill-btn" [class.active]="periodoSelecionado() === 'diario'" (click)="filtrarPeriodo('diario')">Diário</button>
+                    <button class="pill-btn" [class.active]="periodoSelecionado() === 'mensal'" (click)="filtrarPeriodo('mensal')">Mensal</button>
+                    <button class="pill-btn" [class.active]="periodoSelecionado() === 'anual'" (click)="filtrarPeriodo('anual')">Anual</button>
+                </div>
+            </div>
+            <div class="chart-content">
+                <div class="appointments-bar-chart">
+                    <!-- Linhas Guia Horizontais de Y-Axis (Design Premium) -->
+                    <div class="chart-y-grid">
+                        <div class="grid-line" data-label="máx"></div>
+                        <div class="grid-line" data-label="méd"></div>
+                        <div class="grid-line" data-label="mín"></div>
+                    </div>
+
+                    @for (bar of appointmentsChart(); track bar.mes) {
+                    <div class="chart-bar-col">
+                        <span class="chart-bar-value">{{ bar.total }}</span>
+                        <div class="chart-bar-tooltip">{{ bar.total }} consultas</div>
+                        <div class="chart-bar-track">
+                            <div class="chart-bar-fill" [style.height]="bar.pct + '%'"></div>
                         </div>
-                        <span style="width: 40px; font-size: 0.8rem; font-weight: 600; color: #4b5563;">{{ spec.consultations }}</span>
+                        <span class="chart-bar-label">{{ bar.mes }}</span>
+                    </div>
+                    }
+                </div>
+                @if (appointmentsChart().length === 0 || (appointmentsChart().length > 0 && appointmentsChart()[0].total === 0 && appointmentsChart()[5].total === 0)) {
+                <div style="position: absolute; color: #94a3b8; font-size: 0.85rem; font-weight: 600; text-align: center; pointer-events: none;">
+                    Sem agendamentos registrados no período
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Card Gráfico 2: Distribuição por Gênero (Vibrant SVG Donut Chart) -->
+        <div class="card chart-card-small">
+            <div class="card-header">
+                <h3>Distribuição por Gênero</h3>
+                <span class="header-tag">Demográfico</span>
+            </div>
+            <div class="chart-content flex-row">
+                <div class="donut-chart-container">
+                    <svg viewBox="0 0 100 100" class="donut-chart-svg">
+                        @for (item of genderChart(); track item.nome; let i = $index) {
+                        @if (item.pct > 0) {
+                        <circle cx="50" cy="50" r="30" fill="transparent" 
+                            [attr.stroke]="item.cor" 
+                            stroke-width="10" 
+                            stroke-linecap="round"
+                            [attr.stroke-dasharray]="(item.pct * 1.885) + ' ' + ((100 - item.pct) * 1.885)" 
+                            [attr.stroke-dashoffset]="calcularOffsetPizza(i)" 
+                            class="donut-slice"></circle>
+                        }
+                        }
+                        @if (stats()[0]?.value === '0') {
+                        <!-- Anel cinza vazio padrão se não houver pacientes no BD -->
+                        <circle cx="50" cy="50" r="30" fill="transparent" stroke="#f1f5f9" stroke-width="10" class="donut-slice"></circle>
+                        }
+                        <!-- Furo interno branco -->
+                        <circle cx="50" cy="50" r="24" fill="#ffffff"></circle>
+                    </svg>
+                    <div class="donut-chart-inner">
+                        <span class="donut-total">{{ stats()[0]?.value || 0 }}</span>
+                        <span class="donut-sublabel">Pacientes</span>
+                    </div>
+                </div>
+                
+                <!-- Estatísticas de Gênero Detalhadas e Elegantes (Dois canais de progresso) -->
+                <div class="gender-stats-details">
+                    @for (item of genderChart(); track item.nome) {
+                    <div class="gender-stat-row">
+                        <div class="gender-stat-header">
+                            <div class="gender-label-group">
+                                <span class="gender-color-dot" [style.background]="item.cor"></span>
+                                <span class="gender-name-text">{{ item.nome }}</span>
+                            </div>
+                            <span class="gender-percentage-badge">{{ item.pct }}%</span>
+                        </div>
+                        <div class="gender-progress-track">
+                            <div class="gender-progress-fill" [style.width]="item.pct + '%'" [style.background]="item.cor"></div>
+                        </div>
+                        <div class="gender-absolute-value">
+                            {{ item.valor }} pacientes registrados
+                        </div>
                     </div>
                     }
                 </div>
             </div>
         </div>
-        }
     </div>
+    }
 </section>

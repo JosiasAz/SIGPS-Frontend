@@ -100,6 +100,14 @@ export class MockedAuthService extends AbstractAuthService {
         return !!userRole && roles.includes(userRole);
     }
 
+    updateUserRole(role: UserRole): void {
+        const current = this.userState();
+        if (current) {
+            const updated = { ...current, role };
+            this.setUser(updated);
+        }
+    }
+
     private setAuth(token: string) {
         this.tokenState.set(token);
         if (typeof localStorage !== 'undefined') localStorage.setItem(this.AUTH_KEY, token);

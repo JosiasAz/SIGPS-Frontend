@@ -198,19 +198,30 @@ $transition:  0.18s cubic-bezier(.4,0,.2,1);
 }
 
 .step-dot {
-    width: 32px; height: 32px; border-radius: 50%;
+    width: 36px; height: 36px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: .82rem; font-weight: 700; flex-shrink: 0;
-    background: $gray-100; color: $gray-400;
-    transition: all $transition;
+    font-size: .88rem; font-weight: 700; flex-shrink: 0;
+    background: white; color: $gray-400;
+    border: 2px solid $gray-200;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    &.active { background: $green; color: white; box-shadow: 0 0 0 4px rgba(22,101,52,.15); }
-    &.done   { background: $green-mid; color: white; }
+    &.active {
+        background: white;
+        color: $green;
+        border-color: $green;
+        box-shadow: 0 0 0 4px rgba(22, 101, 52, 0.15);
+    }
+    &.done {
+        background: $green;
+        color: white;
+        border-color: $green;
+    }
 }
 
 .step-line {
     flex: 1; height: 2px; background: $gray-200; margin: 0 8px;
-    &.done { background: $green-mid; }
+    transition: background 0.3s ease;
+    &.done { background: $green; }
 }
 
 // ── Progress Track ────────────────────────────────────────────────────────────
@@ -238,13 +249,29 @@ $transition:  0.18s cubic-bezier(.4,0,.2,1);
 
 .tipo-card {
     display: flex; flex-direction: column; align-items: center; gap: 8px;
-    padding: 16px 10px; border-radius: $radius-md;
-    border: 2px solid $gray-200; background: white;
-    cursor: pointer; transition: all $transition;
+    padding: 20px 10px; border-radius: $radius-xl;
+    border: 1.5px solid $gray-200; background: white;
+    cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     text-align: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
 
-    &:hover { border-color: #86efac; background: $gray-50; transform: translateY(-2px); }
-    &.selected { border-color: $green; background: $green-light; box-shadow: 0 0 0 3px rgba(22,101,52,.1); }
+    &:hover {
+        border-color: $green-mid;
+        background: $gray-50;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(22, 163, 74, 0.06);
+    }
+    
+    &.selected {
+        border-color: $green;
+        background: rgba(22, 101, 52, 0.03);
+        box-shadow: 0 12px 28px rgba(22, 101, 52, 0.12), 0 0 0 2px $green;
+        transform: translateY(-2px);
+        
+        .tipo-nome {
+            color: $green;
+        }
+    }
 }
 
 .tipo-icon {
@@ -253,7 +280,7 @@ $transition:  0.18s cubic-bezier(.4,0,.2,1);
     font-weight: 800; font-size: 1rem;
 }
 
-.tipo-nome { font-size: .82rem; font-weight: 700; color: $gray-900; }
+.tipo-nome { font-size: .82rem; font-weight: 700; color: $gray-900; transition: color 0.25s ease; }
 .tipo-conselho { font-size: .72rem; font-weight: 600; color: $gray-400; }
 
 // ── Forms ─────────────────────────────────────────────────────────────────────
@@ -688,4 +715,95 @@ $transition:  0.18s cubic-bezier(.4,0,.2,1);
     .field-row { flex-direction: column; .field-group--sm { flex: unset; width: 100%; } }
     .step-actions { flex-wrap: wrap; }
     .tabs { flex-direction: column; }
+}
+
+// ── Transição de Especialista ──────────────────────────────────────────────────
+.transicao-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(17, 24, 39, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn .4s cubic-bezier(.4,0,.2,1) forwards;
+}
+
+.transicao-content {
+    background: white;
+    padding: 40px 48px;
+    border-radius: $radius-xl;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    max-width: 440px;
+    width: 90%;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transform: translateY(20px);
+    animation: slideUp .4s cubic-bezier(.34,1.56,0.64,1) forwards;
+}
+
+.transicao-logo {
+    width: 80px;
+    height: 80px;
+    background: $green-light;
+    color: $green;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    box-shadow: 0 0 0 10px rgba(22, 101, 52, 0.05);
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+.transicao-content h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: $gray-900;
+    margin: 0 0 8px;
+}
+
+.transicao-sub {
+    font-size: .95rem;
+    color: $gray-400;
+    margin: 0 0 32px;
+}
+
+.transicao-progress-track {
+    height: 6px;
+    background: $gray-100;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.transicao-progress-fill {
+    height: 100%;
+    background: $green;
+    border-radius: 3px;
+    transition: width 0.3s cubic-bezier(.4,0,.2,1);
+}
+
+.transicao-status-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: .82rem;
+    font-weight: 700;
+    color: $gray-700;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    to { transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0px rgba(22, 101, 52, 0.08); }
+    50% { box-shadow: 0 0 0 16px rgba(22, 101, 52, 0); }
 }

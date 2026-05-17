@@ -11,4 +11,5 @@ export abstract class AbstractAuthService {
     abstract register(userData: any): Observable<any>;
     abstract logout(): void;
     abstract hasRole(roles: UserRole[]): boolean;
+    abstract updateUserRole(role: UserRole): void;
 }

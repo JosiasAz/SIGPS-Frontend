@@ -14,18 +14,29 @@ export class DashboardService extends AbstractDashboardService {
     recentActivities = signal<any[]>([]);
     specialistPerformance = signal<any[]>([]);
 
+    // Novas propriedades de alta fidelidade
+    recentPatients = signal<any[]>([]);
+    waitingQueue = signal<any>({ total: 0, tempoMedio: '0 min', lista: [] });
+    appointmentsChart = signal<any[]>([]);
+    genderChart = signal<any[]>([]);
+
     constructor() {
         super();
         this.loadData();
     }
 
-    private loadData() {
-        // Ajustando para o prefixo /api/v1 do backend real
-        this.http.get<any>(`${this.apiUrl}/api/v1/dashboards/`).subscribe(data => {
-            // Mapeamento caso os campos do backend real sejam diferentes
-            if (data.stats) this.stats.set(data.stats);
-            if (data.recent_activities) this.recentActivities.set(data.recent_activities);
-            if (data.specialist_performance) this.specialistPerformance.set(data.specialist_performance);
+    loadData(periodo: string = 'mensal'): void {
+        this.http.get<any>(`${this.apiUrl}/api/v1/dashboards/?periodo=${periodo}`).subscribe({
+            next: (data) => {
+                if (data.stats) this.stats.set(data.stats);
+                if (data.recent_activities) this.recentActivities.set(data.recent_activities);
+                if (data.specialist_performance) this.specialistPerformance.set(data.specialist_performance);
+                if (data.recent_patients) this.recentPatients.set(data.recent_patients);
+                if (data.waiting_queue) this.waitingQueue.set(data.waiting_queue);
+                if (data.appointments_chart) this.appointmentsChart.set(data.appointments_chart);
+                if (data.gender_chart) this.genderChart.set(data.gender_chart);
+            },
+            error: (err) => console.error('Erro ao buscar dados do dashboard:', err)
         });
     }
 }
