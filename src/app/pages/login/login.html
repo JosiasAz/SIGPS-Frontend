@@ -68,10 +68,7 @@
             </header>
 
             <form class="login-form" (submit)="onLogin($event)">
-                <div *ngIf="successMessage() as message" class="success-feedback">
-                    {{ message }}
-                </div>
-                <div *ngIf="errorMessage()" class="error-feedback">
+                <div class="error-feedback" *ngIf="errorMessage()">
                     {{ errorMessage() }}
                 </div>
 

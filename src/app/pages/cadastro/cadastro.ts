@@ -140,7 +140,7 @@ export class Cadastro {
 
     this.authService.register(this.userData).subscribe({
       next: () => {
-        this.router.navigate(['/login']);
+        this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
       },
       error: (err) => {
         this.errorMessage.set('Erro ao criar conta. Tente novamente.');
