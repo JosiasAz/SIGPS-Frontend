@@ -136,9 +136,25 @@ export class Cadastro {
       return;
     }
 
+    if (!this.userData.genero) {
+      this.errorMessage.set('Por favor, selecione seu gênero.');
+      return;
+    }
+
+    if (!this.userData.dataNascimento || this.userData.dataNascimento.length < 10) {
+      this.errorMessage.set('Por favor, insira sua data de nascimento.');
+      return;
+    }
+
+    const [dia, mes, ano] = this.userData.dataNascimento.split('/');
+    const dataNascimentoISO = `${ano}-${mes}-${dia}`;
+
+    const { confirmPassword, dataNascimento, ...rest } = this.userData;
+    const payload = { ...rest, data_nascimento: dataNascimentoISO };
+
     this.isLoading.set(true);
 
-    this.authService.register(this.userData).subscribe({
+    this.authService.register(payload).subscribe({
       next: () => {
         this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
       },
