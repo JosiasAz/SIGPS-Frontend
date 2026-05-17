@@ -31,6 +31,41 @@ export class Cadastro {
   isLoading = signal(false);
   errorMessage = signal('');
 
+  isGeneroDropdownOpen = signal(false);
+
+  opcoesGenero = [
+    { value: 'masculino', label: 'Masculino' },
+    { value: 'feminino', label: 'Feminino' },
+    { value: 'homem-trans', label: 'Homem Trans' },
+    { value: 'mulher-trans', label: 'Mulher Trans' },
+    { value: 'outro', label: 'Outro' },
+    { value: 'prefiro-nao', label: 'Prefiro não informar' },
+  ];
+
+  toggleGeneroDropdown() {
+    this.isGeneroDropdownOpen.set(!this.isGeneroDropdownOpen());
+  }
+
+  selecionarGenero(valor: string) {
+    this.userData.genero = valor;
+    this.isGeneroDropdownOpen.set(false);
+  }
+
+  getGeneroLabel(): string {
+    const selecionado = this.opcoesGenero.find(o => o.value === this.userData.genero);
+    if (!selecionado) return 'Selecione';
+    
+    switch (selecionado.value) {
+      case 'masculino': return 'Masculino';
+      case 'feminino': return 'Feminino';
+      case 'homem-trans': return 'H. Trans';
+      case 'mulher-trans': return 'M. Trans';
+      case 'outro': return 'Outro';
+      case 'prefiro-nao': return 'P. N. I.';
+      default: return selecionado.label;
+    }
+  }
+
   togglePassword() {
     this.showPassword.set(!this.showPassword());
   }

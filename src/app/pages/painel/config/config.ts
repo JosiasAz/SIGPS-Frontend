@@ -63,6 +63,21 @@ export class ConfigComponent implements OnInit {
     });
   }
 
+  deleteUser(userId: number) {
+    if (confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita e removerá todos os dados associados.')) {
+      this.http.delete(`${environment.apiUrl}/api/v1/admin/users/${userId}`).subscribe({
+        next: () => {
+          this.users.update(current => current.filter(u => u.id !== userId));
+          alert('Usuário excluído com sucesso!');
+        },
+        error: (err) => {
+          console.error('Erro ao excluir usuário:', err);
+          alert(err.error?.message || 'Erro ao excluir o usuário. Verifique o console.');
+        }
+      });
+    }
+  }
+
   toggleSetting(label: string): void {
     this.configService.toggleSetting(label);
   }

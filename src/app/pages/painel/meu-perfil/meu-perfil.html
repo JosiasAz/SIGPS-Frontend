@@ -562,7 +562,7 @@
                 <div class="field-row">
                     <div class="field-group">
                         <label class="field-label">CNPJ</label>
-                        <input type="text" formControlName="cnpj" class="field-input" placeholder="00.000.000/0001-00" maxlength="18">
+                        <input type="text" formControlName="cnpj" class="field-input" placeholder="00.000.000/0001-00" maxlength="18" (input)="formatarCnpjInput($event)">
                         @if (step1ClinicaForm.get('cnpj')?.errors?.['cnpjInvalido']) {
                         <div class="field-error">CNPJ inválido. Verifique os dígitos.</div>
                         }
@@ -570,11 +570,11 @@
                     </div>
                     <div class="field-group">
                         <label class="field-label">Telefone</label>
-                        <input type="text" formControlName="telefone" class="field-input" placeholder="(11) 3000-0000">
+                        <input type="text" formControlName="telefone" class="field-input" placeholder="(11) 90000-0000" maxlength="15" (input)="formatarTelefoneInput($event)">
                     </div>
                     <div class="field-group">
                         <label class="field-label">E-mail de Contato</label>
-                        <input type="email" formControlName="emailContato" class="field-input" placeholder="contato@clinica.com">
+                        <input type="email" formControlName="emailContato" class="field-input" placeholder="contato@clinica.com" (input)="formatarEmailInput($event)">
                     </div>
                 </div>
             </form>

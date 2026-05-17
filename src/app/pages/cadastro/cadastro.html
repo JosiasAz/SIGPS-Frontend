@@ -91,18 +91,29 @@
                     <div class="input-group">
                         <label for="genero">Gênero</label>
                         <div class="input-wrapper">
-                            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="4" />
-                                <path d="M12 2v8M12 16v6M6 12H2M16 12h4M7.17 7.17L4.34 4.34M16.83 16.83L19.66 19.66M16.83 7.17L19.66 4.34M7.17 16.83L4.34 19.66" />
-                            </svg>
-                            <select id="genero" name="genero" [(ngModel)]="userData.genero" required>
-                                <option value="" disabled selected>Selecione seu gênero</option>
-                                <option value="masculino">Masculino</option>
-                                <option value="feminino">Feminino</option>
-                                <option value="outro">Outro</option>
-                                <option value="prefiro-nao">Prefiro não informar</option>
-                            </select>
+                            <div class="custom-select-wrapper" (click)="toggleGeneroDropdown()" [class.open]="isGeneroDropdownOpen()">
+                                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="4" />
+                                    <path d="M12 2v8M12 16v6M6 12H2M16 12h4M7.17 7.17L4.34 4.34M16.83 16.83L19.66 19.66M16.83 7.17L19.66 4.34M7.17 16.83L4.34 19.66" />
+                                </svg>
+                                
+                                <div class="custom-select-trigger" [class.has-value]="userData.genero">
+                                    {{ getGeneroLabel() }}
+                                </div>
+                                
+                                <svg class="chevron-icon" width="12" height="8" viewBox="0 0 12 8" fill="none">
+                                    <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+
+                                <div class="custom-options" *ngIf="isGeneroDropdownOpen()">
+                                    <div class="custom-option" *ngFor="let op of opcoesGenero" 
+                                         (click)="selecionarGenero(op.value); $event.stopPropagation()"
+                                         [class.selected]="userData.genero === op.value">
+                                        {{ op.label }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

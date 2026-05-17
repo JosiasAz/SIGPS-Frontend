@@ -238,7 +238,10 @@
                 }
             }
 
-            select {
+            .custom-select-wrapper {
+                position: relative;
+                display: flex;
+                align-items: center;
                 width: 100%;
                 padding: 12px 16px 12px 44px;
                 border-radius: 12px;
@@ -247,33 +250,94 @@
                 font-size: 0.95rem;
                 font-family: inherit;
                 transition: all 0.2s ease;
-                color: var(--text);
                 cursor: pointer;
-                appearance: none;
 
-                option {
-                    color: var(--text);
-                    background: white;
-                }
-
-                option:first-child {
-                    color: var(--text-light);
-                }
-
-                &:focus {
-                    outline: none;
+                &.open {
                     border-color: var(--green);
                     background: white;
                     box-shadow: 0 0 0 4px rgba(65, 150, 64, 0.08);
+                    
+                    .chevron-icon {
+                        transform: translateY(-50%) rotate(180deg);
+                    }
                 }
 
-                &:disabled {
+                .input-icon {
+                    position: absolute;
+                    left: 14px;
                     color: var(--text-light);
-                    cursor: not-allowed;
+                    pointer-events: none;
                 }
 
-                &:invalid {
+                .custom-select-trigger {
                     color: var(--text-light);
+                    user-select: none;
+                    flex: 1;
+                    min-width: 0;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    padding-right: 8px;
+
+                    &.has-value {
+                        color: var(--text);
+                    }
+                }
+
+                .chevron-icon {
+                    position: absolute;
+                    right: 16px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: var(--green-deep);
+                    transition: transform 0.2s;
+                }
+
+                .custom-options {
+                    position: absolute;
+                    top: calc(100% + 8px);
+                    left: 0;
+                    width: 100%;
+                    background: white;
+                    border-radius: 12px;
+                    box-shadow: 0 10px 30px rgba(13, 84, 56, 0.12);
+                    border: 1px solid var(--border);
+                    z-index: 1000;
+                    overflow-y: auto;
+                    max-height: 180px;
+                    animation: dropdownFade 0.2s ease;
+
+                    &::-webkit-scrollbar {
+                        width: 6px;
+                    }
+                    &::-webkit-scrollbar-track {
+                        background: transparent;
+                    }
+                    &::-webkit-scrollbar-thumb {
+                        background-color: var(--green-light);
+                        border-radius: 10px;
+                    }
+                    &::-webkit-scrollbar-thumb:hover {
+                        background-color: var(--green-mid);
+                    }
+
+                    .custom-option {
+                        padding: 12px 16px;
+                        font-size: 0.95rem;
+                        color: var(--text);
+                        cursor: pointer;
+                        transition: background 0.15s;
+
+                        &:hover {
+                            background: rgba(65, 150, 64, 0.08);
+                        }
+
+                        &.selected {
+                            background: var(--green-light);
+                            color: var(--green-dark);
+                            font-weight: 600;
+                        }
+                    }
                 }
             }
 
@@ -458,4 +522,9 @@
     input:checked~.checkmark:after {
         display: block;
     }
+}
+
+@keyframes dropdownFade {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
 }

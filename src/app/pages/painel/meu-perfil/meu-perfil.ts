@@ -405,6 +405,33 @@ export class MeuPerfilComponent implements OnInit {
     return c.length > 5 ? `${c.slice(0,5)}-${c.slice(5)}` : c;
   }
 
+  formatarCnpjInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let v = input.value.replace(/\D/g, '').slice(0, 14);
+    if (v.length > 2) v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+    if (v.length > 5) v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+    if (v.length > 8) v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+    if (v.length > 12) v = v.replace(/(\d{4})(\d)/, '$1-$2');
+    
+    this.step1ClinicaForm.get('cnpj')?.setValue(v, { emitEvent: false });
+  }
+
+  formatarTelefoneInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let v = input.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length > 2) v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
+    if (v.length > 9) v = v.replace(/(\d)(\d{4})$/, '$1-$2');
+    else if (v.length > 5) v = v.replace(/(\d)(\d{4})$/, '$1-$2');
+    
+    this.step1ClinicaForm.get('telefone')?.setValue(v, { emitEvent: false });
+  }
+
+  formatarEmailInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const v = input.value.toLowerCase().trim();
+    this.step1ClinicaForm.get('emailContato')?.setValue(v, { emitEvent: false });
+  }
+
   // ── Wizard Clínica ────────────────────────────────────────────────────────
   clinicaProximo() {
     if (this.etapaClinica() === 1 && this.step1ClinicaForm.invalid) { this.step1ClinicaForm.markAllAsTouched(); return; }
