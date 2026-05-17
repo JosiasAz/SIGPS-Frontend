@@ -23,6 +23,7 @@ export class Login {
   showPassword = signal(false);
   isLoading = signal(false);
   errorMessage = signal('');
+  successMessage = signal('');
   isAccountDisabled = signal(false);
   blockedAccountName = signal('');
 
