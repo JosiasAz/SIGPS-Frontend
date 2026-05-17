@@ -238,7 +238,62 @@
                 }
             }
 
+            select {
+                width: 100%;
+                padding: 12px 16px 12px 44px;
+                border-radius: 12px;
+                border: 1.5px solid var(--border);
+                background: var(--bg);
+                font-size: 0.95rem;
+                font-family: inherit;
+                transition: all 0.2s ease;
+                color: var(--text);
+                cursor: pointer;
+                appearance: none;
+
+                option {
+                    color: var(--text);
+                    background: white;
+                }
+
+                option:first-child {
+                    color: var(--text-light);
+                }
+
+                &:focus {
+                    outline: none;
+                    border-color: var(--green);
+                    background: white;
+                    box-shadow: 0 0 0 4px rgba(65, 150, 64, 0.08);
+                }
+
+                &:disabled {
+                    color: var(--text-light);
+                    cursor: not-allowed;
+                }
+
+                &:invalid {
+                    color: var(--text-light);
+                }
+            }
+
             .password-toggle {
+                position: absolute;
+                right: 16px;
+                background: none;
+                border: none;
+                color: var(--text-light);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                transition: color 0.2s;
+
+                &:hover {
+                    color: var(--green-dark);
+                }
+            }
+
+            .date-toggle {
                 position: absolute;
                 right: 16px;
                 background: none;

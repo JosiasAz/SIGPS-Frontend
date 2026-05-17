@@ -19,12 +19,15 @@ export class Cadastro {
     nome: '',
     email: '',
     cpf: '',
+    genero: '',
+    dataNascimento: '',
     password: '',
     confirmPassword: ''
   };
 
   showPassword = signal(false);
   showConfirmPassword = signal(false);
+  showDatePicker = signal(false);
   isLoading = signal(false);
   errorMessage = signal('');
 
@@ -34,6 +37,28 @@ export class Cadastro {
 
   toggleConfirmPassword() {
     this.showConfirmPassword.set(!this.showConfirmPassword());
+  }
+
+  toggleDatePicker() {
+    this.showDatePicker.set(!this.showDatePicker());
+  }
+
+  formatDate(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/\D/g, '');
+
+    if (value.length > 8) {
+      value = value.substring(0, 8);
+    }
+
+    if (value.length > 4) {
+      value = value.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3");
+    } else if (value.length > 2) {
+      value = value.replace(/(\d{2})(\d{2})/, "$1/$2");
+    }
+
+    input.value = value;
+    this.userData.dataNascimento = value;
   }
 
   formatCpf(event: Event) {
@@ -115,7 +140,7 @@ export class Cadastro {
 
     this.authService.register(this.userData).subscribe({
       next: () => {
-        this.router.navigate(['/login']);
+        this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
       },
       error: (err) => {
         this.errorMessage.set('Erro ao criar conta. Tente novamente.');

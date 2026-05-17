@@ -1,6 +1,6 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AbstractAuthService } from '../../services/auth/abstract-auth.service';
 
@@ -11,8 +11,9 @@ import { AbstractAuthService } from '../../services/auth/abstract-auth.service';
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
+export class Login implements OnInit {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private authService = inject(AbstractAuthService);
 
   credentials = {
@@ -23,8 +24,17 @@ export class Login {
   showPassword = signal(false);
   isLoading = signal(false);
   errorMessage = signal('');
+  successMessage = signal('');
   isAccountDisabled = signal(false);
   blockedAccountName = signal('');
+
+  ngOnInit() {
+    this.route.queryParamMap.subscribe(params => {
+      if (params.get('registered') === 'true') {
+        this.successMessage.set('Conta criada com sucesso! Faça login para continuar.');
+      }
+    });
+  }
 
   togglePassword() {
     this.showPassword.update(v => !v);
@@ -50,6 +60,7 @@ export class Login {
 
     this.isLoading.set(true);
     this.errorMessage.set('');
+    this.successMessage.set('');
     this.isAccountDisabled.set(false);
 
     this.authService.login(this.credentials).subscribe({

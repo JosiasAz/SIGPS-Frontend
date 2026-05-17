@@ -33,7 +33,7 @@
     <!-- ══════════════════════════ FORM SIDE (RIGHT) -->
     <div class="login-form-area">
         <div class="form-card">
-            @if (isAccountDisabled()) {
+            <ng-container *ngIf="isAccountDisabled(); else normalLogin">
             <!-- TELA DE CONTA BLOQUEADA -->
             <div style="text-align: center; padding: 16px 0;">
                 <div style="width: 80px; height: 80px; background: #fef2f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
@@ -59,7 +59,8 @@
                     Tentar com outra conta
                 </button>
             </div>
-            } @else {
+            </ng-container>
+            <ng-template #normalLogin>
             <!-- FORM NORMAL -->
             <header class="form-header">
                 <h2>Entrar na Plataforma</h2>
@@ -131,9 +132,9 @@
             </form>
 
             <div class="form-footer">
-                <p>Ainda não tem uma conta? <a routerLink="/cadastro">Solicite acesso</a></p>
+                <p>Ainda não tem uma conta? <a routerLink="/cadastro">Crie Agora!</a></p>
             </div>
-            }
+            </ng-template>
         </div>
 
         <p class="copyright">© 2026 SIGPS - Todos os direitos reservados.</p>
