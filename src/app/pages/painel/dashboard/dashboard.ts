@@ -24,6 +24,56 @@ export class DashboardComponent {
   userRole = this.authService.userRole;
   periodoSelecionado = signal<string>('mensal');
 
+  isChartEmpty = computed(() => {
+    const chart = this.appointmentsChart();
+    if (!chart || chart.length === 0) return true;
+    return chart.every(bar => bar.total === 0);
+  });
+
+  chartSvgData = computed(() => {
+    const chart = this.appointmentsChart();
+    if (!chart || chart.length === 0) {
+      return { points: [], linePath: '', areaPath: '' };
+    }
+
+    const startX = 40;
+    const endX = 460;
+    const startY = 160;
+    const endY = 30;
+
+    const maxVal = Math.max(...chart.map(c => c.total), 4);
+
+    const points = chart.map((pt, i) => {
+      const stepX = chart.length > 1 ? (endX - startX) / (chart.length - 1) : 0;
+      const x = startX + i * stepX;
+      const y = startY - (pt.total / maxVal) * (startY - endY);
+      return {
+        x,
+        y,
+        label: pt.semana || pt.dia || pt.mes || `P${i + 1}`,
+        total: pt.total
+      };
+    });
+
+    if (points.length === 0) return { points: [], linePath: '', areaPath: '' };
+
+    // Construção de Curva Spline Suave (Cubic Bezier Spline)
+    let linePath = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const cpX1 = p0.x + (p1.x - p0.x) / 3;
+      const cpY1 = p0.y;
+      const cpX2 = p0.x + 2 * (p1.x - p0.x) / 3;
+      const cpY2 = p1.y;
+      linePath += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${p1.x} ${p1.y}`;
+    }
+
+    const areaPath = `${linePath} L ${points[points.length - 1].x} 160 L ${points[0].x} 160 Z`;
+
+    return { points, linePath, areaPath };
+  });
+
   filtrarPeriodo(periodo: string) {
     this.periodoSelecionado.set(periodo);
     this.dashboardService.loadData(periodo);

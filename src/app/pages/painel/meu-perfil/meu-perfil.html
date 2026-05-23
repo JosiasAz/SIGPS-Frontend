@@ -28,7 +28,10 @@
                 <p class="hero-email">{{ perfil()?.email }}</p>
                 <div class="hero-badges">
                     <span class="role-chip" [class]="perfil()?.perfil?.toLowerCase()">
-                        @if (isEspecialista) { 🩺 Profissional de Saúde }
+                        @if (perfil()?.perfil === 'Especialista') { 🩺 Profissional de Saúde }
+                        @else if (perfil()?.perfil === 'Admin') { ⚙️ Administrador }
+                        @else if (perfil()?.perfil === 'Gestor') { 💼 Gestor }
+                        @else if (perfil()?.perfil === 'Visualizador') { 👁️ Visualizador }
                         @else { 👤 Paciente }
                     </span>
                     @if (isEspecialista) {
@@ -108,6 +111,24 @@
 
     <!-- ══════════ ABA: PERFIL PROFISSIONAL ═══════════════════════ -->
     @if (!isEspecialista || abaAtiva() === 'profissional') {
+
+    <!-- Se for Admin, Gestor ou Visualizador, exibe dados administrativos do perfil -->
+    @if (perfil()?.perfil === 'Admin' || perfil()?.perfil === 'Gestor' || perfil()?.perfil === 'Visualizador') {
+    <div class="section-card">
+        <div class="section-card-header">
+            <div>
+                <h3>Dados de Acesso</h3>
+                <p>Informações de identificação da sua conta institucional.</p>
+            </div>
+        </div>
+        <div class="info-grid">
+            <div class="info-item"><label>Nome Completo</label><span>{{ perfil()?.nome }}</span></div>
+            <div class="info-item"><label>E-mail Corporativo</label><span>{{ perfil()?.email }}</span></div>
+            <div class="info-item"><label>Função / Perfil</label><span>{{ perfil()?.perfil }}</span></div>
+            <div class="info-item"><label>Status da Credencial</label><span style="color: var(--green); font-weight: 600;">✓ Ativa e Verificada</span></div>
+        </div>
+    </div>
+    }
 
     <!-- WIZARD para Paciente querendo ser Especialista -->
     @if (isPaciente) {

@@ -270,6 +270,22 @@ $transition:  0.2s ease-in-out;
     position: relative;
     width: 170px;
 
+    &.disabled {
+        opacity: 0.6;
+        cursor: not-allowed !important;
+        
+        select {
+            cursor: not-allowed !important;
+            background: $gray-100;
+            color: $gray-400;
+            border-color: $gray-200;
+            
+            &:hover {
+                border-color: $gray-200;
+            }
+        }
+    }
+
     select {
         width: 100%;
         appearance: none;
@@ -330,6 +346,15 @@ $transition:  0.2s ease-in-out;
 
     &:active {
         transform: translateY(0);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: transparent !important;
+        border-color: rgba(220, 38, 38, 0.1) !important;
+        color: $gray-400 !important;
+        transform: none !important;
     }
 }
 
