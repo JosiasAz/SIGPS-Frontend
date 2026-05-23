@@ -1,0 +1,291 @@
+<!-- Layout do Dashboard Clínico Premium do SIGPS -->
+<section class="page-container">
+    <!-- Header principal -->
+    <div class="content-header" style="margin-bottom: 24px;">
+        <div>
+            <h1 class="dashboard-title">Dashboard Clínico</h1>
+            <p class="dashboard-subtitle">Visão operacional completa e inteligência de atendimento da clínica.</p>
+        </div>
+        @if (headerAction()) {
+        <button class="btn-primary-dashboard" (click)="executeAction()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            {{ headerAction()?.label }}
+        </button>
+        }
+    </div>
+
+    <!-- Banner de Inteligência Artificial (Triagem Inteligente) -->
+    <div class="ai-banner-container">
+        <div class="ai-banner">
+            <div class="ai-banner-icon">
+                <div class="pulse-ring"></div>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+            </div>
+            <div class="ai-banner-content">
+                <span class="ai-badge">Futura Implementação</span>
+                <p class="ai-banner-text">O módulo de <strong>Triagem Inteligente com IA</strong> é uma futura implementação planejada para o SIGPS. Em breve, a inteligência artificial analisará queixas e comorbidades para organizar as prioridades clínicas na fila automaticamente.</p>
+            </div>
+            <button class="ai-banner-btn" (click)="verDetalhesIA()">Saiba Mais</button>
+        </div>
+    </div>
+
+    <!-- Grid Superior: KPIs, Pacientes Recentes e Sala de Espera -->
+    <div class="dashboard-top-grid">
+        
+        <!-- Coluna 1: Stack de KPIs Verticais -->
+        <div class="kpis-stack">
+            @for (stat of stats(); track stat.label) {
+            <div class="mini-kpi-card">
+                <div class="kpi-icon-container" [class]="stat.icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" *ngIf="stat.icon === 'users'"></path>
+                        <circle cx="9" cy="7" r="4" *ngIf="stat.icon === 'users'"></circle>
+                        
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" *ngIf="stat.icon === 'calendar'"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6" *ngIf="stat.icon === 'calendar'"></line>
+                        <line x1="8" y1="2" x2="8" y2="6" *ngIf="stat.icon === 'calendar'"></line>
+                        <line x1="3" y1="10" x2="21" y2="10" *ngIf="stat.icon === 'calendar'"></line>
+                        
+                        <line x1="8" y1="6" x2="21" y2="6" *ngIf="stat.icon === 'list'"></line>
+                        <line x1="8" y1="12" x2="21" y2="12" *ngIf="stat.icon === 'list'"></line>
+                        <line x1="8" y1="18" x2="21" y2="18" *ngIf="stat.icon === 'list'"></line>
+                        
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" *ngIf="stat.icon === 'star'"></polygon>
+                    </svg>
+                </div>
+                <div class="kpi-info-wrapper">
+                    <span class="kpi-label">{{ stat.label }}</span>
+                    <div class="kpi-value-group">
+                        <span class="kpi-value">{{ stat.value }}</span>
+                        <span class="kpi-trend" [class.up]="stat.trend === 'up'" [class.down]="stat.trend === 'down'">
+                            {{ stat.change }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Coluna 2: Pacientes Recentes -->
+        <div class="card recent-patients-card">
+            <div class="card-header">
+                <h3>Pacientes Recentes</h3>
+                <span class="header-tag">Últimos Cadastros</span>
+            </div>
+            <div class="recent-patients-list">
+                @for (patient of recentPatients(); track patient.id) {
+                <div class="patient-row-item">
+                    <div class="patient-avatar-wrapper">
+                        <img [src]="patient.foto" [alt]="patient.nome" class="patient-avatar-img">
+                        <span class="status-indicator" [class.online]="patient.status === 'online'"></span>
+                    </div>
+                    <div class="patient-metadata">
+                        <span class="patient-name">{{ patient.nome }}</span>
+                        <span class="patient-subtext">{{ patient.especialidade }}</span>
+                    </div>
+                    <div class="patient-time-badge">
+                        <span>{{ patient.data }}</span>
+                    </div>
+                </div>
+                }
+                @if (recentPatients().length === 0) {
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #94a3b8; padding: 20px 0;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 8px; opacity: 0.5;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span style="font-size: 0.82rem; font-weight: 600;">Sem pacientes cadastrados</span>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Coluna 3: Sala de Espera (Indicador Visual Progressivo) -->
+        <div class="card waiting-room-card">
+            <div class="card-header-centered">
+                <h3>Sala de Espera</h3>
+                <p>Status atual da fila de triagem</p>
+            </div>
+            <div class="waiting-room-content">
+                <div class="circular-progress-container">
+                    <svg viewBox="0 0 100 100" class="circular-progress-svg">
+                        <!-- Círculo de Background -->
+                        <circle cx="50" cy="50" r="40" class="circle-bg"></circle>
+                        <!-- Círculo de Progresso Ativo -->
+                        <circle cx="50" cy="50" r="40" class="circle-indicator" 
+                            [style.strokeDashoffset]="calcularOffsetFila(waitingQueue().total)" 
+                            [attr.stroke-dashoffset]="calcularOffsetFila(waitingQueue().total)"></circle>
+                    </svg>
+                    <div class="circular-progress-inner">
+                        <span class="waiting-number">{{ waitingQueue().total }}</span>
+                        <span class="waiting-label">pacientes<br>aguardando</span>
+                    </div>
+                </div>
+                <div class="waiting-queue-status">
+                    <div class="status-metric">
+                        <span class="metric-value">{{ waitingQueue().tempoMedio }}</span>
+                        <span class="metric-label">Tempo médio</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-metric">
+                        <span class="metric-value" [class]="obterClasseCarga(waitingQueue().total)">
+                            {{ obterCargaFila(waitingQueue().total) }}
+                        </span>
+                        <span class="metric-label">Carga da fila</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid Inferior: Gráficos de Agendamentos e Distribuição de Convênios -->
+    @if (isGestorOrAdmin()) {
+    <div class="dashboard-bottom-grid">
+        <!-- Card Gráfico 1: Consultas por Mês (HTML Bar Chart) -->
+        <div class="card chart-card-large">
+            <div class="card-header">
+                <h3>Agendamentos de Consultas</h3>
+                <div class="period-selector-pills">
+                    <button class="pill-btn" [class.active]="periodoSelecionado() === 'diario'" (click)="filtrarPeriodo('diario')">Diário</button>
+                    <button class="pill-btn" [class.active]="periodoSelecionado() === 'mensal'" (click)="filtrarPeriodo('mensal')">Mensal</button>
+                    <button class="pill-btn" [class.active]="periodoSelecionado() === 'anual'" (click)="filtrarPeriodo('anual')">Anual</button>
+                </div>
+            </div>
+            <div class="chart-content">
+                <!-- Linhas Guia Horizontais de Y-Axis (Design Premium) -->
+                <div class="chart-y-grid">
+                    <div class="grid-line" data-label="máx"></div>
+                    <div class="grid-line" data-label="méd"></div>
+                    <div class="grid-line" data-label="mín"></div>
+                </div>
+
+                <!-- SVG Glowing Curve Area Chart -->
+                <div class="appointments-line-chart-wrapper" [class.hidden]="isChartEmpty()">
+                    <svg viewBox="0 0 500 200" preserveAspectRatio="none" class="appointments-svg-chart">
+                        <defs>
+                            <!-- Translucent glowing green area gradient -->
+                            <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#10b981" stop-opacity="0.18" />
+                                <stop offset="100%" stop-color="#10b981" stop-opacity="0.00" />
+                            </linearGradient>
+                            <!-- Glowing neon green line gradient -->
+                            <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0%" stop-color="#419640" />
+                                <stop offset="100%" stop-color="#10b981" />
+                            </linearGradient>
+                            <!-- Neon outer glow filter -->
+                            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="5" result="blur" />
+                                <feMerge>
+                                    <feMergeNode in="blur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Area Under the Curve -->
+                        @if (chartSvgData().areaPath) {
+                            <path [attr.d]="chartSvgData().areaPath" fill="url(#areaGradient)" />
+                        }
+
+                        <!-- Neon Glowing Stroke Curved Line -->
+                        @if (chartSvgData().linePath) {
+                            <path [attr.d]="chartSvgData().linePath" fill="none" stroke="url(#lineGradient)" stroke-width="4.5" stroke-linecap="round" filter="url(#glow)" />
+                        }
+
+                        <!-- Vertical dashed guide lines -->
+                        @for (pt of chartSvgData().points; track $index) {
+                            <line [attr.x1]="pt.x" [attr.y1]="160" [attr.x2]="pt.x" [attr.y2]="pt.y" stroke="rgba(16, 185, 129, 0.12)" stroke-width="1.5" stroke-dasharray="4,4" />
+                        }
+
+                        <!-- Interactive Glowing Delicate Circle Nodes -->
+                        @for (pt of chartSvgData().points; track $index) {
+                            <!-- Delicate Micro Green Dot Node -->
+                            <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="2.5" fill="#10b981" stroke="#ffffff" stroke-width="1.5" class="chart-point-node" />
+                        }
+                    </svg>
+
+                    <!-- X-Axis Labels (Aligned perfectly using percentage coordinates) -->
+                    <div class="chart-x-labels">
+                        @for (pt of chartSvgData().points; track $index) {
+                            <div class="x-label-item" [style.left.%]="((pt.x - 40) / 420) * 100">
+                                <span class="x-label-text">{{ pt.label }}</span>
+                                <div class="x-label-tooltip">{{ pt.total }} consultas</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if (isChartEmpty()) {
+                <div class="empty-chart-overlay">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="empty-chart-icon"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span>Sem agendamentos registrados no período</span>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Card Gráfico 2: Distribuição por Gênero (Vibrant SVG Donut Chart) -->
+        <div class="card chart-card-small">
+            <div class="card-header">
+                <h3>Distribuição por Gênero</h3>
+                <span class="header-tag">Demográfico</span>
+            </div>
+            <div class="chart-content flex-row">
+                <div class="donut-chart-container">
+                    <svg viewBox="0 0 100 100" class="donut-chart-svg">
+                        @for (item of genderChart(); track item.nome; let i = $index) {
+                        @if (item.pct > 0) {
+                        <circle cx="50" cy="50" r="30" fill="transparent" 
+                            [attr.stroke]="item.cor" 
+                            stroke-width="10" 
+                            stroke-linecap="round"
+                            [attr.stroke-dasharray]="(item.pct * 1.885) + ' ' + ((100 - item.pct) * 1.885)" 
+                            [attr.stroke-dashoffset]="calcularOffsetPizza(i)" 
+                            class="donut-slice"></circle>
+                        }
+                        }
+                        @if (stats()[0]?.value === '0') {
+                        <!-- Anel cinza escuro vazio padrão se não houver pacientes no BD -->
+                        <circle cx="50" cy="50" r="30" fill="transparent" stroke="rgba(255, 255, 255, 0.05)" stroke-width="10" class="donut-slice"></circle>
+                        }
+                        <!-- Furo interno escuro combinando com o card -->
+                        <circle cx="50" cy="50" r="24" fill="#090e17"></circle>
+                    </svg>
+                    <div class="donut-chart-inner">
+                        <span class="donut-total">{{ stats()[0]?.value || 0 }}</span>
+                        <span class="donut-sublabel">Pacientes</span>
+                    </div>
+                </div>
+                
+                <!-- Estatísticas de Gênero Detalhadas e Elegantes (Dois canais de progresso) -->
+                <div class="gender-stats-details">
+                    @for (item of genderChart(); track item.nome) {
+                    <div class="gender-stat-row">
+                        <div class="gender-stat-header">
+                            <div class="gender-label-group">
+                                <span class="gender-color-dot" [style.background]="item.cor"></span>
+                                <span class="gender-name-text">{{ item.nome }}</span>
+                            </div>
+                            <span class="gender-percentage-badge">{{ item.pct }}%</span>
+                        </div>
+                        <div class="gender-progress-track">
+                            <div class="gender-progress-fill" [style.width]="item.pct + '%'" [style.background]="item.cor"></div>
+                        </div>
+                        <div class="gender-absolute-value">
+                            {{ item.valor }} pacientes registrados
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+</section>

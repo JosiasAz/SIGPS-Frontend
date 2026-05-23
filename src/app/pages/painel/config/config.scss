@@ -1,0 +1,548 @@
+// ── Design Tokens ─────────────────────────────────────────────────────────────
+$green:       #166534;
+$green-mid:   #16a34a;
+$green-light: #dcfce7;
+$blue:        #1d4ed8;
+$blue-light:  #dbeafe;
+$amber:       #d97706;
+$amber-light: #fef3c7;
+$red:         #dc2626;
+$red-light:   #fee2e2;
+$purple:      #7c3aed;
+$purple-light:#f3e8ff;
+$gray-50:     #f9fafb;
+$gray-100:    #f3f4f6;
+$gray-200:    #e5e7eb;
+$gray-300:    #d1d5db;
+$gray-400:    #9ca3af;
+$gray-700:    #374151;
+$gray-900:    #111827;
+$radius-sm:   8px;
+$radius-md:   12px;
+$radius-lg:   16px;
+$radius-xl:   20px;
+$shadow-sm:   0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+$shadow-md:   0 4px 16px rgba(0,0,0,.08);
+$transition:  0.2s ease-in-out;
+
+// ── Layout e Page Container ──────────────────────────────────────────────────
+.page-container {
+    padding: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    animation: fadePage 0.4s ease-out;
+}
+
+@keyframes fadePage {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.content-header {
+    h1 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: $gray-900;
+        margin: 0 0 6px;
+    }
+    p {
+        font-size: 0.95rem;
+        color: $gray-400;
+        margin: 0;
+    }
+}
+
+// ── Cards ────────────────────────────────────────────────────────────────────
+.card {
+    background: white;
+    border-radius: $radius-xl;
+    border: 1px solid $gray-200;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    overflow: hidden;
+    transition: box-shadow $transition;
+
+    &:hover {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    }
+}
+
+.card-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid $gray-100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: linear-gradient(to right, $gray-50, white);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-md;
+    background: rgba(22, 101, 52, 0.05);
+    color: $green;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &.icon-green {
+        background: rgba(22, 163, 74, 0.06);
+        color: $green-mid;
+    }
+}
+
+.card-header h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: $gray-900;
+    margin: 0 0 2px;
+}
+
+.header-sub {
+    font-size: 0.85rem;
+    color: $gray-400;
+    margin: 0;
+}
+
+.user-count-badge {
+    padding: 6px 14px;
+    background: rgba(22, 101, 52, 0.06);
+    color: $green;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 100px;
+}
+
+.card-body {
+    padding: 32px;
+}
+
+// ── Tabela de Usuários ───────────────────────────────────────────────────────
+.table-responsive {
+    overflow-x: auto;
+    border-radius: $radius-md;
+    border: 1px solid $gray-100;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.9rem;
+
+    th {
+        background: $gray-50;
+        padding: 16px 20px;
+        font-weight: 700;
+        color: $gray-700;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 1.5px solid $gray-200;
+    }
+
+    td {
+        padding: 18px 20px;
+        color: $gray-900;
+        border-bottom: 1px solid $gray-100;
+        vertical-align: middle;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:hover td {
+        background: rgba(249, 250, 251, 0.5);
+    }
+}
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: $green-light;
+    color: $green;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    box-shadow: 0 0 0 1px rgba(22,101,52,0.05);
+
+    // Dynamic coloring based on character
+    &[data-letter="A"], &[data-letter="J"], &[data-letter="L"] {
+        background: $green-light; color: $green;
+    }
+    &[data-letter="T"], &[data-letter="C"], &[data-letter="G"] {
+        background: $purple-light; color: $purple;
+    }
+    &[data-letter="M"], &[data-letter="S"], &[data-letter="E"] {
+        background: $blue-light; color: $blue;
+    }
+}
+
+.user-name {
+    font-weight: 700;
+    color: $gray-900;
+}
+
+.user-email {
+    color: $gray-400;
+    font-weight: 500;
+}
+
+// ── Badges ───────────────────────────────────────────────────────────────────
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: capitalize;
+
+    .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    &.paciente {
+        background: rgba(29, 78, 216, 0.05);
+        color: $blue;
+        .dot { background: $blue; }
+    }
+
+    &.visualizador {
+        background: $gray-100;
+        color: $gray-700;
+        .dot { background: $gray-400; }
+    }
+
+    &.especialista {
+        background: rgba(22, 101, 52, 0.05);
+        color: $green;
+        .dot { background: $green; }
+    }
+
+    &.gestor {
+        background: rgba(217, 119, 6, 0.05);
+        color: $amber;
+        .dot { background: $amber; }
+    }
+
+    &.admin {
+        background: rgba(124, 58, 237, 0.05);
+        color: $purple;
+        .dot { background: $purple; }
+    }
+}
+
+// ── Form Controls & Select Wrapper ───────────────────────────────────────────
+.action-cell {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.select-wrapper {
+    position: relative;
+    width: 170px;
+
+    &.disabled {
+        opacity: 0.6;
+        cursor: not-allowed !important;
+        
+        select {
+            cursor: not-allowed !important;
+            background: $gray-100;
+            color: $gray-400;
+            border-color: $gray-200;
+            
+            &:hover {
+                border-color: $gray-200;
+            }
+        }
+    }
+
+    select {
+        width: 100%;
+        appearance: none;
+        background: white;
+        border: 1.5px solid $gray-200;
+        padding: 9px 36px 9px 14px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        border-radius: $radius-md;
+        color: $gray-700;
+        cursor: pointer;
+        transition: all $transition;
+
+        &:focus {
+            outline: none;
+            border-color: $green;
+            box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.08);
+            background: $gray-50;
+        }
+
+        &:hover {
+            border-color: $gray-300;
+        }
+    }
+}
+
+.select-arrow {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: $gray-400;
+    display: flex;
+    align-items: center;
+}
+
+// ── Botões ───────────────────────────────────────────────────────────────────
+.btn-danger-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: 1px solid rgba(220, 38, 38, 0.15);
+    color: $red;
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all $transition;
+
+    &:hover {
+        background: $red-light;
+        border-color: $red;
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: transparent !important;
+        border-color: rgba(220, 38, 38, 0.1) !important;
+        color: $gray-400 !important;
+        transform: none !important;
+    }
+}
+
+// ── Configurações Globais Grid ────────────────────────────────────────────────
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.setting-card {
+    background: white;
+    border-radius: $radius-xl;
+    border: 1.5px solid $gray-200;
+    padding: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+
+    &:hover {
+        border-color: $gray-300;
+        transform: translateY(-2px);
+    }
+
+    &.enabled {
+        border-color: rgba(22, 163, 74, 0.2);
+        box-shadow: 0 10px 24px rgba(22, 163, 74, 0.04);
+        
+        .setting-icon-box {
+            background: rgba(22, 163, 74, 0.08);
+            color: $green-mid;
+        }
+    }
+}
+
+.setting-card-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.setting-meta {
+    display: flex;
+    gap: 16px;
+}
+
+.setting-icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: $radius-md;
+    background: $gray-100;
+    color: $gray-400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.setting-info {
+    h4 {
+        font-size: 0.92rem;
+        font-weight: 800;
+        color: $gray-900;
+        margin: 0 0 4px;
+    }
+    p {
+        font-size: 0.8rem;
+        color: $gray-400;
+        line-height: 1.4;
+        margin: 0;
+    }
+}
+
+.setting-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid $gray-100;
+}
+
+.status-indicator {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: $gray-400;
+    transition: color 0.3s ease;
+    
+    .enabled & {
+        color: $green-mid;
+    }
+}
+
+// ── Switch Toggle (iOS style slider) ─────────────────────────────────────────
+.switch-toggle {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    background: $gray-200;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .switch-handle {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    &.active {
+        background: $green-mid;
+        
+        .switch-handle {
+            left: 25px;
+        }
+    }
+}
+
+// ── Estados Vazios e Loading ──────────────────────────────────────────────────
+.loading-users {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 0;
+    gap: 16px;
+    color: $gray-400;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid $gray-200;
+    border-top-color: $green;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.empty-table {
+    text-align: center;
+    color: $gray-400;
+    padding: 40px !important;
+    font-weight: 500;
+}
+
+// ── Responsividade ───────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+    .page-container {
+        padding: 16px;
+        gap: 20px;
+    }
+    
+    .card-header {
+        padding: 20px;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-cell {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .select-wrapper {
+        width: 100%;
+    }
+    
+    .btn-danger-icon {
+        justify-content: center;
+    }
+}
