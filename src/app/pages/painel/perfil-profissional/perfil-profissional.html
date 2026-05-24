@@ -1,0 +1,358 @@
+<section class="perfil-page">
+
+    @if (!profissional()) {
+    <div class="empty-state" style="padding: 60px; text-align: center;">
+        <p>Carregando perfil do profissional...</p>
+    </div>
+    }
+
+    <!-- ══════════════════ VISÃO DO PACIENTE ══════════════════ -->
+    @if (isPaciente() && profissional()) {
+    <div class="content-header">
+        <button class="btn-back" routerLink="/painel/busca-profissionais">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Voltar para a Busca
+        </button>
+    </div>
+
+    <div class="profile-layout">
+        <!-- Left: Profile Card -->
+        <div class="profile-main">
+            <div class="profile-card">
+                <div class="profile-banner" [style.backgroundImage]="'url(' + profissional()?.banner + ')'">
+                    <div class="banner-overlay"></div>
+                </div>
+                <div class="profile-header-info">
+                    <div class="profile-avatar">
+                        <img [src]="profissional()?.foto" alt="Foto do Médico">
+                        <span class="online-dot" [class.offline]="calcularStatusVisao(profissional()?.last_seen, profissional()?.status) === 'Offline'"></span>
+                    </div>
+                    <div class="profile-titles">
+                        <h1>{{ profissional()?.nome }}</h1>
+                        <p class="specialty">{{ profissional()?.especialidade }}</p>
+                        <div class="badges">
+                            <span class="badge badge-crm">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                {{ profissional()?.crm }}
+                            </span>
+                            <span class="badge badge-star">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="#ffc107" stroke="#ffc107" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                                {{ profissional()?.avaliacao }} ({{ profissional()?.avaliacoesCount }})
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="profile-quick-stats">
+                    <div class="quick-stat">
+                        <span class="qs-value">{{ profissional()?.consultasRealizadas }}</span>
+                        <span class="qs-label">Consultas</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="qs-value">{{ profissional()?.anosExperiencia }}+</span>
+                        <span class="qs-label">Anos Exp.</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="qs-value">{{ profissional()?.taxaRetorno }}%</span>
+                        <span class="qs-label">Retorno</span>
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3>Sobre o profissional</h3>
+                    <p class="bio">{{ profissional()?.sobre || 'Sem descrição cadastrada.' }}</p>
+                </div>
+
+                <div class="profile-section">
+                    <h3>Formação Acadêmica</h3>
+                    <div class="timeline">
+                        @for (f of profissional()?.formacao || []; track f.titulo) {
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <strong>{{ f.titulo }}</strong>
+                                <span>{{ f.instituicao }} — {{ f.ano }}</span>
+                            </div>
+                        </div>
+                        }
+                        @if (!profissional()?.formacao?.length) {
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Formação não cadastrada.</p>
+                        }
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3>Serviços Oferecidos</h3>
+                    <div class="tags-container">
+                        @for (servico of profissional()?.servicos || []; track servico) {
+                            <span class="tag">{{ servico }}</span>
+                        }
+                        @if (!profissional()?.servicos?.length) {
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Serviços não cadastrados.</p>
+                        }
+                    </div>
+                </div>
+
+                <div class="profile-section">
+                    <h3>Avaliações de Pacientes</h3>
+                    <div class="reviews-list">
+                        @for (av of profissional()?.avaliacoes || []; track av.nome) {
+                        <div class="review-item">
+                            <div class="review-header">
+                                <div class="review-avatar">{{ av.nome.charAt(0) }}</div>
+                                <div class="review-meta">
+                                    <strong>{{ av.nome }}</strong>
+                                    <span class="review-date">{{ av.data }}</span>
+                                </div>
+                                <div class="review-stars">
+                                    @for (s of [1,2,3,4,5]; track s) {
+                                        <svg width="14" height="14" viewBox="0 0 24 24" [attr.fill]="s <= av.nota ? '#ffc107' : '#e0e0e0'" [attr.stroke]="s <= av.nota ? '#ffc107' : '#e0e0e0'" stroke-width="2">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                        </svg>
+                                    }
+                                </div>
+                            </div>
+                            <p class="review-text">{{ av.texto }}</p>
+                        </div>
+                        }
+                        @if (!profissional()?.avaliacoes?.length) {
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Nenhuma avaliação ainda.</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Scheduling Sidebar -->
+        <div class="profile-sidebar">
+            <!-- Botão de mensagem -->
+            <button class="btn-message-prof" (click)="iniciarChat()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Enviar Mensagem
+            </button>
+
+            <div class="schedule-card">
+                <div class="schedule-header">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <h3>Agendar Consulta</h3>
+                </div>
+
+                @if (diasDisponiveis().length > 0) {
+                <p class="schedule-subtitle">Toque no horário desejado para agendar sua consulta:</p>
+                <div class="calendar-days">
+                    @for (dia of diasDisponiveis(); track dia.agendaId) {
+                    <div class="day-group">
+                        <div class="day-header">
+                            <span class="day-name">{{ dia.diasemana }}</span>
+                            <span class="day-date">{{ dia.data }}</span>
+                        </div>
+                        <div class="slots-grid">
+                            @for (slot of dia.slots; track slot) {
+                                <button class="slot-btn"
+                                    [class.selected]="selectedSlot()?.agendaId === dia.agendaId && selectedSlot()?.slot === slot"
+                                    (click)="selecionarHorario(dia.agendaId, dia.data, slot)">
+                                    {{ slot }}
+                                </button>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+                } @else {
+                <div style="padding: 24px; text-align: center; color: var(--text-muted);">
+                    <p>Nenhum horário disponível no momento.</p>
+                    <p style="font-size: 0.85rem; margin-top: 8px;">Entre em contato com a unidade de saúde para verificar disponibilidade.</p>
+                </div>
+                }
+
+                @if (selectedSlot()) {
+                <div class="booking-confirm">
+                    <div class="confirm-info">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                        <span><strong>{{ selectedSlot()?.dia }}</strong> às <strong>{{ selectedSlot()?.slot }}</strong></span>
+                    </div>
+                    <div class="confirm-actions">
+                        <button class="btn-confirm" (click)="confirmarAgendamento()">Confirmar Agendamento</button>
+                        <button class="btn-cancel-slot" (click)="cancelarSelecao()">Cancelar</button>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- ══════════════════ VISÃO DO PROFISSIONAL ══════════════════ -->
+    @if (!isPaciente() && profissional()) {
+    <div class="pro-dashboard">
+        <div class="pro-header">
+            <div class="pro-welcome">
+                <div class="pro-avatar-lg">
+                    <img [src]="profissional()?.foto" alt="Foto">
+                </div>
+                <div>
+                    <h1>{{ profissional()?.nome }}</h1>
+                    <p>{{ profissional()?.especialidade }} · {{ profissional()?.crm }}</p>
+                </div>
+            </div>
+            <button class="btn-edit-profile">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Editar Perfil
+            </button>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="pro-stats-grid">
+            <div class="pro-stat-card">
+                <div class="pro-stat-icon blue">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                </div>
+                <div class="pro-stat-info">
+                    <span class="pro-stat-value">{{ estatisticas().pacientesHoje }}</span>
+                    <span class="pro-stat-label">Pacientes Hoje</span>
+                </div>
+            </div>
+            <div class="pro-stat-card">
+                <div class="pro-stat-icon green">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </div>
+                <div class="pro-stat-info">
+                    <span class="pro-stat-value">{{ estatisticas().consultasMes }}</span>
+                    <span class="pro-stat-label">Consultas/Mês</span>
+                </div>
+            </div>
+            <div class="pro-stat-card">
+                <div class="pro-stat-icon purple">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+                <div class="pro-stat-info">
+                    <span class="pro-stat-value">{{ estatisticas().faturamentoMes }}</span>
+                    <span class="pro-stat-label">Faturamento</span>
+                </div>
+            </div>
+            <div class="pro-stat-card">
+                <div class="pro-stat-icon amber">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </div>
+                <div class="pro-stat-info">
+                    <span class="pro-stat-value">{{ estatisticas().satisfacao }}</span>
+                    <span class="pro-stat-label">Satisfação</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agenda do Dia -->
+        <div class="pro-grid-2col">
+            <div class="pro-card">
+                <div class="pro-card-header">
+                    <h3>Agenda de Hoje</h3>
+                    <span class="pro-badge">{{ agendaHoje().length }} pacientes</span>
+                </div>
+                <div class="pro-agenda-list">
+                    @for (item of agendaHoje(); track item.hora) {
+                    <div class="agenda-item" [class.aguardando]="item.status === 'aguardando'">
+                        <div class="agenda-hora">{{ item.hora }}</div>
+                        <div class="agenda-info">
+                            <strong>{{ item.paciente }}</strong>
+                            <span>{{ item.tipo }}</span>
+                        </div>
+                        <div class="agenda-status" [class]="item.status">
+                            {{ item.status === 'confirmado' ? '✓ Confirmado' : '⏳ Aguardando' }}
+                        </div>
+                        @if (isEspecialista()) {
+                        <button class="btn-primary-dashboard btn-sm" style="margin-left: auto; padding: 6px 12px; font-size: 0.8rem; border-radius: 8px;" (click)="abrirProntuario(item)">
+                            Ver Prontuário
+                        </button>
+                        }
+                    </div>
+                    }
+                    @if (agendaHoje().length === 0) {
+                    <p style="color: var(--text-muted); font-size: 0.9rem; padding: 16px 0;">Nenhuma consulta agendada para hoje.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="pro-card">
+                <div class="pro-card-header">
+                    <h3>Últimas Avaliações</h3>
+                    <span class="pro-badge-star">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="#ffc107" stroke="#ffc107" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        {{ profissional()?.avaliacao }}
+                    </span>
+                </div>
+                <div class="reviews-list compact">
+                    @for (av of profissional()?.avaliacoes || []; track av.nome) {
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="review-avatar">{{ av.nome.charAt(0) }}</div>
+                            <div class="review-meta">
+                                <strong>{{ av.nome }}</strong>
+                                <span class="review-date">{{ av.data }}</span>
+                            </div>
+                        </div>
+                        <p class="review-text">{{ av.texto }}</p>
+                    </div>
+                    }
+                    @if (!profissional()?.avaliacoes?.length) {
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Nenhuma avaliação ainda.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Prontuário (Visão Especialista) -->
+        @if (isEspecialista() && selectedPacienteProntuario()) {
+        <div class="modal-overlay active" (click)="fecharProntuario()">
+            <div class="modal-content" (click)="$event.stopPropagation()" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h2>Prontuário Eletrônico</h2>
+                    <button class="modal-close" (click)="fecharProntuario()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div style="background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid var(--border);">
+                        <h3 style="margin: 0 0 8px 0; color: var(--text);">{{ selectedPacienteProntuario()?.paciente }}</h3>
+                        <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
+                            Consulta: {{ selectedPacienteProntuario()?.tipo }} às {{ selectedPacienteProntuario()?.hora }}h
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Anotações Clínicas da Consulta Atual</label>
+                        <textarea class="form-input" rows="4" placeholder="Descreva os sintomas, diagnóstico e recomendações..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Enviar Relatório / Exame (PDF)</label>
+                        <div style="border: 2px dashed var(--border); padding: 24px; text-align: center; border-radius: 12px; background: #fafafa; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" style="margin-bottom: 8px;">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <p style="margin: 0; font-size: 0.9rem; color: var(--text-muted);">Clique para anexar arquivo (Ex: Hemograma.pdf) ou arraste aqui</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" (click)="fecharProntuario()">Cancelar</button>
+                    <button class="btn-primary" (click)="enviarRelatorio()">Concluir e Enviar Relatório</button>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+    }
+</section>

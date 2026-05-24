@@ -1,0 +1,70 @@
+<section class="page-container">
+    <div class="content-header" style="display: flex; justify-content: space-between; align-items:flex-end;">
+        <div>
+            <h1>Fila de Espera Inteligente</h1>
+            <p>Monitoramento em tempo real com priorização por IA.</p>
+        </div>
+        <div class="header-actions" style="display: flex; gap: 12px;">
+            <button class="btn-secondary" style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--surface-color); cursor: pointer;" (click)="reordenar()">
+                Reordenar Fila
+            </button>
+            <button class="btn-primary-dashboard" (click)="analisarIA()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                Análise de Urgência por IA
+            </button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-container">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Prioridade</th>
+                        <th>Paciente</th>
+                        <th>Tempo de Espera</th>
+                        <th>Especialidade</th>
+                        <th>Status</th>
+                        <th style="text-align: right">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (item of fila(); track item.paciente) {
+                    <tr>
+                        <td>
+                            <span class="status-badge" 
+                                [class.critical]="item.prioridade === 'Alta' || item.prioridade === 'Extrema'"
+                                [class.active]="item.prioridade === 'Normal'"
+                                [class.waiting]="item.prioridade === 'Baixa'">
+                                {{ item.prioridade }}
+                            </span>
+                        </td>
+                        <td><strong>{{ item.paciente }}</strong></td>
+                        <td>{{ item.tempoEspera }}</td>
+                        <td>{{ item.especialidade }}</td>
+                        <td>
+                            <span class="status-badge" [class.waiting]="item.status === 'Aguardando'"
+                                [class.active]="item.status === 'Em Atendimento'">
+                                {{ item.status }}
+                            </span>
+                        </td>
+                        <td style="text-align: right">
+                            <button *ngIf="item.status === 'Aguardando'" 
+                                class="btn-secondary" 
+                                style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: transparent; cursor: pointer; font-weight: 500;"
+                                (click)="atender(item.paciente)">
+                                Atender
+                            </button>
+                            <span *ngIf="item.status === 'Em Atendimento'" style="font-size: 0.85rem; color: #666; font-style: italic;">
+                                Em análise...
+                            </span>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

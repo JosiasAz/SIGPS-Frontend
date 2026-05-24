@@ -1,0 +1,135 @@
+<section class="page-container">
+    <div class="content-header">
+        <div class="header-text">
+            <h1>Gestão Inteligente de Fila</h1>
+            <p>Decisões clínicas otimizadas por processamento neural em tempo real.</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary-dashboard" (click)="reordenar()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3L21.5 8M2.5 16l2.7 4.3a10 10 0 0 0 18.8-4.3"></path>
+                </svg>
+                Processar Reanálise
+            </button>
+        </div>
+    </div>
+
+    <!-- Filtros e Resumo SIGPS -->
+    <div class="stats-grid" style="margin-bottom: 32px;">
+        <div class="stat-card">
+            <div class="stat-icon-wrapper users">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </div>
+            <div class="stat-details">
+                <span class="stat-label">Saturação da Fila</span>
+                <div class="stat-value-group">
+                    <span class="stat-value">{{ fila().length }}</span>
+                    <span class="stat-badge up">Monitorado</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-wrapper star">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </div>
+            <div class="stat-details">
+                <span class="stat-label">Urgências Críticas</span>
+                <div class="stat-value-group">
+                    <span class="stat-value" style="color: #ef4444;">{{ altaPrioridade() }} Case</span>
+                    <span class="stat-badge down">Imediato</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon-wrapper calendar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+            </div>
+            <div class="stat-details">
+                <span class="stat-label">Precisão do Score</span>
+                <div class="stat-value-group">
+                    <span class="stat-value">99.2%</span>
+                    <span class="stat-badge up">IA Ativa</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela Principal Estilizada -->
+    <div class="card">
+        <div class="card-header" style="margin-bottom: 24px;">
+            <h3 style="font-size: 1.25rem; font-weight: 700;">Priorização Dinâmica por Risco Clínico</h3>
+        </div>
+        
+        <div class="table-container">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th width="25%">Paciente / Especialidade</th>
+                        <th width="15%">Nível de Urgência</th>
+                        <th width="15%">Score de Risco (%)</th>
+                        <th width="30%">Raciocínio Analítico da IA</th>
+                        <th width="15%" class="text-right">Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (p of fila(); track p.id) {
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="avatar-sm">
+                                    {{ p.paciente.charAt(0) }}
+                                </div>
+                                <div>
+                                    <strong style="display: block; font-size: 1rem;">{{ p.paciente }}</strong>
+                                    <small style="color: var(--text-muted);">{{ p.especialidade }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="status-badge" [class]="p.prioridade.toLowerCase()">{{ p.prioridade }}</span>
+                                @if (p.riskTrend === 'up') {
+                                    <span style="color: #ef4444; font-size: 0.8rem; font-weight: 800;">▲</span>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ia-score-item">
+                                <span [style.color]="p.aiScore > 80 ? '#ef4444' : '#1a7a4e'" style="font-weight: 800; font-size: 1.1rem;">
+                                    {{ p.aiScore }}%
+                                </span>
+                                <div class="progress-mini">
+                                    <div class="progress-fill" [style.width.%]="p.aiScore" [class.danger]="p.aiScore > 80"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <p class="ai-reasoning-bubble" [title]="p.aiReasoning">
+                                {{ p.aiReasoning }}
+                            </p>
+                        </td>
+                        <td class="text-right">
+                            <button class="btn-outline-dashboard" (click)="atender(p.paciente)" style="padding: 8px 16px; font-size: 0.85rem;">
+                                Atender
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

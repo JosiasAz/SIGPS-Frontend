@@ -1,0 +1,183 @@
+<section class="page-container">
+    <div class="content-header">
+        <div>
+            <h1>Especialistas</h1>
+            <p>Gerenciamento de profissionais de saúde e suas especialidades.</p>
+        </div>
+        <button class="btn-primary-dashboard" (click)="adicionarEspecialista()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"></path>
+                <path d="M20 21v-2c0-1.1-.9-2-2-2h-3c-1.1 0-2 .9-2 2v2"></path>
+                <path d="M4 21v-2c0-1.1.9-2 2-2h3c1.1 0 2 .9 2 2v2"></path>
+            </svg>
+            Novo Especialista
+        </button>
+    </div>
+
+    <div class="card">
+        <div class="table-container">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CRM/CRP</th>
+                        <th>Especialidade</th>
+                        <th>Conta</th>
+                        <th>
+                            Presença
+                            <span style="font-size:0.7rem; font-weight:400; color:var(--text-muted); margin-left:4px;">(automático)</span>
+                        </th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (esp of especialistas(); track esp.id) {
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="avatar-sm">{{ esp.nome.substring(4, 6).toUpperCase() }}</div>
+                                <span>{{ esp.nome }}</span>
+                            </div>
+                        </td>
+                        <td>{{ esp.crm || esp.documento }}</td>
+                        <td>{{ esp.especialidade }}</td>
+                        <td>
+                            @if (esp.situacao === 'Inativo') {
+                            <span class="status-badge" style="background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; font-size: 0.8rem;">
+                                Desabilitado
+                            </span>
+                            } @else {
+                            <span class="status-badge active" style="font-size: 0.8rem;">
+                                Habilitado
+                            </span>
+                            }
+                        </td>
+                        <td>
+                            <span class="status-badge" [class.active]="calcularStatusVisao(esp.last_seen, esp.status) === 'Online'"
+                                [class.offline]="calcularStatusVisao(esp.last_seen, esp.status) === 'Offline'">
+                                {{ calcularStatusVisao(esp.last_seen, esp.status) }}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="icon-btn-sm" title="Editar" (click)="editarEspecialista(esp)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="icon-btn-sm text-danger" title="Excluir" (click)="excluirEspecialista(esp.id!, esp.nome)" style="color: #ef4444; margin-left: 8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18"></path>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar especialista -->
+    <dialog #addModal class="native-modal" (click)="fecharModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>{{ editingEspecialistaId !== null ? 'Editar Especialista' : 'Adicionar Novo Especialista' }}</h2>
+                <button class="modal-close" (click)="fecharModal()" title="Fechar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <form [formGroup]="especialistaForm" (ngSubmit)="salvarEspecialista()" class="modal-body">
+                <div class="form-group">
+                    <label for="nome">Nome Completo *</label>
+                    <input id="nome" type="text" formControlName="nome" placeholder="Dr(a). Nome Sobrenome" class="form-input" [class.error]="especialistaForm.get('nome')?.invalid && especialistaForm.get('nome')?.touched">
+                    @if (especialistaForm.get('nome')?.invalid && especialistaForm.get('nome')?.touched) {
+                        <span class="error-message">
+                            @if (especialistaForm.get('nome')?.errors?.['required']) {
+                                Informe nome e sobrenome
+                            } @else if (especialistaForm.get('nome')?.errors?.['minlength'] || especialistaForm.get('nome')?.errors?.['pattern']) {
+                                O nome deve ter no mínimo 5 caracteres e não conter números
+                            } @else if (especialistaForm.get('nome')?.errors?.['duasPalavras']) {
+                                Informe nome e sobrenome
+                            }
+                        </span>
+                    }
+                </div>
+                <div class="form-group">
+                    <label for="crm">CRM/CRP *</label>
+                    <input id="crm" type="text" formControlName="crm" placeholder="Ex: 12345-SP" class="form-input" [class.error]="especialistaForm.get('crm')?.invalid && especialistaForm.get('crm')?.touched" maxlength="9">
+                    @if (especialistaForm.get('crm')?.invalid && especialistaForm.get('crm')?.touched) {
+                        <span class="error-message">
+                            @if (especialistaForm.get('crm')?.errors?.['required']) {
+                                CRM/CRP é obrigatório
+                            } @else if (especialistaForm.get('crm')?.errors?.['pattern']) {
+                                Formato esperado: 12345-SP
+                            } @else if (especialistaForm.get('crm')?.errors?.['ufInvalida']) {
+                                UF inválida
+                            }
+                        </span>
+                    }
+                </div>
+                <div class="form-group">
+                    <label for="especialidade">Especialidade *</label>
+                    <select id="especialidade" formControlName="especialidade" class="form-input" [class.error]="especialistaForm.get('especialidade')?.invalid && especialistaForm.get('especialidade')?.touched">
+                        <option value="">Selecione uma especialidade</option>
+                        @for (esp of especialidades; track esp) {
+                            <option [value]="esp">{{ esp }}</option>
+                        }
+                    </select>
+                    @if (especialistaForm.get('especialidade')?.invalid && especialistaForm.get('especialidade')?.touched) {
+                        <span class="error-message">Especialidade é obrigatória</span>
+                    }
+                </div>
+                @if (editingEspecialistaId !== null) {
+                <div class="form-group">
+                    <label for="situacao">Acesso ao Sistema</label>
+                    <select id="situacao" formControlName="situacao" class="form-input">
+                        <option value="Ativo">Habilitado (pode fazer login)</option>
+                        <option value="Inativo">Desabilitado (sem acesso)</option>
+                    </select>
+                    <p class="hint" style="margin-top: 6px; color: var(--text-muted); font-size: 0.82rem;">
+                        O status <strong>Online/Offline</strong> é detectado automaticamente pela atividade de login do profissional.
+                    </p>
+                </div>
+                }
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" (click)="fecharModal()">Cancelar</button>
+                    <button type="submit" class="btn-primary" [disabled]="especialistaForm.invalid">{{ editingEspecialistaId !== null ? 'Atualizar' : 'Salvar' }}</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
+    <!-- Modal para exclusão de especialista -->
+    <dialog #deleteModal class="native-modal" (click)="fecharModalExclusao()">
+        <div class="modal-content" style="max-width: 420px; text-align: center; padding: 32px 24px;" (click)="$event.stopPropagation()">
+            <div class="modal-header" style="justify-content: center; border: none; padding: 0 0 24px 0;">
+                <div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; width: 72px; height: 72px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 8px 24px rgba(239, 68, 68, 0.15);">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                </div>
+            </div>
+            <div class="modal-body" style="padding: 0;">
+                <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 12px; color: var(--text);">Excluir Especialista?</h2>
+                <p style="color: #64748b; line-height: 1.6; margin-bottom: 32px; font-size: 0.95rem;">
+                    Esta ação excluirá permanentemente o especialista <strong style="color: #0f172a;">{{ deletingEspecialistaNome }}</strong>. Esta ação não poderá ser desfeita.
+                </p>
+                <div class="modal-footer" style="padding: 0; background: transparent; border: none; justify-content: center; gap: 16px;">
+                    <button class="btn-secondary" (click)="fecharModalExclusao()" style="flex: 1; padding: 14px 0;">Cancelar</button>
+                    <button class="btn-primary" style="flex: 1; background: #ef4444; border-color: #ef4444; padding: 14px 0; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);" (click)="confirmarExclusao()">Sim, excluir</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+</section>

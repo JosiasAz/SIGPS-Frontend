@@ -1,21 +1,19 @@
-<!-- ═══════════════════════════════════════════════ NAVBAR -->
+<!-- ═══════════ NAVBAR ═══════════ -->
 <header [class.scrolled]="isScrolled()">
   <nav class="nav-inner">
     <a class="logo" href="#">
-      <span class="logo-icon">
-        <img src="/logo.svg" alt="Logo SIGPS" style="height: 50px; width: auto; display: block;" />
-      </span>
+      <img src="/logo.svg" alt="SIGPS" class="logo-img" />
       <span class="logo-text">SIGPS</span>
     </a>
     <ul class="nav-links">
-      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#como-funciona">Como funciona</a></li>
       <li><a href="#funcionalidades">Funcionalidades</a></li>
       <li><a href="#especialidades">Especialidades</a></li>
       <li><a href="#contato">Contato</a></li>
     </ul>
     <div class="nav-actions">
-      <a class="btn-ghost" href="#">Entrar</a>
-      <a class="btn-primary" href="#">Cadastrar</a>
+      <a routerLink="login" class="btn-ghost">Entrar</a>
+      <a routerLink="cadastro" class="btn-primary">Cadastrar</a>
     </div>
     <button class="hamburger" (click)="toggleMenu()" [class.open]="menuOpen()">
       <span></span><span></span><span></span>
@@ -23,148 +21,238 @@
   </nav>
   <div class="mobile-menu" [class.open]="menuOpen()">
     <ul>
-      <li><a href="#sobre" (click)="toggleMenu()">Sobre</a></li>
+      <li><a href="#como-funciona" (click)="toggleMenu()">Como funciona</a></li>
       <li><a href="#funcionalidades" (click)="toggleMenu()">Funcionalidades</a></li>
       <li><a href="#especialidades" (click)="toggleMenu()">Especialidades</a></li>
       <li><a href="#contato" (click)="toggleMenu()">Contato</a></li>
     </ul>
     <div class="mobile-actions">
       <a class="btn-ghost" href="#">Entrar</a>
-      <a class="btn-primary" href="#">Cadastrar</a>
+      <a class="btn-primary" href="#">Cadastrar Grátis</a>
+      <a routerLink="login" class="btn-ghost">Entrar</a>
+      <a routerLink="cadastro" class="btn-primary">Cadastrar</a>
     </div>
   </div>
 </header>
-<!-- ═══════════════════════════════════════════════ HERO -->
+
+<!-- ═══════════ HERO ═══════════ -->
 <section class="hero" id="sobre">
-  <div class="hero-content">
-    <span class="hero-badge">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <circle cx="7" cy="7" r="6" fill="#2eab6e" opacity=".15" />
-        <circle cx="7" cy="7" r="3" fill="#2eab6e" />
-      </svg>
-      Plataforma de Saúde Inteligente · 2026
-    </span>
-    <h1 class="hero-title">
-      Conecte-se ao<br />
-      <span class="gradient-text">especialista certo,</span><br />
-      no momento certo.
-    </h1>
-    <p class="hero-subtitle">
-      O SIGPS organiza agendas, reduz filas e conecta pacientes a psicólogos,
-      nutricionistas, fisioterapeutas e muito mais — com inteligência artificial
-      que prioriza quem mais precisa.
-    </p>
-    <div class="hero-ctas">
-      <a class="btn-primary large" href="#">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <rect x="2" y="2" width="14" height="14" rx="3" stroke="white" stroke-width="1.5" />
-          <path d="M9 5.5v7M5.5 9h7" stroke="white" stroke-width="1.5" stroke-linecap="round" />
-        </svg>
-        Agendar Consulta
-      </a>
-      <a class="btn-outline large" href="#">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <circle cx="9" cy="6.5" r="3" stroke="#2eab6e" stroke-width="1.5" />
-          <path d="M3 15c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="#2eab6e" stroke-width="1.5" stroke-linecap="round" />
-        </svg>
-        Sou Profissional de Saúde
-      </a>
-    </div>
-    <div class="hero-stats">
-      <div class="stat">
-        <strong>+2.400</strong>
-        <span>Especialistas</span>
+  <div class="hero-bg-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-content fade-in">
+      <!-- <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Priorização inteligente com IA · Novo
+      </div> -->
+      <h1>Gestão de saúde <span class="gradient-text">inteligente</span> para clínicas modernas</h1>
+      <p class="hero-subtitle">
+        Reduza filas, organize agendamentos e conecte pacientes aos especialistas certos — com inteligência artificial que prioriza quem mais precisa.
+      </p>
+      <div class="hero-ctas">
+        <a class="btn-primary large" href="#">
+          Cadastrar Grátis
+          <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+            <path d="M3 8.5h11M8.5 3l5.5 5.5-5.5 5.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="btn-play" href="#">
+          <span class="play-circle">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M5 3.5l6 3.5-6 3.5V3.5z" fill="#2eab6e" />
+            </svg>
+          </span>
+          Ver demonstração
+        </a>
       </div>
-      <div class="stat-divider"></div>
-      <div class="stat">
-        <strong>98%</strong>
-        <span>Satisfação</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat">
-        <strong>-60%</strong>
-        <span>Tempo de espera</span>
+      <div class="hero-proof">
+        <div class="proof-avatars">
+          <div class="p-avatar">JS</div>
+          <div class="p-avatar">MC</div>
+          <div class="p-avatar">RL</div>
+          <div class="p-avatar more">+</div>
+        </div>
+        <span>Mais de <strong>2.400 profissionais</strong> confiam no SIGPS</span>
       </div>
     </div>
-  </div>
-  <div class="hero-visual">
-    <svg viewBox="0 0 480 480" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero-svg">
-      <!-- Background circles -->
-      <circle cx="240" cy="240" r="220" fill="#f0fbf5" stroke="#d4f0e2" stroke-width="1" />
-      <circle cx="240" cy="240" r="170" fill="#e6f7ee" stroke="#b6e8ce" stroke-width="1" />
-      <circle cx="240" cy="240" r="120" fill="#d4f0e2" stroke="#8dd9b0" stroke-width="1.5" />
-      <!-- Orbiting dots -->
-      <circle cx="240" cy="26" r="6" fill="#2eab6e" opacity=".4" class="orbit-dot" />
-      <circle cx="424" cy="160" r="5" fill="#1a7a4e" opacity=".3" />
-      <circle cx="424" cy="330" r="4" fill="#2eab6e" opacity=".25" />
-      <circle cx="56" cy="160" r="5" fill="#1a7a4e" opacity=".3" />
-      <circle cx="56" cy="330" r="4" fill="#2eab6e" opacity=".25" />
-      <!-- Center emblem -->
-      <circle cx="240" cy="240" r="62" fill="white" filter="url(#shadow)" />
-      <path d="M240 210v60M210 240h60" stroke="#2eab6e" stroke-width="7" stroke-linecap="round" />
-      <circle cx="240" cy="240" r="16" fill="#2eab6e" />
-      <circle cx="240" cy="240" r="8" fill="white" />
-      <!-- Floating cards -->
-      <!-- Card 1 -->
-      <g transform="translate(50, 110)" class="float-card-1">
-        <rect width="130" height="64" rx="14" fill="white" filter="url(#shadow)" />
-        <circle cx="24" cy="20" r="10" fill="#eaf7f0" />
-        <path d="M24 15v10M19 20h10" stroke="#2eab6e" stroke-width="1.8" stroke-linecap="round" />
-        <rect x="40" y="13" width="72" height="7" rx="3.5" fill="#d4f0e2" />
-        <rect x="40" y="25" width="50" height="5" rx="2.5" fill="#eaf7f0" />
-        <rect x="14" y="42" width="102" height="10" rx="5" fill="#2eab6e" opacity=".12" />
-        <rect x="14" y="42" width="62" height="10" rx="5" fill="#2eab6e" opacity=".35" />
-        <text x="75" y="51" fill="#1a7a4e" font-size="6.5" font-family="system-ui" font-weight="600"
-          text-anchor="middle">Prioridade Alta</text>
-      </g>
-      <!-- Card 2 -->
-      <g transform="translate(298, 86)" class="float-card-2">
-        <rect width="128" height="60" rx="14" fill="white" filter="url(#shadow)" />
-        <circle cx="22" cy="18" r="9" fill="#eaf7f0" />
-        <path d="M22 13v10M17 18h10" stroke="#2eab6e" stroke-width="1.6" stroke-linecap="round" />
-        <rect x="38" y="11" width="68" height="6" rx="3" fill="#d4f0e2" />
-        <rect x="38" y="22" width="46" height="5" rx="2.5" fill="#eaf7f0" />
-        <rect x="14" y="38" width="98" height="10" rx="5" fill="#d4f0e2" />
-        <circle cx="22" cy="43" r="4" fill="#2eab6e" />
-        <text x="62" y="46" fill="#1a7a4e" font-size="6" font-family="system-ui" text-anchor="middle">Consulta
-          Agendada</text>
-      </g>
-      <!-- Card 3 - AI badge -->
-      <g transform="translate(60, 300)" class="float-card-3">
-        <rect width="118" height="52" rx="12" fill="white" filter="url(#shadow)" />
-        <rect x="10" y="10" width="98" height="32" rx="8" fill="#eaf7f0" />
-        <text x="59" y="24" fill="#2eab6e" font-size="7" font-family="system-ui" font-weight="700"
-          text-anchor="middle">IA Ativa</text>
-        <text x="59" y="35" fill="#555" font-size="5.5" font-family="system-ui" text-anchor="middle">Priorização
-          automática</text>
-        <circle cx="15" cy="15" r="3" fill="#2eab6e" />
-      </g>
-      <!-- Card 4 - Stats -->
-      <g transform="translate(302, 316)" class="float-card-4">
-        <rect width="118" height="52" rx="12" fill="white" filter="url(#shadow)" />
-        <text x="14" y="22" fill="#1a7a4e" font-size="8" font-family="system-ui" font-weight="700">95%</text>
-        <text x="14" y="33" fill="#888" font-size="5.5" font-family="system-ui">Tempo de espera</text>
-        <polyline points="60,40 74,24 88,30 102,14" stroke="#2eab6e" stroke-width="2" fill="none"
-          stroke-linecap="round" />
-      </g>
-      <!-- Connection lines -->
-      <line x1="180" y1="240" x2="130" y2="175" stroke="#2eab6e" stroke-width="1" stroke-dasharray="4,4"
-        opacity=".35" />
-      <line x1="300" y1="240" x2="360" y2="175" stroke="#2eab6e" stroke-width="1" stroke-dasharray="4,4"
-        opacity=".35" />
-      <line x1="240" y1="300" x2="240" y2="346" stroke="#2eab6e" stroke-width="1" stroke-dasharray="4,4"
-        opacity=".35" />
-      <line x1="180" y1="240" x2="118" y2="328" stroke="#2eab6e" stroke-width="1" stroke-dasharray="4,4" opacity=".3" />
-      <line x1="300" y1="240" x2="360" y2="340" stroke="#2eab6e" stroke-width="1" stroke-dasharray="4,4" opacity=".3" />
-      <defs>
-        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#2eab6e" flood-opacity=".1" />
-        </filter>
-      </defs>
-    </svg>
+
+    <div class="hero-visual">
+      <div class="dash-mockup fade-in">
+        <div class="dash-chrome">
+          <div class="chrome-dots"><i class="dot-r"></i><i class="dot-y"></i><i class="dot-g"></i></div>
+          <div class="chrome-url">sigps.app/dashboard</div>
+        </div>
+        <div class="dash-body">
+          <aside class="dash-sidebar">
+            <div class="dash-logo-icon">
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                <path d="M7.5 1v13M1 7.5h13" stroke="#2eab6e" stroke-width="2.5" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div class="dash-nav">
+              <div class="dash-nav-item active"></div>
+              <div class="dash-nav-item"></div>
+              <div class="dash-nav-item"></div>
+              <div class="dash-nav-item"></div>
+            </div>
+          </aside>
+          <main class="dash-main">
+            <div class="dash-topbar">
+              <div class="dash-page-title"></div>
+              <div class="dash-tb-actions">
+                <div class="tb-btn"></div>
+                <div class="tb-btn primary"></div>
+              </div>
+            </div>
+            <div class="dash-kpis">
+              <div class="kpi">
+                <div class="kpi-val green">98%</div>
+                <div class="kpi-lbl">Satisfação</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-val">142</div>
+                <div class="kpi-lbl">Atendidos hoje</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-val orange">-60%</div>
+                <div class="kpi-lbl">Espera</div>
+              </div>
+            </div>
+            <div class="dash-queue-header">Fila de espera</div>
+            <div class="dash-queue">
+              <div class="q-row high">
+                <div class="q-avatar">AS</div>
+                <div class="q-info">
+                  <div class="q-name">Ana Silva</div>
+                  <div class="q-sub">Psicologia · 8 min</div>
+                </div>
+                <div class="q-badge high">Alta</div>
+              </div>
+              <div class="q-row">
+                <div class="q-avatar">MR</div>
+                <div class="q-info">
+                  <div class="q-name">Marcos R.</div>
+                  <div class="q-sub">Nutrição · 14 min</div>
+                </div>
+                <div class="q-badge med">Média</div>
+              </div>
+              <div class="q-row">
+                <div class="q-avatar">LF</div>
+                <div class="q-info">
+                  <div class="q-name">Lúcia F.</div>
+                  <div class="q-sub">Fisioterapia · 22 min</div>
+                </div>
+                <div class="q-badge low">Baixa</div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+
+      <div class="float-card ai-card">
+        <div class="fc-icon green">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1l1.8 3.7 4 .6-2.9 2.8.7 4-3.6-1.9-3.6 1.9.7-4L2.2 5.3l4-.6L8 1z" fill="#2eab6e" />
+          </svg>
+        </div>
+        <div class="fc-content">
+          <strong>IA ativa</strong>
+          <span>Fila reordenada agora</span>
+        </div>
+      </div>
+
+      <div class="float-card notify-card">
+        <div class="fc-icon teal">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1.5a5 5 0 015 5v2.3l1.4 2.7H1.6L3 8.8V6.5a5 5 0 015-5z" fill="#eaf7f0" stroke="#1a7a4e" stroke-width="1.2" />
+            <path d="M6.5 13.5a1.5 1.5 0 003 0" stroke="#1a7a4e" stroke-width="1.2" stroke-linecap="round" />
+          </svg>
+        </div>
+        <div class="fc-content">
+          <strong>Novo agendamento</strong>
+          <span>Psicologia · agora</span>
+        </div>
+        <div class="fc-dot"></div>
+      </div>
+    </div>
   </div>
 </section>
-<!-- ═══════════════════════════════════════════════ PROBLEMAS -->
+
+<!-- ═══════════ TRUST BAR ═══════════ -->
+<div class="trust-bar">
+  <span class="trust-label">A melhor gestão de clínicas</span>
+  <!-- <div class="trust-logos">
+    <span>ClínicaVida</span>
+    <span class="sep">·</span>
+    <span>SaúdePlena</span>
+    <span class="sep">·</span>
+    <span>InstitutoBem</span>
+    <span class="sep">·</span>
+    <span>PróSaúde</span>
+    <span class="sep">·</span>
+    <span>CentroMédico+</span>
+  </div> -->
+</div>
+
+<!-- ═══════════ COMO FUNCIONA ═══════════ -->
+<section class="how-it-works" id="como-funciona">
+  <div class="section-container">
+    <div class="section-header fade-in">
+      <span class="section-tag">Como funciona</span>
+      <h2>Comece a atender melhor em 3 passos</h2>
+      <p>Configure sua clínica em minutos e comece a usar sem burocracia.</p>
+    </div>
+    <div class="steps-row">
+      <div class="step fade-in">
+        <div class="step-num">01</div>
+        <div class="step-icon-wrap">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="11" r="5" stroke="#2eab6e" stroke-width="2" />
+            <path d="M5 26c0-4.97 4.03-9 9-9s9 4.03 9 9" stroke="#2eab6e" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </div>
+        <h3>Cadastre sua clínica</h3>
+        <p>Crie sua conta, adicione os profissionais e configure as especialidades atendidas em poucos cliques.</p>
+      </div>
+      <div class="step-arrow">
+        <svg width="48" height="16" viewBox="0 0 48 16" fill="none">
+          <path d="M0 8h44" stroke="#b6e8ce" stroke-width="2" stroke-linecap="round" />
+          <path d="M36 2l8 6-8 6" stroke="#b6e8ce" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="step fade-in">
+        <div class="step-num">02</div>
+        <div class="step-icon-wrap">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <rect x="4" y="5" width="20" height="20" rx="3" stroke="#2eab6e" stroke-width="2" />
+            <path d="M9 3v4M19 3v4M4 13h20" stroke="#2eab6e" stroke-width="2" stroke-linecap="round" />
+            <path d="M10 19l2 2 5-5" stroke="#2eab6e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <h3>Receba os pacientes</h3>
+        <p>Pacientes entram na fila e a IA organiza automaticamente por prioridade clínica real.</p>
+      </div>
+      <div class="step-arrow">
+        <svg width="48" height="16" viewBox="0 0 48 16" fill="none">
+          <path d="M0 8h44" stroke="#b6e8ce" stroke-width="2" stroke-linecap="round" />
+          <path d="M36 2l8 6-8 6" stroke="#b6e8ce" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="step fade-in">
+        <div class="step-num">03</div>
+        <div class="step-icon-wrap">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <rect x="3" y="4" width="22" height="20" rx="3" stroke="#2eab6e" stroke-width="2" />
+            <path d="M4 18l5-5 4 4 5-8 4 4" stroke="#2eab6e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <h3>Monitore e otimize</h3>
+        <p>Acompanhe KPIs em tempo real e tome decisões baseadas em dados concretos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PROBLEMAS ═══════════ -->
 <section class="problems" id="problemas">
   <div class="section-container">
     <div class="section-header fade-in">
@@ -176,16 +264,14 @@
       <div class="problem-card fade-in">
         <div class="card-icon red">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" stroke="#ef4444"
-              stroke-width="1.8" />
+            <circle cx="12" cy="12" r="9" stroke="#ef4444" stroke-width="1.8" />
             <path d="M12 7v6M12 16.5v.5" stroke="#ef4444" stroke-width="2" stroke-linecap="round" />
           </svg>
         </div>
         <h3>Falta de Visibilidade</h3>
-        <p>Pacientes não sabem quais especialistas atendem sua região ou área de necessidade, perdendo tempo em
-          pesquisas manuais.</p>
+        <p>Pacientes não sabem quais especialistas atendem sua região, perdendo tempo em pesquisas manuais.</p>
         <div class="card-impact">
-          <span>↑ 73% relatam dificuldade em encontrar especialista</span>
+          <span>73% relatam dificuldade em encontrar especialista</span>
         </div>
       </div>
       <div class="problem-card fade-in">
@@ -197,63 +283,58 @@
           </svg>
         </div>
         <h3>Agendamentos Manuais</h3>
-        <p>Ligações, papéis e planilhas geram erros, perda de dados e retrabalho constante — para clínicas e recepções
-          sobrecarregadas.</p>
+        <p>Ligações, papéis e planilhas geram erros e retrabalho constante para recepções sobrecarregadas.</p>
         <div class="card-impact">
-          <span>↑ 4h/dia desperdiçadas em tarefas administrativas</span>
+          <span>4h/dia desperdiçadas em tarefas administrativas</span>
         </div>
       </div>
       <div class="problem-card fade-in">
         <div class="card-icon purple">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#8b5cf6" stroke-width="1.8"
-              stroke-linecap="round" />
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="#8b5cf6" stroke-width="1.8" stroke-linecap="round" />
             <circle cx="9" cy="7" r="4" stroke="#8b5cf6" stroke-width="1.8" />
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="#8b5cf6" stroke-width="1.8"
-              stroke-linecap="round" />
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="#8b5cf6" stroke-width="1.8" stroke-linecap="round" />
           </svg>
         </div>
         <h3>Filas Sem Critério</h3>
-        <p>Sem priorização inteligente, pacientes aguardam em ordem de chegada — sem considerar urgência ou necessidade
-          clínica real.</p>
+        <p>Sem priorização inteligente, pacientes aguardam em ordem de chegada, sem considerar urgência clínica.</p>
         <div class="card-impact">
-          <span>↑ 2,5h de espera média sem sistema de prioridade</span>
+          <span>2,5h de espera média sem sistema de prioridade</span>
         </div>
       </div>
     </div>
     <div class="solution-bridge">
       <div class="bridge-line"></div>
       <div class="bridge-label">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M10 3l7 7-7 7M3 10h14" stroke="#2eab6e" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
-        </svg>
-        A solução SIGPS resolve tudo isso
+        <!-- <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M3 9h12M9 3l6 6-6 6" stroke="#2eab6e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg> -->
+        A solução é o SIGPS
       </div>
       <div class="bridge-line"></div>
     </div>
   </div>
 </section>
-<!-- ═══════════════════════════════════════════════ FUNCIONALIDADES -->
+
+<!-- ═══════════ FUNCIONALIDADES ═══════════ -->
 <section class="features" id="funcionalidades">
   <div class="section-container">
     <div class="section-header light fade-in">
       <span class="section-tag light">Funcionalidades</span>
       <h2>Tudo que sua clínica precisa em um só lugar</h2>
-      <p>Tecnologia moderna integrada com inteligência artificial para transformar a gestão em saúde.</p>
+      <p>Tecnologia moderna com inteligência artificial para transformar a gestão em saúde.</p>
     </div>
     <div class="features-grid">
       <div class="feature-card fade-in">
         <div class="feature-icon">
           <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
             <rect x="3" y="11" width="20" height="13" rx="3" stroke="white" stroke-width="1.8" />
-            <path d="M8 11V8a5 5 0 0 1 10 0v3" stroke="white" stroke-width="1.8" stroke-linecap="round" />
+            <path d="M8 11V8a5 5 0 0110 0v3" stroke="white" stroke-width="1.8" stroke-linecap="round" />
             <circle cx="13" cy="17.5" r="2" fill="white" />
           </svg>
         </div>
         <h3>Autenticação Segura</h3>
-        <p>Login com perfis diferenciados via JWT — admin, gestor, recepção e visualizador, com controle granular de
-          acesso.</p>
+        <p>JWT com perfis diferenciados — admin, gestor, recepção e visualizador, com controle granular de acesso.</p>
       </div>
       <div class="feature-card fade-in">
         <div class="feature-icon">
@@ -265,21 +346,18 @@
           </svg>
         </div>
         <h3>Gestão de Pacientes</h3>
-        <p>Cadastro completo com histórico de atendimentos, especialidades vinculadas e acompanhamento longitudinal do
-          paciente.</p>
+        <p>Cadastro completo com histórico de atendimentos, especialidades e acompanhamento longitudinal.</p>
       </div>
       <div class="feature-card fade-in highlight">
         <div class="feature-icon ai">
           <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
             <path d="M13 3l2.5 5 5.5.8-4 3.9.9 5.5L13 15.5l-4.9 2.7.9-5.5-4-3.9 5.5-.8L13 3z" stroke="#2eab6e"
               stroke-width="1.8" stroke-linejoin="round" fill="#eaf7f0" />
-            <circle cx="13" cy="20" r="2.5" fill="#2eab6e" opacity=".7" />
           </svg>
         </div>
         <span class="ai-badge">IA</span>
         <h3>Priorização Inteligente</h3>
-        <p>Modelo de Machine Learning analisa urgência e histórico para reordenar a fila automaticamente, sem
-          subjetividade humana.</p>
+        <p>Machine Learning analisa urgência e histórico para reordenar a fila automaticamente, sem subjetividade humana.</p>
       </div>
       <div class="feature-card fade-in">
         <div class="feature-icon">
@@ -290,20 +368,18 @@
           </svg>
         </div>
         <h3>Dashboard Analítico</h3>
-        <p>KPIs em tempo real: tempo médio de espera, taxa de atendimento e volume por especialidade para decisões
-          baseadas em dados.</p>
+        <p>KPIs em tempo real: tempo médio de espera, taxa de atendimento e volume por especialidade.</p>
       </div>
       <div class="feature-card fade-in">
         <div class="feature-icon">
           <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
             <path d="M4 6h18M4 12h12M4 18h8" stroke="white" stroke-width="1.8" stroke-linecap="round" />
-            <circle cx="20" cy="18" r="4" fill="white" opacity=".3" stroke="white" stroke-width="1.5" />
+            <circle cx="20" cy="18" r="4" stroke="white" stroke-width="1.5" />
             <path d="M20 16v2l1.5 1.5" stroke="white" stroke-width="1.5" stroke-linecap="round" />
           </svg>
         </div>
         <h3>Lista de Espera</h3>
-        <p>Controle completo da fila com atualização em tempo real, histórico de movimentações e notificação automática
-          ao paciente.</p>
+        <p>Controle completo da fila com atualização em tempo real e notificação automática ao paciente.</p>
       </div>
       <div class="feature-card fade-in">
         <div class="feature-icon">
@@ -314,13 +390,13 @@
           </svg>
         </div>
         <h3>Agendamento Online</h3>
-        <p>Agendamento vinculado à agenda dos especialistas, com controle de disponibilidade em tempo real e confirmação
-          automática.</p>
+        <p>Vinculado à agenda dos especialistas, com disponibilidade em tempo real e confirmação automática.</p>
       </div>
     </div>
   </div>
 </section>
-<!-- ═══════════════════════════════════════════════ ESPECIALIDADES -->
+
+<!-- ═══════════ ESPECIALIDADES ═══════════ -->
 <section class="specialties" id="especialidades">
   <div class="section-container">
     <div class="section-header fade-in">
@@ -328,123 +404,164 @@
       <h2>Para todo profissional de saúde e bem-estar</h2>
       <p>O SIGPS suporta um amplo catálogo de especialidades clínicas e terapêuticas.</p>
     </div>
-    <div class="specialties-track">
-      <div class="specialties-inner">
-        <span class="chip">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <circle cx="7" cy="5" r="2.5" stroke="#2eab6e" stroke-width="1.3" />
-            <path d="M2 13c0-2.761 2.239-5 5-5s5 2.239 5 5" stroke="#2eab6e" stroke-width="1.3"
-              stroke-linecap="round" />
-          </svg>
-          Psicologia
-        </span>
-        <span class="chip">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M7 2c2.761 0 5 2.239 5 5s-2.239 5-5 5-5-2.239-5-5 2.239-5 5-5z" stroke="#2eab6e"
-              stroke-width="1.3" />
-            <path d="M7 5v2l1.5 1.5" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" />
-          </svg>
-          Nutrição
-        </span>
-        <span class="chip">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M4 10l6-6M7 4l3 3M4 7l3 3" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" />
-          </svg>
-          Fisioterapia
-        </span>
-        <span class="chip">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <circle cx="7" cy="7" r="5" stroke="#2eab6e" stroke-width="1.3" />
-            <path d="M5 8.5c.5.8 3.5.8 4 0M5.5 6h.5M8 6h.5" stroke="#2eab6e" stroke-width="1.3"
-              stroke-linecap="round" />
-          </svg>
-          Odontologia
-        </span>
-        <span class="chip">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <rect x="2" y="3" width="10" height="10" rx="2" stroke="#2eab6e" stroke-width="1.3" />
-            <path d="M5 1v4M9 1v4M2 7h10" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" />
-          </svg>
-          Dermatologia
-        </span>
-        <span class="chip">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M7 2l1.5 3h3.5l-2.8 2 1 3.5L7 9l-3.2 1.5 1-3.5L2 5h3.5L7 2z" stroke="#2eab6e" stroke-width="1.2"
-              stroke-linejoin="round" />
-          </svg>
-          Pediatria
-        </span>
-        <span class="chip">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M2 7h2l2-4 2 8 2-4h2" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round"
-              stroke-linejoin="round" />
-          </svg>
-          Cardiologia
-        </span>
-        <span class="chip">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <circle cx="7" cy="5" r="2.5" stroke="#2eab6e" stroke-width="1.3" />
-            <path d="M2 13c0-2.761 2.239-5 5-5s5 2.239 5 5" stroke="#2eab6e" stroke-width="1.3"
-              stroke-linecap="round" />
-          </svg>
-          Geriatria
-        </span>
-        <span class="chip featured">+ 40 especialidades</span>
-        <!-- Duplicatas para loop infinito -->
-        <span class="chip">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <circle cx="7" cy="5" r="2.5" stroke="#2eab6e" stroke-width="1.3" />
-            <path d="M2 13c0-2.761 2.239-5 5-5s5 2.239 5 5" stroke="#2eab6e" stroke-width="1.3"
-              stroke-linecap="round" />
-          </svg>
-          Psicologia
-        </span>
-        <span class="chip">Nutrição</span>
-        <span class="chip">Fisioterapia</span>
-        <span class="chip">Odontologia</span>
-        <span class="chip">Dermatologia</span>
-        <span class="chip">Pediatria</span>
-        <span class="chip">Cardiologia</span>
-        <span class="chip">Geriatria</span>
-        <span class="chip featured">+ 40 especialidades</span>
+  </div>
+  <div class="specialties-track">
+    <div class="specialties-inner">
+      <span class="chip">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="5" r="2.5" stroke="#2eab6e" stroke-width="1.3" />
+          <path d="M2 13c0-2.761 2.239-5 5-5s5 2.239 5 5" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" />
+        </svg>Psicologia
+      </span>
+      <span class="chip">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 2a5 5 0 110 10A5 5 0 017 2z" stroke="#2eab6e" stroke-width="1.3" />
+          <path d="M7 5v2l1.5 1.5" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" />
+        </svg>Nutrição
+      </span>
+      <span class="chip">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M4 10l6-6M7 4l3 3M4 7l3 3" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" />
+        </svg>Fisioterapia
+      </span>
+      <span class="chip">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="5" stroke="#2eab6e" stroke-width="1.3" />
+          <path d="M5 8.5c.5.8 3.5.8 4 0M5.5 6h.5M8 6h.5" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" />
+        </svg>Odontologia
+      </span>
+      <span class="chip">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <rect x="2" y="3" width="10" height="10" rx="2" stroke="#2eab6e" stroke-width="1.3" />
+          <path d="M5 1v4M9 1v4M2 7h10" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" />
+        </svg>Dermatologia
+      </span>
+      <span class="chip">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 2l1.5 3h3.5l-2.8 2 1 3.5L7 9l-3.2 1.5 1-3.5L2 5h3.5L7 2z" stroke="#2eab6e" stroke-width="1.2" stroke-linejoin="round" />
+        </svg>Pediatria
+      </span>
+      <span class="chip">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M2 7h2l2-4 2 8 2-4h2" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>Cardiologia
+      </span>
+      <span class="chip">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="5" r="2.5" stroke="#2eab6e" stroke-width="1.3" />
+          <path d="M2 13c0-2.761 2.239-5 5-5s5 2.239 5 5" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" />
+        </svg>Geriatria
+      </span>
+      <span class="chip">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M3 7h2l1-3 2 6 1-3h2" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>Neurologia
+      </span>
+      <span class="chip">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="5" stroke="#2eab6e" stroke-width="1.3" />
+          <path d="M5 7h4M7 5v4" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" />
+        </svg>Ortopedia
+      </span>
+      <span class="chip featured">+ 40 especialidades</span>
+      <!-- Duplicatas para loop infinito -->
+      <span class="chip">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="5" r="2.5" stroke="#2eab6e" stroke-width="1.3" />
+          <path d="M2 13c0-2.761 2.239-5 5-5s5 2.239 5 5" stroke="#2eab6e" stroke-width="1.3" stroke-linecap="round" />
+        </svg>Psicologia
+      </span>
+      <span class="chip">Nutrição</span>
+      <span class="chip">Fisioterapia</span>
+      <span class="chip">Odontologia</span>
+      <span class="chip">Dermatologia</span>
+      <span class="chip">Pediatria</span>
+      <span class="chip">Cardiologia</span>
+      <span class="chip">Geriatria</span>
+      <span class="chip">Neurologia</span>
+      <span class="chip">Ortopedia</span>
+      <span class="chip featured">+ 40 especialidades</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ DEPOIMENTOS ═══════════ -->
+<section class="testimonials">
+  <div class="section-container">
+    <div class="section-header fade-in">
+      <span class="section-tag">Depoimentos</span>
+      <h2>O que nossos clientes dizem</h2>
+      <p>Clínicas reais, resultados reais. Veja como o SIGPS transformou o atendimento.</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card fade-in">
+        <div class="t-stars">★★★★★</div>
+        <p>"Reduzimos o tempo de espera em 65% no primeiro mês. A priorização por IA foi um divisor de águas para nossos pacientes."</p>
+        <div class="t-author">
+          <div class="t-avatar">CP</div>
+          <div class="t-info">
+            <strong>Dra. Carla Pereira</strong>
+            <span>Diretora Clínica, SaúdePlena</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in">
+        <div class="t-stars">★★★★★</div>
+        <p>"Eliminamos completamente o uso de planilhas e ligações. O agendamento online reduziu 80% do trabalho da recepção."</p>
+        <div class="t-author">
+          <div class="t-avatar">RF</div>
+          <div class="t-info">
+            <strong>Rafael Fontes</strong>
+            <span>Gestor Operacional, InstitutoBem</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in">
+        <div class="t-stars">★★★★★</div>
+        <p>"O dashboard analítico nos deu visibilidade total. Agora tomamos decisões baseadas em dados, não em intuição."</p>
+        <div class="t-author">
+          <div class="t-avatar">AM</div>
+          <div class="t-info">
+            <strong>Dra. Ana Mello</strong>
+            <span>Coordenadora, PróSaúde</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
-<!-- ═══════════════════════════════════════════════ CTA FINAL -->
+
+<!-- ═══════════ CTA FINAL ═══════════ -->
 <section class="cta-final" id="contato">
   <div class="cta-inner fade-in">
     <div class="cta-decoration">
-      <svg width="200" height="200" viewBox="0 0 200 200" fill="none" class="cta-bg-svg">
-        <circle cx="100" cy="100" r="90" stroke="white" stroke-width="1" opacity=".15" />
-        <circle cx="100" cy="100" r="65" stroke="white" stroke-width="1" opacity=".1" />
-        <circle cx="100" cy="100" r="40" stroke="white" stroke-width="1.5" opacity=".15" />
-        <path d="M100 70v60M70 100h60" stroke="white" stroke-width="4" stroke-linecap="round" opacity=".3" />
+      <svg width="320" height="320" viewBox="0 0 320 320" fill="none">
+        <circle cx="160" cy="160" r="150" stroke="white" stroke-width="1" opacity=".1" />
+        <circle cx="160" cy="160" r="110" stroke="white" stroke-width="1" opacity=".08" />
+        <circle cx="160" cy="160" r="70" stroke="white" stroke-width="1.5" opacity=".12" />
       </svg>
     </div>
     <span class="section-tag light">Comece agora</span>
-    <h2>Comece agora<br />sem complicação.</h2>
-    <p>Crie sua conta gratuitamente e conecte sua clínica ou consultório ao SIGPS em menos de 5 minutos.</p>
+    <h2>Pronto para transformar sua clínica?</h2>
+    <p>Crie sua conta gratuitamente e conecte-se ao SIGPS em menos de 5 minutos.</p>
     <div class="cta-actions">
-      <a class="btn-white large" href="#">
+      <a routerLink="cadastro" class="btn-white large">
         Criar conta gratuita
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
           <path d="M3 9h12M9 3l6 6-6 6" stroke="#1a7a4e" stroke-width="2" stroke-linecap="round"
             stroke-linejoin="round" />
         </svg>
       </a>
-      <span class="cta-note">Sem cartão de crédito · Cancele quando quiser</span>
     </div>
   </div>
 </section>
-<!-- ═══════════════════════════════════════════════ FOOTER -->
+
+<!-- ═══════════ FOOTER ═══════════ -->
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
       <a class="logo" href="#">
-        <span class="logo-icon">
-          <img src="/logo.svg" alt="Logo SIGPS" style="height: 42px; width: auto; display: block;" />
-        </span>
+        <img src="/logo.svg" alt="SIGPS" class="logo-img" style="height:38px;filter:brightness(10)" />
         <span class="logo-text">SIGPS</span>
       </a>
       <p>Conectando pacientes aos profissionais certos, no momento certo, com inteligência e eficiência.</p>
@@ -460,7 +577,7 @@
         </ul>
       </div>
       <div class="footer-col">
-        <h4>Desenvolvedores</h4>
+        <h4>Empresa</h4>
         <ul>
           <li><a href="#">Sobre</a></li>
           <li><a href="#">Equipe</a></li>

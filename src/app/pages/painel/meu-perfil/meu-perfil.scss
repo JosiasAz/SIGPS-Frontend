@@ -1,0 +1,809 @@
+// ── Design Tokens ─────────────────────────────────────────────────────────────
+$green:       #166534;
+$green-mid:   #16a34a;
+$green-light: #dcfce7;
+$blue:        #1d4ed8;
+$amber:       #d97706;
+$red:         #dc2626;
+$purple:      #7c3aed;
+$gray-50:     #f9fafb;
+$gray-100:    #f3f4f6;
+$gray-200:    #e5e7eb;
+$gray-400:    #9ca3af;
+$gray-700:    #374151;
+$gray-900:    #111827;
+$radius-sm:   8px;
+$radius-md:   12px;
+$radius-lg:   16px;
+$radius-xl:   20px;
+$shadow-sm:   0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+$shadow-md:   0 4px 16px rgba(0,0,0,.08);
+$shadow-lg:   0 8px 32px rgba(0,0,0,.10);
+$transition:  0.18s cubic-bezier(.4,0,.2,1);
+
+// ── Shell ─────────────────────────────────────────────────────────────────────
+.perfil-shell {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px 0 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+.toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: $radius-md;
+    font-size: .9rem;
+    font-weight: 600;
+    box-shadow: $shadow-lg;
+    animation: slideIn .2s ease;
+
+    &.sucesso { background: $green; color: white; }
+    &.erro     { background: $red;  color: white; }
+}
+@keyframes slideIn { from { transform: translateX(20px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
+
+// ── Hero Card ─────────────────────────────────────────────────────────────────
+.hero-card {
+    background: white;
+    border-radius: $radius-xl;
+    border: 1px solid $gray-200;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    box-shadow: $shadow-sm;
+}
+
+.hero-left { display: flex; align-items: center; gap: 20px; }
+
+.hero-avatar {
+    position: relative;
+    flex-shrink: 0;
+
+    img {
+        width: 72px; height: 72px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid $gray-200;
+    }
+}
+
+.avatar-badge.verified {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 20px; height: 20px;
+    background: $green-mid;
+    border-radius: 50%;
+    border: 2px solid white;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.hero-info {
+    h1 { font-size: 1.35rem; font-weight: 800; color: $gray-900; margin: 0 0 2px; }
+}
+.hero-email { color: $gray-400; font-size: .88rem; margin: 0 0 8px; }
+
+.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.hero-especialidade { font-size: .82rem; color: $gray-700; margin: 6px 0 0; }
+
+.hero-verified-seal {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: $green; font-size: .72rem; font-weight: 700; opacity: .85;
+}
+
+// ── Chips ─────────────────────────────────────────────────────────────────────
+.role-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: .78rem; font-weight: 700; letter-spacing: .3px;
+
+    &.paciente      { background: #dbeafe; color: $blue; }
+    &.especialista  { background: $green-light; color: $green; }
+    &.gestor        { background: #fef3c7; color: #92400e; }
+    &.admin         { background: #f3e8ff; color: $purple; }
+}
+
+.verif-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: .78rem; font-weight: 700;
+
+    &.nao_verificado { background: #f3f4f6; color: $gray-700; }
+    &.em_analise     { background: #eff6ff; color: $blue; }
+    &.verificado     { background: $green-light; color: $green; }
+    &.rejeitado      { background: #fef2f2; color: $red; }
+    &.pendente       { background: #fef3c7; color: $amber; }
+    &.verificada     { background: $green-light; color: $green; }
+}
+
+.tab-badge {
+    background: $green; color: white;
+    font-size: .68rem; font-weight: 700;
+    padding: 2px 7px; border-radius: 10px; margin-left: 4px;
+}
+
+// ── Status Banner ─────────────────────────────────────────────────────────────
+.status-banner {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px 20px; border-radius: $radius-md;
+    font-size: .9rem; position: relative; overflow: hidden;
+
+    strong { display: block; font-weight: 700; margin-bottom: 2px; }
+    p { margin: 0; opacity: .85; font-size: .85rem; }
+
+    &.warning { background: #fefce8; border: 1px solid #fde68a; color: #713f12; }
+    &.info    { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; }
+    &.success { background: $green-light; border: 1px solid #86efac; color: $green; }
+    &.danger  { background: #fef2f2; border: 1px solid #fca5a5; color: $red; }
+}
+
+.status-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+
+.status-progress {
+    height: 4px; background: rgba(255,255,255,.4);
+    border-radius: 2px; overflow: hidden; margin-top: 10px;
+    .progress-bar { height: 100%; background: currentColor; border-radius: 2px; opacity: .6; transition: width .6s ease; }
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+.tabs {
+    display: flex; gap: 4px;
+    background: $gray-100; padding: 4px; border-radius: $radius-md;
+}
+
+.tab {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 10px 16px; border-radius: $radius-sm;
+    background: transparent; border: none;
+    font-size: .9rem; font-weight: 600; color: $gray-400;
+    cursor: pointer; transition: all $transition;
+
+    &:hover { color: $gray-700; background: rgba(255,255,255,.6); }
+    &.active { background: white; color: $gray-900; box-shadow: $shadow-sm; }
+}
+
+// ── Wizard Card ───────────────────────────────────────────────────────────────
+.wizard-card {
+    background: white;
+    border-radius: $radius-xl;
+    border: 1px solid $gray-200;
+    box-shadow: $shadow-sm;
+    overflow: hidden;
+}
+
+.wizard-top {
+    padding: 28px 32px 20px;
+    border-bottom: 1px solid $gray-100;
+
+    h2 { font-size: 1.2rem; font-weight: 800; color: $gray-900; margin: 0 0 4px; }
+    p  { font-size: .88rem; color: $gray-400; margin: 0; }
+}
+
+// ── Step Indicator ────────────────────────────────────────────────────────────
+.step-indicator {
+    display: flex; align-items: center;
+    padding: 24px 32px 0;
+}
+
+.step-dot {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .88rem; font-weight: 700; flex-shrink: 0;
+    background: white; color: $gray-400;
+    border: 2px solid $gray-200;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.active {
+        background: white;
+        color: $green;
+        border-color: $green;
+        box-shadow: 0 0 0 4px rgba(22, 101, 52, 0.15);
+    }
+    &.done {
+        background: $green;
+        color: white;
+        border-color: $green;
+    }
+}
+
+.step-line {
+    flex: 1; height: 2px; background: $gray-200; margin: 0 8px;
+    transition: background 0.3s ease;
+    &.done { background: $green; }
+}
+
+// ── Progress Track ────────────────────────────────────────────────────────────
+.progress-track {
+    margin: 16px 32px 0;
+    height: 4px; background: $gray-100; border-radius: 2px; overflow: hidden;
+}
+.progress-fill {
+    height: 100%; background: $green; border-radius: 2px;
+    transition: width .4s ease;
+}
+
+// ── Wizard Step ───────────────────────────────────────────────────────────────
+.wizard-step { padding: 28px 32px 32px; }
+
+.step-title { font-size: 1.05rem; font-weight: 800; color: $gray-900; margin: 0 0 4px; }
+.step-subtitle { font-size: .85rem; color: $gray-400; margin: 0 0 24px; }
+
+// ── Tipos de profissional (grid de cards) ─────────────────────────────────────
+.tipo-prof-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+.tipo-card {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 20px 10px; border-radius: $radius-xl;
+    border: 1.5px solid $gray-200; background: white;
+    cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+
+    &:hover {
+        border-color: $green-mid;
+        background: $gray-50;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(22, 163, 74, 0.06);
+    }
+    
+    &.selected {
+        border-color: $green;
+        background: rgba(22, 101, 52, 0.03);
+        box-shadow: 0 12px 28px rgba(22, 101, 52, 0.12), 0 0 0 2px $green;
+        transform: translateY(-2px);
+        
+        .tipo-nome {
+            color: $green;
+        }
+    }
+}
+
+.tipo-icon {
+    width: 44px; height: 44px; border-radius: $radius-sm;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1rem;
+}
+
+.tipo-nome { font-size: .82rem; font-weight: 700; color: $gray-900; transition: color 0.25s ease; }
+.tipo-conselho { font-size: .72rem; font-weight: 600; color: $gray-400; }
+
+// ── Forms ─────────────────────────────────────────────────────────────────────
+.step-form { display: flex; flex-direction: column; gap: 16px; }
+
+.field-row {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    .field-group { flex: 1; min-width: 140px; }
+}
+
+.field-group { display: flex; flex-direction: column; gap: 5px;
+    &--sm { flex: 0 0 100px !important; min-width: 80px !important; }
+}
+
+.field-label {
+    font-size: .82rem; font-weight: 600; color: $gray-700;
+    display: flex; align-items: center; gap: 3px;
+}
+
+.req { color: $red; }
+
+.field-input {
+    padding: 10px 14px; border: 1.5px solid $gray-200;
+    border-radius: $radius-sm; font-size: .9rem; color: $gray-900;
+    background: white; transition: border-color $transition, box-shadow $transition;
+    font-family: inherit; width: 100%; box-sizing: border-box;
+
+    &:focus {
+        outline: none; border-color: $green-mid;
+        box-shadow: 0 0 0 3px rgba(22,163,74,.12);
+    }
+
+    &:disabled { background: $gray-50; color: $gray-400; cursor: not-allowed; }
+}
+
+.field-select { cursor: pointer; appearance: auto; }
+.field-textarea { resize: vertical; min-height: 90px; }
+
+.field-hint { font-size: .78rem; color: $gray-400; }
+.field-error { font-size: .78rem; color: $red; font-weight: 600; }
+
+.input-with-action { position: relative; display: flex; align-items: center;
+    input { padding-right: 36px; }
+}
+.input-spinner {
+    position: absolute; right: 12px;
+    width: 16px; height: 16px; border: 2px solid $gray-200;
+    border-top-color: $green; border-radius: 50%; animation: spin .6s linear infinite;
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+.step-actions {
+    display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;
+    padding-top: 20px; border-top: 1px solid $gray-100;
+}
+
+.btn-primary {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 10px 20px; border-radius: $radius-sm;
+    background: $green; color: white; border: none;
+    font-size: .9rem; font-weight: 700; cursor: pointer;
+    transition: background $transition, transform $transition;
+
+    &:hover:not(:disabled) { background: darken($green, 5%); transform: translateY(-1px); }
+    &:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    &.btn--sm { padding: 7px 14px; font-size: .82rem; }
+}
+
+.btn-outline {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: $radius-sm;
+    background: white; color: $gray-700;
+    border: 1.5px solid $gray-200;
+    font-size: .85rem; font-weight: 600; cursor: pointer;
+    transition: all $transition;
+
+    &:hover { border-color: $gray-400; color: $gray-900; }
+}
+
+.btn-ghost {
+    padding: 10px 16px; border-radius: $radius-sm;
+    background: transparent; border: none;
+    font-size: .9rem; font-weight: 600; color: $gray-400;
+    cursor: pointer; transition: color $transition;
+
+    &:hover { color: $gray-700; }
+}
+
+.btn-icon-danger {
+    width: 30px; height: 30px; border-radius: $radius-sm;
+    background: transparent; border: 1.5px solid $gray-200;
+    color: $gray-400; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all $transition;
+
+    &:hover { border-color: $red; color: $red; background: #fef2f2; }
+}
+
+.btn-spinner {
+    width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4);
+    border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg) } }
+
+// ── Card de verificação ───────────────────────────────────────────────────────
+.verif-action-card {
+    background: #fffbeb;
+    border: 1.5px solid #f59e0b;
+    border-radius: $radius-xl;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadeSlideIn .3s ease;
+
+    &.rejeitado {
+        background: #fef2f2;
+        border-color: $red;
+
+        .verif-action-icon { background: #fef2f2; color: $red; }
+        h4 { color: $red; }
+    }
+}
+
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.verif-action-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+
+    h4 {
+        font-size: .9rem;
+        font-weight: 700;
+        color: #92400e;
+        margin: 0 0 4px;
+    }
+    p {
+        font-size: .83rem;
+        color: #78350f;
+        margin: 0;
+        line-height: 1.5;
+    }
+}
+
+.verif-action-icon {
+    width: 42px;
+    height: 42px;
+    background: #fef3c7;
+    color: $amber;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.verif-upload-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.upload-doc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: $radius-sm;
+    border: 1.5px dashed #d97706;
+    background: white;
+    color: #92400e;
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all $transition;
+
+    &:hover { background: #fef3c7; border-style: solid; }
+
+    &.file-ok {
+        border-style: solid;
+        border-color: $green;
+        background: $green-light;
+        color: $green;
+    }
+}
+
+.verif-formats {
+    font-size: .75rem;
+    color: #a16207;
+    margin: 0;
+}
+
+// ── Edit Form blocks ──────────────────────────────────────────────────────────
+.edit-block {
+    padding: 20px 28px;
+    border-bottom: 1px solid $gray-100;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    &:last-of-type { border-bottom: none; }
+}
+
+.edit-block-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: .76rem;
+    font-weight: 800;
+    color: $gray-400;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+}
+
+.edit-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+
+    @media (max-width: 560px) { grid-template-columns: 1fr; }
+}
+
+.edit-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 80px;
+    gap: 12px;
+
+    @media (max-width: 560px) { grid-template-columns: 1fr 80px; }
+}
+
+.edit-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 28px 20px;
+}
+
+.field-hint.linked {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: $green;
+    background: $green-light;
+    padding: 6px 10px;
+    border-radius: $radius-sm;
+    margin-top: 4px;
+}
+
+// ── Section Card ──────────────────────────────────────────────────────────────
+.section-card {
+    background: white; border-radius: $radius-xl;
+    border: 1px solid $gray-200; box-shadow: $shadow-sm;
+    overflow: hidden;
+}
+
+.section-card-header {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+    padding: 22px 28px; border-bottom: 1px solid $gray-100;
+
+    h3 { font-size: 1rem; font-weight: 800; color: $gray-900; margin: 0 0 2px; }
+    p  { font-size: .82rem; color: $gray-400; margin: 0; }
+}
+
+.clinic-type-badge {
+    display: inline-block; margin-top: 4px;
+    background: $gray-100; color: $gray-700;
+    font-size: .75rem; font-weight: 700;
+    padding: 2px 9px; border-radius: 12px;
+}
+
+// ── Info Grid ─────────────────────────────────────────────────────────────────
+.info-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: $gray-100;
+    margin: 0; padding: 0;
+}
+
+.info-item {
+    background: white; padding: 16px 28px;
+    display: flex; flex-direction: column; gap: 4px;
+
+    label { font-size: .75rem; font-weight: 700; color: $gray-400; text-transform: uppercase; letter-spacing: .5px; }
+    span  { font-size: .9rem; color: $gray-900; }
+
+    &--full { grid-column: 1 / -1; }
+}
+
+// ── Review Box ────────────────────────────────────────────────────────────────
+.review-box {
+    background: $gray-50; border: 1px solid $gray-200;
+    border-radius: $radius-md; overflow: hidden; margin-bottom: 16px;
+}
+
+.review-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 16px; border-bottom: 1px solid $gray-200;
+    font-size: .88rem;
+
+    &:last-child { border-bottom: none; }
+    span { color: $gray-400; font-weight: 500; }
+    strong { color: $gray-900; }
+}
+
+// ── Checkbox ──────────────────────────────────────────────────────────────────
+.checkbox-label {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: .85rem; color: $gray-700; cursor: pointer;
+    margin-top: 12px;
+
+    input { margin-top: 2px; accent-color: $green; }
+}
+
+.link { color: $green; text-decoration: underline; }
+
+// ── Document Upload ───────────────────────────────────────────────────────────
+.doc-upload-area { display: flex; flex-direction: column; gap: 16px; }
+
+.doc-accepted {
+    display: flex; align-items: center; gap: 8px;
+    font-size: .85rem; color: $gray-700;
+}
+
+.doc-desc { font-size: .85rem; color: $gray-400; margin: 0; }
+
+.upload-zone {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px; padding: 32px; text-align: center;
+    border: 2px dashed $gray-200; border-radius: $radius-lg;
+    cursor: pointer; transition: all $transition;
+    background: $gray-50;
+
+    svg { color: $gray-400; }
+    p { margin: 0; font-size: .9rem; color: $gray-700; }
+    span { font-size: .78rem; color: $gray-400; }
+
+    &:hover { border-color: $green-mid; background: $green-light; svg { color: $green; } }
+    &.has-file { border-color: $green-mid; background: $green-light; border-style: solid; }
+}
+
+.doc-sent {
+    display: flex; align-items: center; gap: 8px; padding: 12px 16px;
+    background: $green-light; border: 1px solid #86efac;
+    border-radius: $radius-sm; font-size: .85rem; font-weight: 600; color: $green;
+}
+
+.doc-action-row {
+    padding: 16px 28px; border-top: 1px solid $gray-100;
+}
+
+.doc-action-label { font-size: .82rem; font-weight: 600; color: $gray-700; margin: 0 0 8px; }
+
+.upload-mini {
+    display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+    padding: 7px 14px; border-radius: $radius-sm;
+    border: 1.5px solid $gray-200; background: white;
+    font-size: .82rem; font-weight: 600; color: $gray-700;
+    transition: all $transition;
+
+    &:hover { border-color: $green; color: $green; }
+}
+
+// ── Add Member ────────────────────────────────────────────────────────────────
+.add-member-row {
+    display: flex; gap: 10px; padding: 20px 24px 8px;
+    input { flex: 1; }
+}
+
+// ── Member List ───────────────────────────────────────────────────────────────
+.member-list {
+    padding: 0 24px 24px;
+    display: flex; flex-direction: column; gap: 8px;
+}
+
+.member-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: $radius-sm;
+    border: 1px solid $gray-200; background: $gray-50;
+}
+
+.member-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: $green-light; color: $green;
+    font-weight: 800; display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; flex-shrink: 0;
+}
+
+.member-info {
+    flex: 1;
+    strong { display: block; font-size: .88rem; color: $gray-900; }
+    span   { font-size: .78rem; color: $gray-400; }
+}
+
+.empty-members { color: $gray-400; font-size: .85rem; padding: 8px 0; }
+
+// ── Paciente Upgrade Hint ─────────────────────────────────────────────────────
+.paciente-upgrade-hint {
+    background: white; border: 1px solid $gray-200; border-radius: $radius-xl;
+    padding: 40px; text-align: center; box-shadow: $shadow-sm;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.paciente-upgrade-icon { font-size: 3rem; }
+.paciente-upgrade-hint h3 { font-size: 1rem; font-weight: 800; color: $gray-900; margin: 0; }
+.paciente-upgrade-hint p  { font-size: .88rem; color: $gray-400; max-width: 400px; margin: 0; }
+
+// ── Skeleton Loading ──────────────────────────────────────────────────────────
+.loading-shell { gap: 16px; }
+.skeleton {
+    background: linear-gradient(90deg, $gray-100 25%, $gray-200 50%, $gray-100 75%);
+    background-size: 200% 100%; border-radius: $radius-xl;
+    animation: shimmer 1.4s infinite;
+}
+.hero-skeleton { height: 116px; }
+.card-skeleton { height: 200px; &.short { height: 100px; } }
+
+@keyframes shimmer { from { background-position: 200% 0 } to { background-position: -200% 0 } }
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 640px) {
+    .perfil-shell { padding: 16px 0 32px; gap: 12px; }
+    .hero-card { padding: 20px; }
+    .hero-left { flex-direction: column; align-items: flex-start; }
+    .wizard-top, .wizard-step { padding: 20px; }
+    .tipo-prof-grid { grid-template-columns: repeat(3, 1fr); }
+    .info-grid { grid-template-columns: 1fr; }
+    .field-row { flex-direction: column; .field-group--sm { flex: unset; width: 100%; } }
+    .step-actions { flex-wrap: wrap; }
+    .tabs { flex-direction: column; }
+}
+
+// ── Transição de Especialista ──────────────────────────────────────────────────
+.transicao-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(17, 24, 39, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn .4s cubic-bezier(.4,0,.2,1) forwards;
+}
+
+.transicao-content {
+    background: white;
+    padding: 40px 48px;
+    border-radius: $radius-xl;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    max-width: 440px;
+    width: 90%;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transform: translateY(20px);
+    animation: slideUp .4s cubic-bezier(.34,1.56,0.64,1) forwards;
+}
+
+.transicao-logo {
+    width: 80px;
+    height: 80px;
+    background: $green-light;
+    color: $green;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    box-shadow: 0 0 0 10px rgba(22, 101, 52, 0.05);
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+.transicao-content h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: $gray-900;
+    margin: 0 0 8px;
+}
+
+.transicao-sub {
+    font-size: .95rem;
+    color: $gray-400;
+    margin: 0 0 32px;
+}
+
+.transicao-progress-track {
+    height: 6px;
+    background: $gray-100;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.transicao-progress-fill {
+    height: 100%;
+    background: $green;
+    border-radius: 3px;
+    transition: width 0.3s cubic-bezier(.4,0,.2,1);
+}
+
+.transicao-status-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: .82rem;
+    font-weight: 700;
+    color: $gray-700;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    to { transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0px rgba(22, 101, 52, 0.08); }
+    50% { box-shadow: 0 0 0 16px rgba(22, 101, 52, 0); }
+}
