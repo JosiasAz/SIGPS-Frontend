@@ -1,5 +1,5 @@
 export const environment = {
     production: false,
     useMock: false,
-    apiUrl: 'http://127.0.0.1:5000'
+    apiUrl: 'http://187.77.2.176:5000'
 };
