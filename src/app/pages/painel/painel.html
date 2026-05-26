@@ -1,7 +1,8 @@
 <div class="dashboard-container" [class.paciente-theme]="userRoleLabel() === 'Paciente'" [class.collapsed]="isSidebarCollapsed()">
     <!-- ══════════════════════════ SIDEBAR ADMIN -->
     @if (userRoleLabel() !== 'Paciente') {
-    <aside class="sidebar">
+    <div class="sidebar-overlay" *ngIf="isMobileMenuOpen()" (click)="closeMobileMenu()"></div>
+    <aside class="sidebar" [class.mobile-open]="isMobileMenuOpen()">
         <div class="sidebar-header">
             <div class="logo-area">
                 <span class="logo-icon">
@@ -96,6 +97,13 @@
         <!-- Top Navbar Admin -->
         @if (userRoleLabel() !== 'Paciente') {
         <header class="top-navbar">
+            <button class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Abrir menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
             <div class="search-area">
                 <div class="search-box">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -180,18 +188,27 @@
         <header class="top-navbar paciente-navbar">
             <div class="logo-area" style="display: flex; align-items: center; gap: 12px; cursor: pointer;" routerLink="/painel/portal-paciente">
                 <img src="/logo.svg" alt="Logo SIGPS" style="height: 48px;" />
-                <span style="font-weight: 800; font-size: 1.25rem; color: var(--green-dark);">SIGPS</span>
+                <span style="font-weight: 800; font-size: 1.25rem; color: var(--green-dark);" class="hide-mobile">SIGPS</span>
             </div>
 
-            <nav class="paciente-horizontal-nav" style="display: flex; gap: 32px; margin-left: 48px;">
-                <a routerLink="/painel/portal-paciente" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Meu Portal</a>
-                <a routerLink="/painel/agendas" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Minhas Consultas</a>
-                <a routerLink="/painel/busca-profissionais" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Explorar Profissionais</a>
-                <a routerLink="/painel/chat" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Mensagens</a>
-                <a routerLink="/painel/meu-perfil" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Meu Perfil</a>
+            <button class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Abrir menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <nav class="paciente-horizontal-nav" [class.mobile-open]="isMobileMenuOpen()">
+                <button class="close-mobile-nav" (click)="closeMobileMenu()">×</button>
+                <a (click)="closeMobileMenu()" routerLink="/painel/portal-paciente" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Meu Portal</a>
+                <a (click)="closeMobileMenu()" routerLink="/painel/agendas" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Minhas Consultas</a>
+                <a (click)="closeMobileMenu()" routerLink="/painel/busca-profissionais" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Explorar Profissionais</a>
+                <a (click)="closeMobileMenu()" routerLink="/painel/chat" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Mensagens</a>
+                <a (click)="closeMobileMenu()" routerLink="/painel/meu-perfil" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Meu Perfil</a>
             </nav>
 
-            <div class="user-actions" style="margin-left: auto;">
+            <div class="user-actions user-actions-paciente">
                 <div class="user-profile">
                     <div class="user-info" style="text-align: right;">
                         <span class="name">{{ currentUser()?.name || 'Paciente' }}</span>

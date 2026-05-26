@@ -528,3 +528,24 @@
     from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+@media (max-width: 640px) {
+    .registration-form-area {
+        padding: 16px;
+        
+        .form-card {
+            padding: 24px 20px;
+            border-radius: 20px;
+            
+            .form-header {
+                h2 {
+                    font-size: 1.5rem;
+                }
+            }
+        }
+
+        .input-group .input-wrapper input {
+            font-size: 16px; /* Prevents iOS zoom */
+        }
+    }
+}

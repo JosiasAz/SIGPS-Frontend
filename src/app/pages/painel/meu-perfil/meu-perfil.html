@@ -95,8 +95,9 @@
     }
 
     <!-- ── TABS ───────────────────────────────────────────────────── -->
-    @if (isEspecialista) {
+    @if (isEspecialista || isPaciente) {
     <div class="tabs">
+        @if (isEspecialista) {
         <button class="tab" [class.active]="abaAtiva() === 'profissional'" (click)="abaAtiva.set('profissional')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             Perfil Profissional
@@ -106,11 +107,22 @@
             {{ clinica() ? 'Minha Clínica' : 'Criar Clínica' }}
             @if (clinica()) { <span class="tab-badge">Ativa</span> }
         </button>
+        }
+        @if (isPaciente) {
+        <button class="tab" [class.active]="abaAtiva() === 'paciente'" (click)="abaAtiva.set('paciente')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+            Ficha Médica
+        </button>
+        <button class="tab" [class.active]="abaAtiva() === 'profissional'" (click)="abaAtiva.set('profissional')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Seja um Profissional
+        </button>
+        }
     </div>
     }
 
-    <!-- ══════════ ABA: PERFIL PROFISSIONAL ═══════════════════════ -->
-    @if (!isEspecialista || abaAtiva() === 'profissional') {
+    <!-- ══════════ ABA: PERFIL PROFISSIONAL / ADMIN ═══════════════════════ -->
+    @if (perfil()?.perfil === 'Admin' || perfil()?.perfil === 'Gestor' || perfil()?.perfil === 'Visualizador' || abaAtiva() === 'profissional') {
 
     <!-- Se for Admin, Gestor ou Visualizador, exibe dados administrativos do perfil -->
     @if (perfil()?.perfil === 'Admin' || perfil()?.perfil === 'Gestor' || perfil()?.perfil === 'Visualizador') {
@@ -559,6 +571,147 @@
     </div>
     }
     }
+    }
+
+    <!-- ══════════ ABA: FICHA MÉDICA (PACIENTE) ═══════════════════ -->
+    @if (isPaciente && abaAtiva() === 'paciente') {
+    <div class="section-card">
+        <div class="section-card-header">
+            <div>
+                <h3>Ficha Clínica</h3>
+                <p>Mantenha suas comorbidades e alergias atualizadas para a Inteligência Artificial classificar sua prioridade com precisão.</p>
+            </div>
+            @if (!editandoFichaMedica()) {
+            <button class="btn-outline" (click)="editandoFichaMedica.set(true)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                Editar Ficha
+            </button>
+            }
+        </div>
+
+        @if (!editandoFichaMedica()) {
+        <div class="info-grid">
+            <div class="info-item"><label>Nome Completo</label><span>{{ perfil()?.nome }}</span></div>
+            <div class="info-item"><label>Gênero</label><span>{{ 
+                perfil()?.genero === 'masculino' ? 'Masculino' :
+                perfil()?.genero === 'feminino' ? 'Feminino' :
+                perfil()?.genero === 'homem-trans' ? 'Homem Trans' :
+                perfil()?.genero === 'mulher-trans' ? 'Mulher Trans' :
+                perfil()?.genero === 'outro' ? 'Outro' :
+                perfil()?.genero === 'prefiro-nao' ? 'Prefiro não informar' :
+                perfil()?.genero || '—' 
+            }}</span></div>
+            <div class="info-item"><label>CPF</label><span>{{ perfil()?.pacienteInfo?.cpf || '—' }}</span></div>
+            <div class="info-item"><label>Data de Nascimento</label><span>{{ perfil()?.pacienteInfo?.dataNascimento ? (perfil()?.pacienteInfo?.dataNascimento | date:'dd/MM/yyyy':'UTC') : '—' }}</span></div>
+            <div class="info-item"><label>Telefone</label><span>{{ perfil()?.pacienteInfo?.telefone || '—' }}</span></div>
+            <div class="info-item"><label>Tipo Sanguíneo</label><span>{{ perfil()?.pacienteInfo?.tipoSanguineo || '—' }}</span></div>
+            <div class="info-item info-item--full">
+                <label>Comorbidades Relatadas</label>
+                <span>{{ perfil()?.pacienteInfo?.comorbidades || 'Nenhuma comorbidade relatada.' }}</span>
+            </div>
+            <div class="info-item info-item--full">
+                <label>Alergias Conhecidas</label>
+                <span>{{ perfil()?.pacienteInfo?.alergias || 'Nenhuma alergia relatada.' }}</span>
+            </div>
+        </div>
+        } @else {
+        <form [formGroup]="fichaMedicaForm" (ngSubmit)="salvarFichaMedica()">
+            <!-- Bloco: Dados Pessoais do Paciente -->
+            <div class="edit-block">
+                <div class="edit-block-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    Dados Pessoais
+                </div>
+                <div class="edit-grid-2">
+                    <div class="field-group">
+                        <label class="field-label">Nome Completo <span class="req">*</span></label>
+                        <input type="text" formControlName="nome" class="field-input" placeholder="Seu nome completo">
+                        @if (fichaMedicaForm.get('nome')?.invalid && fichaMedicaForm.get('nome')?.touched) {
+                            <div class="field-error">Nome é obrigatório</div>
+                        }
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Gênero <span class="req">*</span></label>
+                        <select formControlName="genero" class="field-input field-select">
+                            <option value="">Selecione</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="feminino">Feminino</option>
+                            <option value="homem-trans">Homem Trans</option>
+                            <option value="mulher-trans">Mulher Trans</option>
+                            <option value="outro">Outro</option>
+                            <option value="prefiro-nao">Prefiro não informar</option>
+                        </select>
+                        @if (fichaMedicaForm.get('genero')?.invalid && fichaMedicaForm.get('genero')?.touched) {
+                            <div class="field-error">Gênero é obrigatório</div>
+                        }
+                    </div>
+                </div>
+                <div class="edit-grid-2">
+                    <div class="field-group">
+                        <label class="field-label">CPF <span class="req">*</span></label>
+                        <input type="text" formControlName="cpf" class="field-input" placeholder="000.000.000-00" (input)="formatarCpfPaciente($event)">
+                        @if (fichaMedicaForm.get('cpf')?.invalid && fichaMedicaForm.get('cpf')?.touched) {
+                            <div class="field-error">CPF é obrigatório (formato 000.000.000-00)</div>
+                        }
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Data de Nascimento <span class="req">*</span></label>
+                        <input type="text" formControlName="dataNascimento" class="field-input" placeholder="dd/mm/aaaa" (input)="formatarDataPaciente($event)">
+                        @if (fichaMedicaForm.get('dataNascimento')?.invalid && fichaMedicaForm.get('dataNascimento')?.touched) {
+                            <div class="field-error">Data de nascimento é obrigatória</div>
+                        }
+                    </div>
+                </div>
+                <div class="edit-grid-2">
+                    <div class="field-group">
+                        <label class="field-label">Telefone</label>
+                        <input type="text" formControlName="telefone" class="field-input" placeholder="(00) 00000-0000" (input)="formatarTelefonePaciente($event)">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Tipo Sanguíneo</label>
+                        <select formControlName="tipoSanguineo" class="field-input field-select">
+                            <option value="">Selecione</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bloco: Informações Clínicas -->
+            <div class="edit-block" style="margin-top: 24px;">
+                <div class="edit-block-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                    Informações Clínicas
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Comorbidades (Doenças pré-existentes)</label>
+                    <textarea formControlName="comorbidades" class="field-input field-textarea" rows="3"
+                        placeholder="Ex: Diabetes, Hipertensão, Câncer, Asma..."></textarea>
+                    <div class="field-hint">A IA usará estas informações para priorizar o seu atendimento clínico. Escreva de forma clara.</div>
+                </div>
+                <div class="field-group" style="margin-top: 16px;">
+                    <label class="field-label">Alergias</label>
+                    <textarea formControlName="alergias" class="field-input field-textarea" rows="2"
+                        placeholder="Ex: Alergia a Penicilina, Dipirona..."></textarea>
+                </div>
+            </div>
+
+            <div class="edit-actions">
+                <button type="button" class="btn-ghost" (click)="editandoFichaMedica.set(false)">Cancelar</button>
+                <button type="submit" class="btn-primary" [disabled]="salvando() || fichaMedicaForm.invalid">
+                    @if (salvando()) { <span class="btn-spinner"></span> } Salvar Ficha
+                </button>
+            </div>
+        </form>
+        }
+    </div>
     }
 
     <!-- ══════════ ABA: CLÍNICA ═══════════════════════════════════ -->

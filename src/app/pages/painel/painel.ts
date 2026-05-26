@@ -20,6 +20,7 @@ export class Painel {
   private router = inject(Router);
 
   isSidebarCollapsed = signal(false);
+  isMobileMenuOpen = signal(false);
 
   currentUser = this.authService.currentUser;
   unreadMessages = this.chatService.unreadCount;
@@ -48,6 +49,7 @@ export class Painel {
     { icon: 'message-square', label: 'Chat e Mensagens', route: '/painel/chat', roles: ['admin', 'gestor', 'especialista', 'visualizador', 'paciente'] as UserRole[] },
     { icon: 'pie-chart', label: 'Relatórios', route: '/painel/relatorios', roles: ['admin', 'gestor'] as UserRole[] },
     { icon: 'settings', label: 'Configurações', route: '/painel/config', roles: ['admin'] as UserRole[] },
+    { icon: 'book-open', label: 'Documentação', route: '/painel/documentacao', roles: ['admin', 'gestor', 'especialista', 'visualizador', 'paciente'] as UserRole[] },
   ];
 
   menuItems = computed(() => {
@@ -56,6 +58,14 @@ export class Painel {
 
   toggleSidebar() {
     this.isSidebarCollapsed.set(!this.isSidebarCollapsed());
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen.set(!this.isMobileMenuOpen());
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen.set(false);
   }
 
   onLogout() {

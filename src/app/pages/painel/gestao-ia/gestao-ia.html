@@ -58,7 +58,7 @@
                 </svg>
             </div>
             <div class="stat-details">
-                <span class="stat-label">Precisão do Score</span>
+                <span class="stat-label">Precisão da Prioridade</span>
                 <div class="stat-value-group">
                     <span class="stat-value">99.2%</span>
                     <span class="stat-badge up">IA Ativa</span>
@@ -77,10 +77,9 @@
             <table class="dashboard-table">
                 <thead>
                     <tr>
-                        <th width="25%">Paciente / Especialidade</th>
+                        <th width="30%">Paciente / Especialidade</th>
                         <th width="15%">Nível de Urgência</th>
-                        <th width="15%">Score de Risco (%)</th>
-                        <th width="30%">Raciocínio Analítico da IA</th>
+                        <th width="40%">Raciocínio Analítico da IA</th>
                         <th width="15%" class="text-right">Ação</th>
                     </tr>
                 </thead>
@@ -104,16 +103,6 @@
                                 @if (p.riskTrend === 'up') {
                                     <span style="color: #ef4444; font-size: 0.8rem; font-weight: 800;">▲</span>
                                 }
-                            </div>
-                        </td>
-                        <td>
-                            <div class="ia-score-item">
-                                <span [style.color]="p.aiScore > 80 ? '#ef4444' : '#1a7a4e'" style="font-weight: 800; font-size: 1.1rem;">
-                                    {{ p.aiScore }}%
-                                </span>
-                                <div class="progress-mini">
-                                    <div class="progress-fill" [style.width.%]="p.aiScore" [class.danger]="p.aiScore > 80"></div>
-                                </div>
                             </div>
                         </td>
                         <td>

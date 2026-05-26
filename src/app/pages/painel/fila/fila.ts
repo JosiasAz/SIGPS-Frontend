@@ -21,7 +21,7 @@ export class FilaComponent {
     this.filaService.analisarIA();
   }
 
-  atender(paciente: string) {
-    this.filaService.atenderPaciente(paciente);
+  atender(item: any) {
+    this.filaService.atenderPaciente(item.id, item.paciente);
   }
 }

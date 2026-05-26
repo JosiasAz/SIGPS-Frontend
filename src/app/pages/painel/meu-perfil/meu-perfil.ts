@@ -8,7 +8,7 @@ import { environment } from '../../../env/environment';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 interface PerfilCompleto {
-  id: number; nome: string; email: string; perfil: string;
+  id: number; nome: string; email: string; perfil: string; genero?: string;
   tipoProfissional?: string; especialidade?: string;
   conselho?: string; numeroRegistro?: string; uf?: string; crm?: string;
   foto?: string; sobre?: string; localAtendimento?: string;
@@ -16,6 +16,14 @@ interface PerfilCompleto {
   documentoEnviado: boolean;
   clinicaAdmin?: ClinicaDetalhes | null;
   clinicaVinculada?: { id: number; nome: string; enderecoFormatado: string } | null;
+  pacienteInfo?: {
+    cpf?: string;
+    dataNascimento?: string;
+    telefone?: string;
+    tipoSanguineo?: string;
+    comorbidades?: string;
+    alergias?: string;
+  } | null;
 }
 
 interface ClinicaDetalhes {
@@ -156,7 +164,7 @@ export class MeuPerfilComponent implements OnInit {
   get podeReceberAgendamentos() { return this.statusVerif === 'verificado'; }
 
   // ── Abas ──────────────────────────────────────────────────────────────────
-  abaAtiva = signal<'profissional' | 'clinica'>('profissional');
+  abaAtiva = signal<'profissional' | 'clinica' | 'paciente'>('profissional');
 
   // ── Wizard: upgrade Paciente → Especialista ───────────────────────────────
   etapaWizard = signal(1);
@@ -170,6 +178,10 @@ export class MeuPerfilComponent implements OnInit {
   // ── Edição do perfil profissional existente ───────────────────────────────
   editProfForm: FormGroup;
   editandoProfissional = signal(false);
+
+  // ── Edição da Ficha Médica do Paciente ──────────────────────────────────
+  fichaMedicaForm: FormGroup;
+  editandoFichaMedica = signal(false);
 
   // Signals reativos para rastrear o conselho selecionado em cada contexto
   conselhoWizard = signal('');
@@ -235,6 +247,17 @@ export class MeuPerfilComponent implements OnInit {
       sobre:            [''],
       localAtendimento: ['']
     });
+
+    this.fichaMedicaForm = this.fb.group({
+      nome:           ['', Validators.required],
+      genero:         ['', Validators.required],
+      cpf:            ['', [Validators.required, Validators.pattern(/^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/)]],
+      dataNascimento: ['', Validators.required],
+      telefone:       [''],
+      tipoSanguineo:  [''],
+      comorbidades:   [''],
+      alergias:       ['']
+    });
   }
 
   ngOnInit() {
@@ -258,6 +281,11 @@ export class MeuPerfilComponent implements OnInit {
         });
         // Inicializa o signal com o conselho já salvo no perfil
         this.conselhoEdit.set(p.conselho || '');
+        if (p.perfil === 'Paciente') {
+          this.abaAtiva.set('paciente');
+          this.popularFormPaciente(p);
+        }
+
         if (p.clinicaAdmin) {
           const c = p.clinicaAdmin;
           this.step1ClinicaForm.patchValue({ tipo: c.tipo, nome: c.nome, cnpj: c.cnpj, telefone: c.telefone, emailContato: c.emailContato });
@@ -426,6 +454,108 @@ export class MeuPerfilComponent implements OnInit {
       },
       error: () => { this.salvando.set(false); this.showToast('erro', 'Erro ao salvar.'); }
     });
+  }
+
+  private popularFormPaciente(p: PerfilCompleto) {
+    let dataNascFormatada = '';
+    if (p.pacienteInfo?.dataNascimento) {
+      const parts = p.pacienteInfo.dataNascimento.split('-');
+      if (parts.length === 3) {
+        dataNascFormatada = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+    }
+
+    let cpfFormatado = p.pacienteInfo?.cpf || '';
+    if (cpfFormatado && cpfFormatado.length === 11) {
+      cpfFormatado = cpfFormatado.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    }
+
+    let telFormatado = p.pacienteInfo?.telefone || '';
+    if (telFormatado) {
+      const cleanTel = telFormatado.replace(/\D/g, '');
+      if (cleanTel.length === 11) {
+        telFormatado = cleanTel.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+      } else if (cleanTel.length === 10) {
+        telFormatado = cleanTel.replace(/^(\d{2})(\d{4})(\d{4})$/, "($1) $2-$3");
+      }
+    }
+
+    this.fichaMedicaForm.patchValue({
+      nome: p.nome || '',
+      genero: p.genero ? p.genero.toLowerCase() : '',
+      cpf: cpfFormatado,
+      dataNascimento: dataNascFormatada,
+      telefone: telFormatado,
+      tipoSanguineo: p.pacienteInfo?.tipoSanguineo || '',
+      comorbidades: p.pacienteInfo?.comorbidades || '',
+      alergias: p.pacienteInfo?.alergias || ''
+    });
+  }
+
+  // ── Editar Ficha Médica (Paciente) ────────────────────────────────────────
+  salvarFichaMedica() {
+    this.salvando.set(true);
+    const formVal = this.fichaMedicaForm.value;
+
+    let dataNascimentoISO = '';
+    if (formVal.dataNascimento && formVal.dataNascimento.includes('/')) {
+      const [dia, mes, ano] = formVal.dataNascimento.split('/');
+      dataNascimentoISO = `${ano}-${mes}-${dia}`;
+    } else {
+      dataNascimentoISO = formVal.dataNascimento;
+    }
+
+    const payload = {
+      ...formVal,
+      dataNascimento: dataNascimentoISO
+    };
+
+    this.http.patch<any>(`${this.api}/api/v1/perfil/me`, payload).subscribe({
+      next: (res) => {
+        this.salvando.set(false);
+        this.perfil.set(res.perfil);
+        this.popularFormPaciente(res.perfil);
+        this.editandoFichaMedica.set(false);
+        this.showToast('sucesso', 'Ficha médica atualizada com sucesso!');
+      },
+      error: () => { this.salvando.set(false); this.showToast('erro', 'Erro ao salvar ficha.'); }
+    });
+  }
+
+  formatarCpfPaciente(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/\D/g, '').slice(0, 11);
+    if (value.length > 9) {
+      value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    } else if (value.length > 6) {
+      value = value.replace(/(\d{3})(\d{3})(\d{1,3})/, "$1.$2.$3");
+    } else if (value.length > 3) {
+      value = value.replace(/(\d{3})(\d{1,3})/, "$1.$2");
+    }
+    input.value = value;
+    this.fichaMedicaForm.get('cpf')?.setValue(value, { emitEvent: false });
+  }
+
+  formatarTelefonePaciente(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let v = input.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length > 2) v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
+    if (v.length > 9) v = v.replace(/(\d)(\d{4})$/, '$1-$2');
+    else if (v.length > 5) v = v.replace(/(\d)(\d{4})$/, '$1-$2');
+    input.value = v;
+    this.fichaMedicaForm.get('telefone')?.setValue(v, { emitEvent: false });
+  }
+
+  formatarDataPaciente(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/\D/g, '').slice(0, 8);
+    if (value.length > 4) {
+      value = value.replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3");
+    } else if (value.length > 2) {
+      value = value.replace(/(\d{2})(\d{2})/, "$1/$2");
+    }
+    input.value = value;
+    this.fichaMedicaForm.get('dataNascimento')?.setValue(value, { emitEvent: false });
   }
 
   // ── Upload documento ──────────────────────────────────────────────────────

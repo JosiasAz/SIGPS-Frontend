@@ -62,9 +62,9 @@ export class MockedFilaService extends AbstractFilaService {
         this.fila.set(currentFila);
     }
 
-    atenderPaciente(pacienteNome: string): void {
+    atenderPaciente(id: string, pacienteNome?: string): void {
         const currentFila = this.fila().map(p => {
-            if (p.paciente === pacienteNome) {
+            if (p.id === id || p.paciente === pacienteNome) {
                 return { ...p, status: 'Em Atendimento' as const, tempoEspera: '--' };
             }
             return p;

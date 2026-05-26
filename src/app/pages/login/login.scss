@@ -400,3 +400,24 @@
         display: block;
     }
 }
+
+@media (max-width: 640px) {
+    .login-form-area {
+        padding: 16px;
+        
+        .form-card {
+            padding: 24px 20px;
+            border-radius: 20px;
+            
+            .form-header {
+                h2 {
+                    font-size: 1.5rem;
+                }
+            }
+        }
+
+        .input-group .input-wrapper input {
+            font-size: 16px; /* Prevents iOS zoom */
+        }
+    }
+}

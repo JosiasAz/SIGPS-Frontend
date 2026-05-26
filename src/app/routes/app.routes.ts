@@ -21,11 +21,14 @@ import { PerfilProfissionalComponent } from '../pages/painel/perfil-profissional
 import { BuscaProfissionaisComponent } from '../pages/painel/busca-profissionais/busca-profissionais';
 import { GestaoIAComponent } from '../pages/painel/gestao-ia/gestao-ia';
 import { MeuPerfilComponent } from '../pages/painel/meu-perfil/meu-perfil';
+import { EquipeComponent } from '../pages/equipe/equipe';
+import { DocumentacaoComponent } from '../pages/painel/documentacao/documentacao';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
     { path: 'login', component: Login },
     { path: 'cadastro', component: Cadastro },
+    { path: 'equipe', component: EquipeComponent },
     {
         path: 'painel',
         component: Painel,
@@ -101,6 +104,11 @@ export const routes: Routes = [
                 path: 'config',
                 component: ConfigComponent,
                 canActivate: [roleGuard(['admin'])]
+            },
+            {
+                path: 'documentacao',
+                component: DocumentacaoComponent,
+                canActivate: [roleGuard(['admin', 'gestor', 'especialista', 'visualizador', 'paciente'])]
             },
         ]
     },

@@ -54,7 +54,7 @@
                             <button *ngIf="item.status === 'Aguardando'" 
                                 class="btn-secondary" 
                                 style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: transparent; cursor: pointer; font-weight: 500;"
-                                (click)="atender(item.paciente)">
+                                (click)="atender(item)">
                                 Atender
                             </button>
                             <span *ngIf="item.status === 'Em Atendimento'" style="font-size: 0.85rem; color: #666; font-style: italic;">

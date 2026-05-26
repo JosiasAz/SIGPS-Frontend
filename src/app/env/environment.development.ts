@@ -1,5 +1,5 @@
 export const environment = {
     production: false,
     useMock: false,
-    apiUrl: 'https://api.sigps.online'
+    apiUrl: 'http://localhost:5000'
 };

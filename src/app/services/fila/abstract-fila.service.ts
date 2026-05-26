@@ -7,8 +7,8 @@ export interface PacienteFila {
     tempoEspera: string;
     especialidade: string;
     status: 'Aguardando' | 'Em Atendimento' | 'Triagem' | 'Concluído';
-    aiScore: number;
-    aiReasoning: string;
+    aiReasoning?: string;
+    aiScore?: number;
     riskTrend: 'up' | 'down' | 'stable';
     vitals?: {
         bpm: number;
@@ -21,6 +21,6 @@ export abstract class AbstractFilaService {
     abstract fila: Signal<PacienteFila[]>;
     abstract reordenarFila(): void;
     abstract analisarIA(): void;
-    abstract atenderPaciente(pacienteNome: string): void;
+    abstract atenderPaciente(id: string, pacienteNome?: string): void;
     abstract adicionarNaFila(paciente: Partial<PacienteFila>): void;
 }

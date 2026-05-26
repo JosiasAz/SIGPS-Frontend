@@ -44,11 +44,11 @@ export class FilaService extends AbstractFilaService {
         });
     }
 
-    atenderPaciente(pacienteNome: string): void {
-        this.http.post(`${this.apiUrl}${API_ENDPOINTS.FILA.ATENDER}`, { pacienteNome }).subscribe({
+    atenderPaciente(id: string, pacienteNome?: string): void {
+        this.http.patch(`${this.apiUrl}${API_ENDPOINTS.FILA.BASE}/${id}/status`, { status: 'Em Atendimento' }).subscribe({
             next: () => {
                 this.fila.update(prev => prev.map(p => {
-                    if (p.paciente === pacienteNome) {
+                    if (p.id === id) {
                         return { ...p, status: 'Em Atendimento' as const, tempoEspera: '--' };
                     }
                     return p;
