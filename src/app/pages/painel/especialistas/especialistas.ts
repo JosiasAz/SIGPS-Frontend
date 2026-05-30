@@ -1,7 +1,9 @@
-import { Component, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, inject, ViewChild, ElementRef, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { AbstractEspecialistasService, Profissional } from '../../../services/especialistas/abstract-especialistas.service';
+import { EspecialistasService } from '../../../services/especialistas/especialistas.service';
+import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
 
 @Component({
   selector: 'app-especialistas',
@@ -10,9 +12,19 @@ import { AbstractEspecialistasService, Profissional } from '../../../services/es
   templateUrl: './especialistas.html',
   styleUrls: ['../painel.scss'],
 })
-export class EspecialistasComponent {
+export class EspecialistasComponent implements OnInit {
   private especialistasService = inject(AbstractEspecialistasService);
+  private authService = inject(AbstractAuthService);
   private fb = inject(FormBuilder);
+
+  isAdmin = computed(() => this.authService.userRole() === 'admin');
+  organizations = this.authService.organizations;
+  activeOrganizationId = this.authService.activeOrganizationId;
+  clinicaAtivaLabel = computed(() => {
+    const orgId = this.activeOrganizationId();
+    if (orgId === 0) return 'Todas as clínicas';
+    return this.organizations().find(o => o.id === orgId)?.nome ?? 'Clínica selecionada';
+  });
 
   @ViewChild('addModal') addModal!: ElementRef<HTMLDialogElement>;
   @ViewChild('deleteModal') deleteModal!: ElementRef<HTMLDialogElement>;
@@ -57,6 +69,10 @@ export class EspecialistasComponent {
         }
       }
     });
+  }
+
+  ngOnInit() {
+    (this.especialistasService as EspecialistasService).loadEspecialistas();
   }
 
   // Validator: Pelo menos 2 palavras com espaço

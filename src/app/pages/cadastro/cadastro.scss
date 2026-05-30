@@ -385,10 +385,51 @@
             color: var(--green-dark);
             font-weight: 600;
             text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            font: inherit;
 
             &:hover {
                 text-decoration: underline;
             }
+        }
+    }
+
+    .terms-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        padding: 20px;
+    }
+
+    .terms-modal {
+        background: #fff;
+        border-radius: 16px;
+        max-width: 520px;
+        width: 100%;
+        padding: 28px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+
+        h3 {
+            margin: 0 0 12px;
+            color: #0f172a;
+        }
+
+        p {
+            color: #475569;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
         }
     }
 

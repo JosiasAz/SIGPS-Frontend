@@ -1,0 +1,260 @@
+.fila-page {
+    .fila-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .ia-auto-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 100px;
+        background: #ecfdf5;
+        border: 1px solid #bbf7d0;
+        color: #166534;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .ia-pulse {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #22c55e;
+        animation: iaPulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes iaPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .fila-btn {
+        padding: 10px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--surface-color, #fff);
+        cursor: pointer;
+        font-weight: 600;
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.analise-ia-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+    background: #f8faf8;
+
+    &.analise-critico {
+        background: #fef2f2;
+        border-color: #fecaca;
+    }
+
+    &.analise-alerta {
+        background: #fffbeb;
+        border-color: #fde68a;
+    }
+
+    .analise-ia-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-muted);
+    }
+
+    .analise-ia-content p {
+        margin: 4px 0 0;
+        font-size: 0.92rem;
+        color: var(--text);
+    }
+
+    .analise-ia-stats {
+        margin-left: auto;
+        display: flex;
+        gap: 16px;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        flex-wrap: wrap;
+
+        .critico-count strong {
+            color: #dc2626;
+        }
+    }
+}
+
+.fila-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.fila-stat-card {
+    background: var(--surface-color, #fff);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .fila-stat-label {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .fila-stat-value {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--text);
+
+        &.em-atendimento { color: #2563eb; }
+        &.critico { color: #dc2626; }
+    }
+}
+
+.fila-table-card {
+    overflow: hidden;
+}
+
+.fila-empty {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--text-muted);
+
+    svg {
+        margin-bottom: 12px;
+        opacity: 0.4;
+    }
+
+    p {
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 6px;
+    }
+
+    span {
+        font-size: 0.85rem;
+    }
+}
+
+.fila-table {
+    .posicao-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: var(--green-soft, #e8f5e9);
+        color: var(--green-dark, #2e7d32);
+        font-weight: 800;
+        font-size: 0.82rem;
+    }
+
+    .prio-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 700;
+
+        &.prio-extrema { background: #fee2e2; color: #b91c1c; }
+        &.prio-alta { background: #ffedd5; color: #c2410c; }
+        &.prio-normal { background: #dcfce7; color: #15803d; }
+        &.prio-baixa { background: #f3f4f6; color: #6b7280; }
+
+        .trend-up { font-size: 0.65rem; }
+    }
+
+    .cell-sub {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+    }
+
+    .cell-muted {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    .consulta-chip {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 6px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .ai-reasoning {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        line-height: 1.4;
+        max-width: 280px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .row-em-atendimento {
+        background: rgba(37, 99, 235, 0.04);
+    }
+
+    .fila-actions {
+        white-space: nowrap;
+    }
+
+    .btn-atender,
+    .btn-finalizar {
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-atender {
+        background: var(--green, #419640);
+        color: #fff;
+    }
+
+    .btn-finalizar {
+        background: #2563eb;
+        color: #fff;
+    }
+}
+
+.text-right {
+    text-align: right;
+}

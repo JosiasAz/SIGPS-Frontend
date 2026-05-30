@@ -10,6 +10,33 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
+.explore-tabs {
+    display: inline-flex;
+    gap: 6px;
+    padding: 5px;
+    margin-bottom: 20px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    box-shadow: var(--shadow);
+
+    .explore-tab {
+        padding: 10px 22px;
+        border-radius: 999px;
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        transition: all 0.2s ease;
+
+        &.active {
+            background: linear-gradient(135deg, var(--green), var(--green-deep));
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(65, 150, 64, 0.25);
+        }
+    }
+}
+
 .btn-back {
     display: inline-flex;
     align-items: center;
@@ -50,6 +77,28 @@
         margin-bottom: 32px;
         max-width: 600px;
         margin-inline: auto;
+    }
+
+    .clinic-filter-banner {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        padding: 8px 14px;
+        border-radius: 999px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+
+        button {
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-weight: 700;
+            cursor: pointer;
+        }
     }
 
     .search-bar {
@@ -126,11 +175,19 @@
 }
 
 .results-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     margin-bottom: 24px;
     p {
         color: var(--text-muted);
         font-size: 0.95rem;
         strong { color: var(--text); }
+    }
+    .loading-hint {
+        font-size: 0.85rem;
+        color: var(--text-muted);
     }
 }
 
@@ -169,6 +226,20 @@
             object-position: top;
             border: 3px solid white;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+
+            &.placeholder-avatar {
+                background: #f1f5f9;
+                color: #94a3b8;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                svg {
+                    display: block;
+                    width: 36px;
+                    height: 36px;
+                }
+            }
         }
 
         .pro-rating {
@@ -198,10 +269,32 @@
         margin: 0 0 4px 0;
     }
 
+    .pro-clinic {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin: 0 0 4px 0;
+    }
+
     .pro-crm {
         font-size: 0.85rem;
         color: var(--text-muted);
-        margin: 0 0 20px 0;
+        margin: 0 0 10px 0;
+    }
+
+    .verif-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+
+        &.verificado { background: #dcfce7; color: #166534; }
+        &.nao_verificado { background: #f3f4f6; color: #374151; }
+        &.em_analise { background: #eff6ff; color: #1d4ed8; }
+        &.rejeitado { background: #fef2f2; color: #b91c1c; }
     }
 
     .pro-availability {
@@ -220,6 +313,12 @@
         svg { color: var(--green); }
     }
 
+    .pro-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
     .btn-view-profile {
         text-align: center;
         width: 100%;
@@ -236,6 +335,27 @@
         &:hover {
             background: var(--green);
             color: white;
+        }
+    }
+
+    .btn-message-card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 12px;
+        background: var(--green);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
         }
     }
 }

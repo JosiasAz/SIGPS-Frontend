@@ -1,4 +1,6 @@
 import { Injectable, signal, inject, effect } from '@angular/core';
+import { of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { AbstractAgendasService, Agenda, Consulta } from './abstract-agendas.service';
 import { SimulationService } from '../simulation/simulation.service';
 
@@ -42,12 +44,14 @@ export class MockedAgendasService extends AbstractAgendasService {
         this.agendas.update(prev => prev.filter(a => a.id !== id));
     }
 
-    adicionarAgenda(agenda: Omit<Agenda, 'id'>): void {
+    adicionarAgenda(agenda: Omit<Agenda, 'id'>): import('rxjs').Observable<Agenda> {
         const novaAgenda: Agenda = {
             id: Math.floor(Math.random() * 1000) + 10,
             ...agenda
         } as Agenda;
-        this.agendas.update(prev => [...prev, novaAgenda]);
+        return of(novaAgenda).pipe(
+            tap((created) => this.agendas.update(prev => [...prev, created]))
+        );
     }
 
     atualizarAgenda(id: number, agenda: Partial<Agenda>): void {

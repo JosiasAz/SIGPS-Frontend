@@ -19,7 +19,6 @@ export class ChatService extends AbstractChatService {
 
   constructor() {
     super();
-    this.loadConversations();
   }
 
   loadConversations(): void {

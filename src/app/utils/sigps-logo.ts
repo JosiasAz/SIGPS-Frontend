@@ -1,0 +1,17 @@
+/** Logo SIGPS embutido — garante renderização no PDF sem depender de URL externa. */
+export const SIGPS_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="56" height="56" role="img" aria-label="SIGPS">
+  <defs>
+    <linearGradient id="sigpsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#419640"/>
+      <stop offset="100%" stop-color="#0d5438"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(10, 10)">
+    <path d="M40 10 Q52 10 52 25 L52 35 Q52 40 40 40 Q28 40 28 35 L28 25 Q28 10 40 10" fill="url(#sigpsGrad)"/>
+    <path d="M40 70 Q28 70 28 55 L28 45 Q28 40 40 40 Q52 40 52 45 L52 55 Q52 70 40 70" fill="#419640" opacity="0.8"/>
+    <path d="M70 40 Q70 52 55 52 L45 52 Q40 52 40 40 Q40 28 45 28 L55 28 Q70 28 70 40" fill="#1a7a4e"/>
+    <path d="M10 40 Q10 28 25 28 L35 28 Q40 28 40 40 Q40 52 35 52 L25 52 Q10 52 10 40" fill="#2d4238"/>
+    <circle cx="40" cy="40" r="10" fill="white"/>
+    <circle cx="40" cy="40" r="4" fill="#1a7a4e"/>
+  </g>
+</svg>`;

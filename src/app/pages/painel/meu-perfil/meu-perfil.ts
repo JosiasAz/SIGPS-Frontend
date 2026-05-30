@@ -2,9 +2,11 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
 import { environment } from '../../../env/environment';
+import { resolveMediaUrl } from '../../../utils/media-url';
+import { PerfilService } from '../../../services/perfil/perfil.service';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 interface PerfilCompleto {
@@ -30,7 +32,7 @@ interface ClinicaDetalhes {
   id: number; nome: string; tipo: string; cnpj: string; telefone: string;
   emailContato: string; cep: string; rua: string; numero: string;
   complemento: string; bairro: string; cidade: string; estado: string;
-  enderecoFormatado: string; statusVerificacao: string;
+  enderecoFormatado: string; statusVerificacao: string; foto?: string;
   especialistas: { id: number; nome: string; especialidade: string; crm: string; statusVerificacao: string }[];
 }
 
@@ -120,12 +122,18 @@ const UFS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','P
 function cnpjValidator(ctrl: AbstractControl): ValidationErrors | null {
   const c = (ctrl.value || '').replace(/\D/g, '');
   if (!c) return null;
-  if (c.length !== 14 || new Set(c).size === 1) return { cnpjInvalido: true };
-  const calc = (c: string, n: number) => {
-    const s = Array.from({length: n-1}, (_, i) => parseInt(c[i]) * ((n - i) % 8 + 2)).reduce((a, b) => a + b, 0);
-    const r = 11 - s % 11; return r >= 10 ? 0 : r;
+  if (c.length !== 14 || /^(\d)\1+$/.test(c)) return { cnpjInvalido: true };
+
+  const digito = (base: string, pesos: number[]) => {
+    const soma = pesos.reduce((acc, peso, i) => acc + parseInt(base[i], 10) * peso, 0);
+    const resto = soma % 11;
+    return resto < 2 ? 0 : 11 - resto;
   };
-  return calc(c, 13) === +c[12] && calc(c, 14) === +c[13] ? null : { cnpjInvalido: true };
+
+  const dv1 = digito(c, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+  const dv2 = digito(c, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+
+  return dv1 === +c[12] && dv2 === +c[13] ? null : { cnpjInvalido: true };
 }
 
 // ── Componente ────────────────────────────────────────────────────────────────
@@ -141,6 +149,8 @@ export class MeuPerfilComponent implements OnInit {
   private authService = inject(AbstractAuthService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private perfilService = inject(PerfilService);
   private api = environment.apiUrl;
 
   readonly tiposProfissional = TIPOS_PROFISSIONAL;
@@ -151,6 +161,8 @@ export class MeuPerfilComponent implements OnInit {
   perfil = signal<PerfilCompleto | null>(null);
   carregando = signal(true);
   salvando = signal(false);
+  enviandoFoto = signal(false);
+  enviandoFotoClinica = signal(false);
   toast = signal<{tipo: 'sucesso'|'erro'; msg: string} | null>(null);
 
   // ── Transição de upgrade ──────────────────────────────────────────────────
@@ -160,8 +172,26 @@ export class MeuPerfilComponent implements OnInit {
 
   get isPaciente() { return this.perfil()?.perfil === 'Paciente'; }
   get isEspecialista() { return this.perfil()?.perfil === 'Especialista'; }
+  get isGestor() { return this.perfil()?.perfil === 'Gestor'; }
+  get podeGerirClinica() { return this.isEspecialista || this.isGestor; }
   get statusVerif() { return this.perfil()?.statusVerificacao || 'nao_verificado'; }
   get podeReceberAgendamentos() { return this.statusVerif === 'verificado'; }
+
+  fotoPerfil = computed(() => {
+    const p = this.perfil();
+    const url = resolveMediaUrl(p?.foto);
+    if (url) return url;
+    const nome = encodeURIComponent(p?.nome || 'U');
+    return `https://ui-avatars.com/api/?name=${nome}&background=166534&color=fff&size=200`;
+  });
+
+  fotoClinica = computed(() => {
+    const c = this.clinica();
+    const url = resolveMediaUrl(c?.foto);
+    if (url) return url;
+    const nome = encodeURIComponent(c?.nome || 'Clinica');
+    return `https://ui-avatars.com/api/?name=${nome}&background=419640&color=fff&size=256&bold=true`;
+  });
 
   // ── Abas ──────────────────────────────────────────────────────────────────
   abaAtiva = signal<'profissional' | 'clinica' | 'paciente'>('profissional');
@@ -211,6 +241,7 @@ export class MeuPerfilComponent implements OnInit {
 
   // ── Clínica ───────────────────────────────────────────────────────────────
   clinica = signal<ClinicaDetalhes | null>(null);
+  pendingInvites = signal<any[]>([]);
 
   constructor() {
     this.step1Form = this.fb.group({ tipoProfissional: ['', Validators.required] });
@@ -224,7 +255,11 @@ export class MeuPerfilComponent implements OnInit {
       cep: [''], rua: [''], numero: [''], complemento: [''],
       bairro: [''], cidade: [''], estado: ['']
     });
-    this.step4Form = this.fb.group({ sobre: ['', [Validators.required, Validators.minLength(20)]], concordaTermos: [false, Validators.requiredTrue] });
+    this.step4Form = this.fb.group({
+      sobre: ['', [Validators.required, Validators.minLength(20)]],
+      concordaTermos: [false, Validators.requiredTrue],
+      autonomo: [false]
+    });
 
     this.step1ClinicaForm = this.fb.group({
       tipo:  ['Clínica', Validators.required],
@@ -261,36 +296,115 @@ export class MeuPerfilComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.carregarPerfil();
-    // Propaga mudanças do conselho nos FormGroups para os signals reativos
+    const cached = this.perfilService.perfil();
+    if (cached) {
+      this.processarPerfil(cached as unknown as PerfilCompleto, false);
+      this.carregando.set(false);
+      this.carregarPerfil(true);
+    } else {
+      this.carregarPerfil();
+    }
+    this.carregarConvites();
     this.step2Form.get('conselho')!.valueChanges.subscribe(v => this.conselhoWizard.set(v || ''));
     this.editProfForm.get('conselho')!.valueChanges.subscribe(v => this.conselhoEdit.set(v || ''));
+
+    this.route.queryParams.subscribe(params => {
+      this.aplicarAbaDaUrl(params['aba']);
+    });
   }
 
-  private carregarPerfil() {
-    this.carregando.set(true);
-    this.http.get<PerfilCompleto>(`${this.api}/api/v1/perfil/me`).subscribe({
-      next: (p) => {
-        this.perfil.set(p);
-        this.carregando.set(false);
-        if (p.clinicaAdmin) this.clinica.set(p.clinicaAdmin as ClinicaDetalhes);
-        this.editProfForm.patchValue({
-          especialidade: p.especialidade || '', conselho: p.conselho || '',
-          numeroRegistro: p.numeroRegistro || '', uf: p.uf || '',
-          sobre: p.sobre || '', localAtendimento: p.localAtendimento || ''
-        });
-        // Inicializa o signal com o conselho já salvo no perfil
-        this.conselhoEdit.set(p.conselho || '');
-        if (p.perfil === 'Paciente') {
-          this.abaAtiva.set('paciente');
-          this.popularFormPaciente(p);
-        }
+  private aplicarAbaDaUrl(aba: string | undefined) {
+    if (aba === 'clinica' && this.podeGerirClinica) {
+      this.abaAtiva.set('clinica');
+    } else if (aba === 'conta' || aba === 'profissional') {
+      this.abaAtiva.set('profissional');
+    } else if (aba === 'paciente' && this.isPaciente) {
+      this.abaAtiva.set('paciente');
+    }
+  }
 
-        if (p.clinicaAdmin) {
-          const c = p.clinicaAdmin;
-          this.step1ClinicaForm.patchValue({ tipo: c.tipo, nome: c.nome, cnpj: c.cnpj, telefone: c.telefone, emailContato: c.emailContato });
-          this.step2ClinicaForm.patchValue({ cep: c.cep, rua: c.rua, numero: c.numero, complemento: c.complemento, bairro: c.bairro, cidade: c.cidade, estado: c.estado });
-        }
+  selecionarAba(aba: 'profissional' | 'clinica' | 'paciente') {
+    this.abaAtiva.set(aba);
+    this.editandoClinica.set(false);
+    this.editandoProfissional.set(false);
+
+    const queryParams: Record<string, string | null> = {
+      aba: aba === 'clinica' ? 'clinica' : aba === 'paciente' ? 'paciente' : 'conta',
+    };
+    this.router.navigate([], { relativeTo: this.route, queryParams, replaceUrl: true });
+
+    setTimeout(() => {
+      document.getElementById('conteudo-abas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
+
+  carregarConvites() {
+    this.http.get<any[]>(`${this.api}/api/v1/organizations/invites/pending`).subscribe({
+      next: (invs) => this.pendingInvites.set(invs),
+      error: (e) => console.error('Erro ao carregar convites:', e)
+    });
+  }
+
+  aceitarConvite(token: string) {
+    this.http.post<any>(`${this.api}/api/v1/organizations/invites/accept`, { token }).subscribe({
+      next: () => {
+        this.showToast('sucesso', 'Convite aceito com sucesso!');
+        this.authService.loadOrganizations().subscribe(() => this.carregarPerfil(true, true));
+      },
+      error: (e) => this.showToast('erro', e.error?.message || 'Erro ao aceitar convite.')
+    });
+  }
+
+  private mesclarPerfilResposta(atualizado: PerfilCompleto): void {
+    this.perfil.update(p => {
+      if (!p) return atualizado;
+      const merged: PerfilCompleto = { ...p, ...atualizado };
+      if (p.clinicaAdmin?.especialistas?.length && !atualizado.clinicaAdmin?.especialistas?.length) {
+        merged.clinicaAdmin = { ...merged.clinicaAdmin!, especialistas: p.clinicaAdmin.especialistas };
+      }
+      return merged;
+    });
+  }
+
+  private processarPerfil(p: PerfilCompleto, silencioso: boolean): void {
+    this.perfil.set(p);
+    if (p.clinicaAdmin) this.clinica.set(p.clinicaAdmin as ClinicaDetalhes);
+    this.editProfForm.patchValue({
+      especialidade: p.especialidade || '', conselho: p.conselho || '',
+      numeroRegistro: p.numeroRegistro || '', uf: p.uf || '',
+      sobre: p.sobre || '', localAtendimento: p.localAtendimento || ''
+    });
+    this.conselhoEdit.set(p.conselho || '');
+    if (!silencioso) {
+      const abaUrl = this.route.snapshot.queryParams['aba'];
+      if (abaUrl) {
+        this.aplicarAbaDaUrl(abaUrl);
+      } else if (p.perfil === 'Paciente') {
+        this.abaAtiva.set('paciente');
+      } else if (this.podeGerirClinica && p.clinicaAdmin) {
+        this.abaAtiva.set('clinica');
+      } else {
+        this.abaAtiva.set('profissional');
+      }
+    }
+
+    if (p.perfil === 'Paciente') {
+      this.popularFormPaciente(p);
+    }
+
+    if (p.clinicaAdmin) {
+      const c = p.clinicaAdmin;
+      this.step1ClinicaForm.patchValue({ tipo: c.tipo, nome: c.nome, cnpj: c.cnpj, telefone: c.telefone, emailContato: c.emailContato });
+      this.step2ClinicaForm.patchValue({ cep: c.cep, rua: c.rua, numero: c.numero, complemento: c.complemento, bairro: c.bairro, cidade: c.cidade, estado: c.estado });
+    }
+  }
+
+  private carregarPerfil(silencioso = false, force = false) {
+    if (!silencioso) this.carregando.set(true);
+    this.perfilService.getMe(force).subscribe({
+      next: (raw) => {
+        this.processarPerfil(raw as unknown as PerfilCompleto, silencioso);
+        this.carregando.set(false);
       },
       error: () => this.carregando.set(false)
     });
@@ -391,6 +505,7 @@ export class MeuPerfilComponent implements OnInit {
       ...this.step2Form.value,
       ...this.step3Form.value,
       sobre: this.step4Form.value.sobre,
+      autonomo: this.step4Form.value.autonomo,
       localAtendimento: this._montarEnderecoLocal()
     };
     this.http.post<any>(`${this.api}/api/v1/perfil/tornar-especialista`, payload).subscribe({
@@ -405,34 +520,21 @@ export class MeuPerfilComponent implements OnInit {
   iniciarTransicaoUpgrade(perfilUpgrade: any) {
     this.transicaoAtiva.set(true);
     this.transicaoStatus.set('Salvando perfil profissional...');
-    this.transicaoProgresso.set(15);
+    this.transicaoProgresso.set(30);
 
-    // Phase 2: Update database role & local session
     setTimeout(() => {
       this.transicaoStatus.set('Atualizando permissões de acesso...');
-      this.transicaoProgresso.set(45);
+      this.transicaoProgresso.set(60);
       this.authService.updateUserRole('especialista');
-    }, 800);
-
-    // Phase 3: Setup dashboard settings
-    setTimeout(() => {
-      this.transicaoStatus.set('Preparando seu painel de especialista...');
-      this.transicaoProgresso.set(75);
       this.perfil.set(perfilUpgrade);
-    }, 1600);
+    }, 400);
 
-    // Phase 4: Finalizing & routing
     setTimeout(() => {
       this.transicaoStatus.set('Concluído! Carregando...');
       this.transicaoProgresso.set(100);
-    }, 2400);
-
-    // Redirect to Specialist dashboard!
-    setTimeout(() => {
       this.transicaoAtiva.set(false);
       this.router.navigate(['/painel/dashboard']);
-      this.showToast('sucesso', 'Parabéns! Seu perfil de Especialista foi criado com sucesso.');
-    }, 3000);
+    }, 1200);
   }
 
   private _montarEnderecoLocal(): string {
@@ -444,11 +546,13 @@ export class MeuPerfilComponent implements OnInit {
 
   // ── Editar perfil profissional ────────────────────────────────────────────
   salvarEditPerfil() {
+    const formVal = this.editProfForm.value;
+    this.perfil.update(p => p ? { ...p, ...formVal } : p);
     this.salvando.set(true);
-    this.http.patch<any>(`${this.api}/api/v1/perfil/me`, this.editProfForm.value).subscribe({
+    this.http.patch<any>(`${this.api}/api/v1/perfil/me`, formVal).subscribe({
       next: (res) => {
         this.salvando.set(false);
-        this.perfil.set(res.perfil);
+        this.mesclarPerfilResposta(res.perfil);
         this.editandoProfissional.set(false);
         this.showToast('sucesso', 'Perfil atualizado com sucesso!');
       },
@@ -494,7 +598,6 @@ export class MeuPerfilComponent implements OnInit {
 
   // ── Editar Ficha Médica (Paciente) ────────────────────────────────────────
   salvarFichaMedica() {
-    this.salvando.set(true);
     const formVal = this.fichaMedicaForm.value;
 
     let dataNascimentoISO = '';
@@ -505,15 +608,29 @@ export class MeuPerfilComponent implements OnInit {
       dataNascimentoISO = formVal.dataNascimento;
     }
 
-    const payload = {
-      ...formVal,
-      dataNascimento: dataNascimentoISO
-    };
+    const payload = { ...formVal, dataNascimento: dataNascimentoISO };
 
+    this.perfil.update(p => p ? {
+      ...p,
+      nome: formVal.nome,
+      genero: formVal.genero,
+      pacienteInfo: {
+        ...p.pacienteInfo,
+        cpf: formVal.cpf,
+        telefone: formVal.telefone,
+        tipoSanguineo: formVal.tipoSanguineo,
+        comorbidades: formVal.comorbidades,
+        alergias: formVal.alergias,
+        dataNascimento: dataNascimentoISO
+      }
+    } : p);
+    if (formVal.nome) this.authService.updateDisplayName(formVal.nome);
+
+    this.salvando.set(true);
     this.http.patch<any>(`${this.api}/api/v1/perfil/me`, payload).subscribe({
       next: (res) => {
         this.salvando.set(false);
-        this.perfil.set(res.perfil);
+        this.mesclarPerfilResposta(res.perfil);
         this.popularFormPaciente(res.perfil);
         this.editandoFichaMedica.set(false);
         this.showToast('sucesso', 'Ficha médica atualizada com sucesso!');
@@ -581,6 +698,106 @@ export class MeuPerfilComponent implements OnInit {
     });
   }
 
+  // ── Upload Foto ──────────────────────────────────────────────────────────
+  onFotoSelecionada(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const arquivo = input.files[0];
+    const previewUrl = URL.createObjectURL(arquivo);
+    this.perfil.update(p => p ? { ...p, foto: previewUrl } : p);
+
+    const form = new FormData();
+    form.append('foto', arquivo);
+    this.enviandoFoto.set(true);
+
+    this.http.post<any>(`${this.api}/api/v1/perfil/foto`, form).subscribe({
+      next: (res) => {
+        URL.revokeObjectURL(previewUrl);
+        this.enviandoFoto.set(false);
+        this.perfil.update(p => p ? { ...p, foto: res.foto } : p);
+        this.showToast('sucesso', 'Foto de perfil atualizada!');
+        input.value = '';
+      },
+      error: (e) => {
+        URL.revokeObjectURL(previewUrl);
+        this.enviandoFoto.set(false);
+        this.carregarPerfil(true, true);
+        this.showToast('erro', e.error?.message || 'Erro ao enviar foto.');
+        input.value = '';
+      }
+    });
+  }
+
+  private msgErroUpload(e: any, contexto: string): string {
+    const status = e?.status;
+    const msg = e?.error?.message;
+    if (status === 404) {
+      return 'Recurso de upload indisponível no servidor. É necessário atualizar o backend (deploy).';
+    }
+    if (status === 403) return msg || 'Sem permissão para esta operação.';
+    if (status === 413) return 'Arquivo muito grande. Máximo 10 MB.';
+    if (status === 400) return msg || 'Arquivo inválido.';
+    if (status === 0) return 'Sem conexão com o servidor. Verifique se o backend está rodando.';
+    return msg || `Erro ao enviar ${contexto}.`;
+  }
+
+  private validarArquivoImagem(arquivo: File): string | null {
+    const tipos = ['image/jpeg', 'image/png', 'image/webp'];
+    const extensoes = ['.jpg', '.jpeg', '.png', '.webp'];
+    const nome = arquivo.name.toLowerCase();
+    const tipoOk = tipos.includes(arquivo.type) || extensoes.some(ext => nome.endsWith(ext));
+    if (!tipoOk) return 'Use JPG, PNG ou WEBP.';
+    if (arquivo.size > 10 * 1024 * 1024) return 'Arquivo muito grande. Máximo 10 MB.';
+    return null;
+  }
+
+  onFotoClinicaSelecionada(event: Event) {
+    const c = this.clinica();
+    if (!c?.id) {
+      this.showToast('erro', 'Salve a clínica antes de enviar a foto.');
+      return;
+    }
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const arquivo = input.files[0];
+    const erroValidacao = this.validarArquivoImagem(arquivo);
+    if (erroValidacao) {
+      this.showToast('erro', erroValidacao);
+      input.value = '';
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(arquivo);
+    this.clinica.update(cl => cl ? { ...cl, foto: previewUrl } : cl);
+
+    const form = new FormData();
+    form.append('foto', arquivo);
+    this.enviandoFotoClinica.set(true);
+
+    this.http.post<any>(`${this.api}/api/v1/organizations/${c.id}/foto`, form).subscribe({
+      next: (res) => {
+        URL.revokeObjectURL(previewUrl);
+        this.enviandoFotoClinica.set(false);
+        const foto = res.foto || res.organization?.foto;
+        this.clinica.update(cl => cl ? { ...cl, foto } : cl);
+        this.perfil.update(p => p?.clinicaAdmin
+          ? { ...p, clinicaAdmin: { ...p.clinicaAdmin, foto } }
+          : p);
+        this.showToast('sucesso', 'Foto da clínica atualizada!');
+        input.value = '';
+      },
+      error: (e) => {
+        URL.revokeObjectURL(previewUrl);
+        this.enviandoFotoClinica.set(false);
+        this.carregarPerfil(true, true);
+        this.showToast('erro', this.msgErroUpload(e, 'foto da clínica'));
+        input.value = '';
+      }
+    });
+  }
+
   // ── CEP lookup ────────────────────────────────────────────────────────────
   buscarCep(cep: string, form: FormGroup) {
     const clean = cep.replace(/\D/g, '');
@@ -642,8 +859,8 @@ export class MeuPerfilComponent implements OnInit {
     const payload = { ...this.step1ClinicaForm.value, ...this.step2ClinicaForm.value };
     this.salvando.set(true);
     const req = c
-      ? this.http.patch<ClinicaDetalhes>(`${this.api}/api/v1/clinicas/${c.id}`, payload)
-      : this.http.post<ClinicaDetalhes>(`${this.api}/api/v1/clinicas/`, payload);
+      ? this.http.patch<ClinicaDetalhes>(`${this.api}/api/v1/organizations/${c.id}`, payload)
+      : this.http.post<ClinicaDetalhes>(`${this.api}/api/v1/organizations`, payload);
 
     req.subscribe({
       next: (cl) => {
@@ -651,7 +868,17 @@ export class MeuPerfilComponent implements OnInit {
         this.clinica.set(cl);
         this.perfil.update(p => p ? { ...p, clinicaAdmin: cl } : p);
         this.editandoClinica.set(false);
-        this.showToast('sucesso', c ? 'Clínica atualizada! Todos os endereços dos profissionais vinculados foram atualizados.' : 'Clínica criada com sucesso!');
+        const eraNova = !c;
+        if (eraNova) {
+          this.authService.refreshUserProfile().subscribe();
+          this.authService.loadOrganizations().subscribe();
+        }
+        this.showToast(
+          'sucesso',
+          eraNova
+            ? 'Clínica criada! Você agora é Gestor Clínico desta unidade.'
+            : 'Clínica atualizada! Todos os endereços dos profissionais vinculados foram atualizados.'
+        );
       },
       error: (e) => { this.salvando.set(false); this.showToast('erro', e.error?.message || 'Erro.'); }
     });
@@ -669,21 +896,20 @@ export class MeuPerfilComponent implements OnInit {
     if (!email || !c) return;
     this.adicionandoMembro.set(true);
     this.erroMembro.set('');
-    this.http.post<any>(`${this.api}/api/v1/clinicas/${c.id}/especialistas`, { email }).subscribe({
+    this.http.post<any>(`${this.api}/api/v1/organizations/${c.id}/invites`, { email, role: 'ESPECIALISTA' }).subscribe({
       next: (res) => {
         this.adicionandoMembro.set(false);
-        this.clinica.set(res.clinica);
         this.emailNovoMembro.set('');
-        this.showToast('sucesso', res.message);
+        this.showToast('sucesso', 'Convite de especialista enviado com sucesso!');
       },
-      error: (e) => { this.adicionandoMembro.set(false); this.erroMembro.set(e.error?.message || 'Erro.'); }
+      error: (e) => { this.adicionandoMembro.set(false); this.erroMembro.set(e.error?.message || 'Erro ao convidar.'); }
     });
   }
 
   removerMembro(espId: number) {
     const c = this.clinica();
     if (!c || !confirm('Remover este profissional da clínica?')) return;
-    this.http.delete(`${this.api}/api/v1/clinicas/${c.id}/especialistas/${espId}`).subscribe({
+    this.http.delete(`${this.api}/api/v1/organizations/${c.id}/members/${espId}`).subscribe({
       next: () => {
         this.clinica.update(cl => cl ? { ...cl, especialistas: cl.especialistas.filter(e => e.id !== espId) } : cl);
         this.showToast('sucesso', 'Profissional removido.');

@@ -2,6 +2,9 @@ import { Injectable, signal, inject, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AbstractExamesService, Exame } from './abstract-exames.service';
 import { environment } from '../../env/environment';
+import { cacheGet, cacheSet, cacheInvalidate } from '../../utils/api-cache';
+
+const TTL_MS = 3 * 60 * 1000;
 
 @Injectable({
   providedIn: 'root'
@@ -16,13 +19,17 @@ export class ExamesService extends AbstractExamesService {
 
   constructor() {
     super();
-    this.loadExames();
   }
 
-  loadExames() {
+  loadExames(force = false) {
+    const key = 'exames:me';
+    const cached = !force ? cacheGet<Exame[]>(key, { session: true }) : null;
+    if (cached) {
+      this.exames.set(cached);
+      return;
+    }
     this.http.get<any[]>(`${this.apiUrl}/api/v1/exams/me`).subscribe({
       next: (data) => {
-        // Map backend format to frontend format
         const mapped = data.map(e => ({
           id: e.id,
           title: e.nome_exame,
@@ -33,6 +40,7 @@ export class ExamesService extends AbstractExamesService {
           type: 'documento',
           arquivo: e.arquivo
         } as Exame));
+        cacheSet(key, mapped, TTL_MS, { session: true });
         this.exames.set(mapped);
       },
       error: (err) => console.error('Erro ao buscar exames:', err)
@@ -50,6 +58,7 @@ export class ExamesService extends AbstractExamesService {
   excluirExame(id: number): void {
     this.http.delete(`${this.apiUrl}/api/v1/exams/${id}`).subscribe({
       next: () => {
+        cacheInvalidate('exames:');
         this.exames.update(prev => prev.filter(e => e.id !== id));
       },
       error: (err) => console.error('Erro ao excluir exame:', err)

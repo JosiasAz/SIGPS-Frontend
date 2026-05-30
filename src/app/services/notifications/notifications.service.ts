@@ -15,7 +15,6 @@ export class NotificationsService extends AbstractNotificationsService {
 
   constructor() {
     super();
-    this.loadNotifications();
   }
 
   loadNotifications(): void {

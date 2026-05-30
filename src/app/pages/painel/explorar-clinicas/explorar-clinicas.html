@@ -1,0 +1,107 @@
+<section class="page-container">
+  <div class="content-header">
+    <button class="btn-back" routerLink="/painel/portal-paciente" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      Voltar ao Início
+    </button>
+  </div>
+
+  <nav class="explore-tabs" aria-label="Modo de exploração">
+    <a routerLink="/painel/explorar-clinicas" routerLinkActive="active" class="explore-tab">Clínicas</a>
+    <a routerLink="/painel/busca-profissionais" routerLinkActive="active" class="explore-tab">Profissionais</a>
+  </nav>
+
+  <div class="explore-hero">
+    <h1>Explorar Clínicas</h1>
+    <p>Encontre consultórios e clínicas cadastrados no SIGPS e veja os profissionais disponíveis.</p>
+  </div>
+
+  <div class="card filtros-card">
+    <div class="filtros-row">
+      <div class="filtro-field">
+        <label for="filtro-nome-clinica">Nome da clínica</label>
+        <input id="filtro-nome-clinica" type="search" class="form-input" placeholder="Ex: Consultório, Saúde..."
+          [ngModel]="filtroNome()" (ngModelChange)="filtroNome.set($event); onFiltroChange()">
+      </div>
+      <div class="filtro-field">
+        <label for="filtro-cidade">Cidade</label>
+        <input id="filtro-cidade" type="search" class="form-input" placeholder="Ex: São Paulo"
+          [ngModel]="filtroCidade()" (ngModelChange)="filtroCidade.set($event); onFiltroChange()">
+      </div>
+      <button type="button" class="btn-limpar" (click)="limparFiltros()">Limpar</button>
+    </div>
+  </div>
+
+  <div class="results-info">
+    <p>Exibindo <strong>{{ clinica().length }}</strong> clínicas e consultórios</p>
+    @if (carregando()) {
+    <span class="loading-hint">Atualizando...</span>
+    }
+  </div>
+
+  <div class="clinics-grid">
+    @for (c of clinica(); track c.id) {
+    <article class="clinic-card">
+      <div class="clinic-cover">
+        <img [src]="(c.foto | mediaUrl) || fotoFallback(c.nome)" [alt]="c.nome" class="clinic-photo"
+          (error)="onFotoErro($event, c.nome)">
+        <span class="clinic-type">{{ tipoLabel(c.tipo) }}</span>
+      </div>
+      <div class="clinic-body">
+        <h3>{{ c.nome }}</h3>
+        @if (c.cidade || c.estado) {
+        <p class="clinic-location">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          {{ c.cidade }}{{ c.estado ? ' / ' + c.estado : '' }}
+        </p>
+        }
+        @if (c.enderecoFormatado) {
+        <p class="clinic-address">{{ c.enderecoFormatado }}</p>
+        }
+        <div class="clinic-meta">
+          <span>{{ c.totalProfissionais }} profissional(is)</span>
+          @if (c.statusVerificacao) {
+          <span class="verif-chip" [class]="c.statusVerificacao">{{ labelVerificacao(c.statusVerificacao) }}</span>
+          }
+        </div>
+        @if (c.especialidades.length) {
+        <div class="clinic-tags">
+          @for (esp of c.especialidades.slice(0, 4); track esp) {
+          <span class="tag">{{ esp }}</span>
+          }
+        </div>
+        }
+        <button type="button" class="btn-explore" (click)="verProfissionais(c)">
+          Ver profissionais e agendar
+        </button>
+      </div>
+    </article>
+    }
+  </div>
+
+  @if (!carregando() && clinica().length === 0) {
+  <div class="empty-state">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M3 21h18"></path>
+      <path d="M5 21V7l8-4v18"></path>
+      <path d="M19 21V11l-6-4"></path>
+    </svg>
+    <h2>Nenhuma clínica encontrada</h2>
+    <p>
+      Se o Wagner (ou outro gestor) já criou a clínica, ela aparece aqui assim que o backend estiver atualizado
+      e houver profissionais vinculados.
+    </p>
+    <p class="empty-hint">
+      Enquanto isso, use a aba <strong>Profissionais</strong> — o Wagner já aparece lá como dentista verificado.
+    </p>
+    <button type="button" class="btn-clear" routerLink="/painel/busca-profissionais">Ver profissionais</button>
+    <button type="button" class="btn-clear" (click)="limparFiltros()">Limpar filtros</button>
+  </div>
+  }
+</section>

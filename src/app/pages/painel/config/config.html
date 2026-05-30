@@ -96,6 +96,82 @@
         </div>
     </div>
 
+    <!-- Verificação de identidade profissional -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <div class="header-left">
+                <div class="header-icon icon-green">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                </div>
+                <div>
+                    <h3>Verificação de Identidade Profissional</h3>
+                    <p class="header-sub">Analise documentos enviados e aprove ou rejeite cadastros de especialistas.</p>
+                </div>
+            </div>
+            @if (!isLoadingVerificacoes()) {
+            <span class="user-count-badge">{{ verificacoes().length }} pendentes</span>
+            <button type="button" class="btn-secondary" style="padding: 6px 14px; margin-left: 8px;" (click)="loadVerificacoes()">Atualizar</button>
+            }
+        </div>
+
+        <div class="card-body">
+            @if (isLoadingVerificacoes()) {
+            <div class="loading-users">
+                <div class="spinner"></div>
+                <p>Carregando solicitações...</p>
+            </div>
+            } @else if (verificacoes().length === 0) {
+            <p class="empty-table">Nenhuma verificação pendente no momento.</p>
+            @if (erroVerificacoes()) {
+            <p class="empty-table" style="color: #b45309; margin-top: 8px;">{{ erroVerificacoes() }}</p>
+            }
+            } @else {
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Profissional</th>
+                            <th>Especialidade</th>
+                            <th>Registro</th>
+                            <th>Status</th>
+                            <th>Documento</th>
+                            <th style="text-align: right;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (item of verificacoes(); track item.userId) {
+                        <tr>
+                            <td>
+                                <strong>{{ item.nome }}</strong><br>
+                                <span class="user-email">{{ item.email }}</span>
+                            </td>
+                            <td>{{ item.especialidade || '—' }}</td>
+                            <td>{{ item.crm || '—' }}</td>
+                            <td>
+                                <span class="badge especialista">{{ labelVerificacao(item.statusVerificacao) }}</span>
+                            </td>
+                            <td>
+                                @if (item.documentoEnviado) {
+                                <button type="button" class="btn-secondary" style="padding: 6px 12px;" (click)="baixarDocumento(item.userId)">Ver documento</button>
+                                } @else {
+                                <span class="user-email">Não enviado</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="action-cell">
+                                    <button type="button" class="btn-primary" style="padding: 8px 12px;" (click)="atualizarVerificacao(item.userId, 'verificado')">Aprovar</button>
+                                    <button type="button" class="btn-danger-icon" style="padding: 8px 12px;" (click)="atualizarVerificacao(item.userId, 'rejeitado')">Rejeitar</button>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            }
+        </div>
+    </div>
+
     <!-- Seção de Configurações -->
     <div class="card">
         <div class="card-header">

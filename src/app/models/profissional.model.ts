@@ -3,13 +3,17 @@ export interface Profissional {
   nome: string;
   especialidade: string;
   crm: string;
-  avaliacao: number;
-  avaliacoesCount: number;
+  avaliacao?: number | null;
+  avaliacoesCount?: number;
   foto?: string;
   proximaVaga?: string;
+  localAtendimento?: string;
+  organizationId?: number | null;
+  organizationNome?: string;
   documento?: string;
   status?: string; // Mantido por retrocompatibilidade com UI antiga, mas agora computado
   situacao?: 'Ativo' | 'Inativo';
+  statusVerificacao?: 'nao_verificado' | 'em_analise' | 'verificado' | 'rejeitado';
   last_seen?: Date | string;
   uf?: string;
   consultasRealizadas?: number;
@@ -22,5 +26,5 @@ export interface Profissional {
   banner?: string;
   estatisticas?: { pacientesHoje: number, consultasMes: number, faturamentoMes: string, satisfacao: string };
   agendaHoje?: { hora: string, paciente: string, tipo: string, status: string }[];
-  diasDisponiveis?: { agendaId: number, data: string, diasemana: string, slots: string[] }[];
+  diasDisponiveis?: { agendaId: number, data: string, diasemana: string, slots: (string | { hora: string, disponivel: boolean, agendaId?: number })[] }[];
 }

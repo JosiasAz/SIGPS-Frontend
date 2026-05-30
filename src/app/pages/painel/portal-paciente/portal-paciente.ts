@@ -3,7 +3,9 @@ import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
 import { AbstractAgendasService } from '../../../services/agendas/abstract-agendas.service';
+import { AgendasService } from '../../../services/agendas/agendas.service';
 import { AbstractExamesService } from '../../../services/exames/abstract-exames.service';
+import { ExamesService } from '../../../services/exames/exames.service';
 import { AbstractChatService } from '../../../services/chat/abstract-chat.service';
 
 @Component({
@@ -44,7 +46,8 @@ export class PortalPacienteComponent implements OnInit {
   });
 
   ngOnInit() {
-    // No longer needed to set signal manually
+    (this.agendasService as AgendasService).loadAll();
+    (this.examesService as ExamesService).loadExames();
   }
 
   metrics = computed(() => {

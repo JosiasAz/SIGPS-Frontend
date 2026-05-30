@@ -17,7 +17,8 @@
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                     </svg>
                     <p>Nenhuma conversa ainda.</p>
-                    <small>Acesse o perfil de um profissional para iniciar.</small>
+                    <small>Busque um profissional e toque em <strong>Mensagem</strong> no perfil ou na busca.</small>
+                    <a routerLink="/painel/busca-profissionais" class="btn-find-prof">Explorar profissionais</a>
                 </div>
                 }
 
@@ -25,7 +26,7 @@
                 <button class="conv-item" [class.active]="activeConversation()?.userId === conv.userId" (click)="abrirConversa(conv.userId)">
                     <div class="conv-avatar">
                         @if (conv.userFoto) {
-                        <img [src]="conv.userFoto" [alt]="conv.userName">
+                        <img [src]="conv.userFoto | mediaUrl" [alt]="conv.userName" (error)="onFotoErro($event)">
                         } @else {
                         <span>{{ inicialAvatar(conv.userName) }}</span>
                         }
@@ -66,17 +67,22 @@
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
                 </button>
-                <div class="header-avatar">
-                    @if (activeConversation()?.userFoto) {
-                    <img [src]="activeConversation()?.userFoto" [alt]="activeConversation()?.userName">
-                    } @else {
-                    <span>{{ inicialAvatar(activeConversation()?.userName || '') }}</span>
-                    }
-                </div>
-                <div class="header-info">
-                    <h3>{{ activeConversation()?.userName }}</h3>
-                    <span>{{ activeConversation()?.userRole }}</span>
-                </div>
+                <button class="header-profile-link" (click)="irParaPerfil(activeConversation())" [disabled]="!isPaciente()">
+                    <div class="header-avatar">
+                        @if (activeConversation()?.userFoto) {
+                        <img [src]="activeConversation()?.userFoto | mediaUrl" [alt]="activeConversation()?.userName" (error)="onFotoErro($event)">
+                        } @else {
+                        <span>{{ inicialAvatar(activeConversation()?.userName || '') }}</span>
+                        }
+                    </div>
+                    <div class="header-info">
+                        <h3>{{ activeConversation()?.userName }}</h3>
+                        <span>{{ activeConversation()?.userRole }}</span>
+                        @if (isPaciente()) {
+                        <small class="header-hint">Toque para ver o perfil</small>
+                        }
+                    </div>
+                </button>
                 <button class="btn-clear-history" (click)="clearConversa()" title="Apagar conversa">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="3 6 5 6 21 6"></polyline>

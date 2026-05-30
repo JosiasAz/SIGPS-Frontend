@@ -28,8 +28,8 @@
             <div class="stat-details">
                 <span class="stat-label">Saturação da Fila</span>
                 <div class="stat-value-group">
-                    <span class="stat-value">{{ fila().length }}</span>
-                    <span class="stat-badge up">Monitorado</span>
+                    <span class="stat-value">{{ analiseIA()?.total_na_fila ?? fila().length }}</span>
+                    <span class="stat-badge up">Do banco</span>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
             <div class="stat-details">
                 <span class="stat-label">Urgências Críticas</span>
                 <div class="stat-value-group">
-                    <span class="stat-value" style="color: #ef4444;">{{ altaPrioridade() }} Case</span>
+                    <span class="stat-value" style="color: #ef4444;">{{ analiseIA()?.pacientes_criticos ?? altaPrioridade() }}</span>
                     <span class="stat-badge down">Imediato</span>
                 </div>
             </div>
@@ -111,7 +111,7 @@
                             </p>
                         </td>
                         <td class="text-right">
-                            <button class="btn-outline-dashboard" (click)="atender(p.paciente)" style="padding: 8px 16px; font-size: 0.85rem;">
+                            <button class="btn-outline-dashboard" (click)="atender(p)" style="padding: 8px 16px; font-size: 0.85rem;">
                                 Atender
                             </button>
                         </td>

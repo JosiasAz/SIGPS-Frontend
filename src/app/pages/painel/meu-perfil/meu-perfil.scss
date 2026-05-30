@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // ── Design Tokens ─────────────────────────────────────────────────────────────
 $green:       #166534;
 $green-mid:   #16a34a;
@@ -101,6 +103,21 @@ $transition:  0.18s cubic-bezier(.4,0,.2,1);
 .hero-verified-seal {
     display: flex; flex-direction: column; align-items: center; gap: 4px;
     color: $green; font-size: .72rem; font-weight: 700; opacity: .85;
+}
+
+.hero-context-label {
+    font-size: .78rem; font-weight: 700; color: $green;
+    text-transform: uppercase; letter-spacing: .4px; margin: 0 0 4px;
+}
+
+.hero-card--clinica {
+    border-left: 4px solid $green-mid;
+}
+
+.hero-avatar--clinica img {
+    width: 88px; height: 88px;
+    border-radius: 12px;
+    border: 2px solid rgba($green-mid, 0.35);
 }
 
 // ── Chips ─────────────────────────────────────────────────────────────────────
@@ -344,7 +361,7 @@ $transition:  0.18s cubic-bezier(.4,0,.2,1);
     font-size: .9rem; font-weight: 700; cursor: pointer;
     transition: background $transition, transform $transition;
 
-    &:hover:not(:disabled) { background: darken($green, 5%); transform: translateY(-1px); }
+    &:hover:not(:disabled) { background: color.adjust($green, $lightness: -5%); transform: translateY(-1px); }
     &:disabled { opacity: .55; cursor: not-allowed; transform: none; }
     &.btn--sm { padding: 7px 14px; font-size: .82rem; }
 }

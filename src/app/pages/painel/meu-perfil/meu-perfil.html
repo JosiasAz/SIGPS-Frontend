@@ -12,11 +12,59 @@
     </div>
     }
 
-    <!-- ── HERO ──────────────────────────────────────────────────── -->
+    <!-- ── HERO (muda conforme a aba) ─────────────────────────────── -->
+    @if (abaAtiva() === 'clinica' && podeGerirClinica) {
+    <div class="hero-card hero-card--clinica">
+        <div class="hero-left">
+            <div class="hero-avatar hero-avatar--clinica">
+                <label style="cursor: pointer; display: block; position: relative;" title="Clique para alterar a foto da clínica">
+                    <img [src]="fotoClinica()" [alt]="clinica()?.nome || 'Clínica'" [style.opacity]="enviandoFotoClinica() ? '0.5' : '1'">
+                    @if (enviandoFotoClinica()) {
+                    <div class="avatar-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px;">
+                        <span class="btn-spinner" style="border-color: rgba(255,255,255,0.3); border-top-color: white;"></span>
+                    </div>
+                    }
+                    <div class="avatar-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; text-align: center; font-size: 11px; padding: 4px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; opacity: 0; transition: opacity 0.3s;"
+                         onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
+                        Foto da Clínica
+                    </div>
+                    <input type="file" accept=".jpg,.jpeg,.png,.webp" style="display:none" (change)="onFotoClinicaSelecionada($event)">
+                </label>
+            </div>
+            <div class="hero-info">
+                <p class="hero-context-label">🏢 Minha Clínica</p>
+                <h1>{{ clinica()?.nome || 'Cadastrar clínica' }}</h1>
+                @if (clinica()) {
+                <p class="hero-email">{{ clinica()!.tipo }} · {{ clinica()!.enderecoFormatado || 'Endereço não informado' }}</p>
+                <div class="hero-badges">
+                    <span class="role-chip gestor">Estabelecimento</span>
+                    @if (clinica()!.statusVerificacao) {
+                    <span class="verif-chip" [class]="clinica()!.statusVerificacao">{{ statusVerifClinica(clinica()!.statusVerificacao) }}</span>
+                    }
+                </div>
+                } @else {
+                <p class="hero-email">Complete o cadastro para gerenciar sua equipe e local de atendimento.</p>
+                }
+            </div>
+        </div>
+    </div>
+    } @else {
     <div class="hero-card">
         <div class="hero-left">
             <div class="hero-avatar">
-                <img [src]="perfil()?.foto || 'https://ui-avatars.com/api/?name=' + perfil()?.nome + '&background=166534&color=fff&size=200'" [alt]="perfil()?.nome">
+                <label style="cursor: pointer; display: block; position: relative;" title="Clique para alterar a foto de perfil">
+                    <img [src]="fotoPerfil()" [alt]="perfil()?.nome" [style.opacity]="enviandoFoto() ? '0.5' : '1'">
+                    @if (enviandoFoto()) {
+                    <div class="avatar-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 50%;">
+                        <span class="btn-spinner" style="border-color: rgba(255,255,255,0.3); border-top-color: white;"></span>
+                    </div>
+                    }
+                    <div class="avatar-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; text-align: center; font-size: 11px; padding: 4px; border-bottom-left-radius: 50%; border-bottom-right-radius: 50%; opacity: 0; transition: opacity 0.3s;"
+                         onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
+                        Alterar Foto
+                    </div>
+                    <input type="file" accept=".jpg,.jpeg,.png" style="display:none" (change)="onFotoSelecionada($event)">
+                </label>
                 @if (statusVerif === 'verificado') {
                 <div class="avatar-badge verified" title="Profissional Verificado">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -24,6 +72,9 @@
                 }
             </div>
             <div class="hero-info">
+                @if (isGestor && abaAtiva() === 'profissional') {
+                <p class="hero-context-label">👤 Minha Conta</p>
+                }
                 <h1>{{ perfil()?.nome }}</h1>
                 <p class="hero-email">{{ perfil()?.email }}</p>
                 <div class="hero-badges">
@@ -50,6 +101,7 @@
         </div>
         }
     </div>
+    }
 
     <!-- ── BANNER DE STATUS ───────────────────────────────────────── -->
     @if (isEspecialista) {
@@ -95,25 +147,36 @@
     }
 
     <!-- ── TABS ───────────────────────────────────────────────────── -->
-    @if (isEspecialista || isPaciente) {
-    <div class="tabs">
+    @if (isEspecialista || isPaciente || isGestor) {
+    <div class="tabs" id="conteudo-abas">
         @if (isEspecialista) {
-        <button class="tab" [class.active]="abaAtiva() === 'profissional'" (click)="abaAtiva.set('profissional')">
+        <button type="button" class="tab" [class.active]="abaAtiva() === 'profissional'" (click)="selecionarAba('profissional')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             Perfil Profissional
         </button>
-        <button class="tab" [class.active]="abaAtiva() === 'clinica'" (click)="abaAtiva.set('clinica')">
+        <button type="button" class="tab" [class.active]="abaAtiva() === 'clinica'" (click)="selecionarAba('clinica')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
             {{ clinica() ? 'Minha Clínica' : 'Criar Clínica' }}
             @if (clinica()) { <span class="tab-badge">Ativa</span> }
         </button>
         }
+        @if (isGestor) {
+        <button type="button" class="tab" [class.active]="abaAtiva() === 'clinica'" (click)="selecionarAba('clinica')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            {{ clinica() ? 'Minha Clínica' : 'Cadastrar Clínica' }}
+            @if (clinica()) { <span class="tab-badge">Ativa</span> }
+        </button>
+        <button type="button" class="tab" [class.active]="abaAtiva() === 'profissional'" (click)="selecionarAba('profissional')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Minha Conta
+        </button>
+        }
         @if (isPaciente) {
-        <button class="tab" [class.active]="abaAtiva() === 'paciente'" (click)="abaAtiva.set('paciente')">
+        <button type="button" class="tab" [class.active]="abaAtiva() === 'paciente'" (click)="selecionarAba('paciente')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
             Ficha Médica
         </button>
-        <button class="tab" [class.active]="abaAtiva() === 'profissional'" (click)="abaAtiva.set('profissional')">
+        <button type="button" class="tab" [class.active]="abaAtiva() === 'profissional'" (click)="selecionarAba('profissional')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             Seja um Profissional
         </button>
@@ -122,7 +185,7 @@
     }
 
     <!-- ══════════ ABA: PERFIL PROFISSIONAL / ADMIN ═══════════════════════ -->
-    @if (perfil()?.perfil === 'Admin' || perfil()?.perfil === 'Gestor' || perfil()?.perfil === 'Visualizador' || abaAtiva() === 'profissional') {
+    @if ((perfil()?.perfil === 'Admin' || perfil()?.perfil === 'Visualizador' || (perfil()?.perfil === 'Gestor' && abaAtiva() !== 'clinica')) || (abaAtiva() === 'profissional' && isEspecialista)) {
 
     <!-- Se for Admin, Gestor ou Visualizador, exibe dados administrativos do perfil -->
     @if (perfil()?.perfil === 'Admin' || perfil()?.perfil === 'Gestor' || perfil()?.perfil === 'Visualizador') {
@@ -235,7 +298,7 @@
                         }
                     </div>
                     <div class="field-group field-group--sm">
-                        <label class="field-label">UF do Registro <span class="req">*</span></label>
+                        <label class="field-label">UF <span class="req">*</span></label>
                         <select formControlName="uf" class="field-input field-select">
                             <option value="">UF</option>
                             @for (uf of ufs; track uf) { <option [value]="uf">{{ uf }}</option> }
@@ -347,6 +410,10 @@
                 <div class="field-error">Escreva pelo menos 20 caracteres descrevendo seu perfil profissional.</div>
                 }
             </div>
+            <label class="checkbox-label" style="margin-top:12px; margin-bottom:12px;">
+                <input type="checkbox" [formControl]="$any(step4Form.get('autonomo'))">
+                <span>Sou profissional autônomo (Cria automaticamente um consultório isolado)</span>
+            </label>
             <label class="checkbox-label">
                 <input type="checkbox" [formControl]="$any(step4Form.get('concordaTermos'))">
                 <span>Declaro que as informações são verdadeiras e concordo com os <a href="#" class="link">Termos de Uso</a>.</span>
@@ -715,7 +782,36 @@
     }
 
     <!-- ══════════ ABA: CLÍNICA ═══════════════════════════════════ -->
-    @if (isEspecialista && abaAtiva() === 'clinica') {
+    @if (podeGerirClinica && abaAtiva() === 'clinica') {
+
+    <!-- CONVITES PENDENTES -->
+    @if (pendingInvites() && pendingInvites().length > 0) {
+    <div class="section-card pending-invites-card" style="border-left: 4px solid var(--primary-color, #419640); background: #f0fdf4; margin-bottom: 24px;">
+        <div class="section-card-header" style="padding: 24px 24px 12px;">
+            <div>
+                <h3 style="color: #166534; display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1.15rem; font-weight: 700;">
+                    ✉️ Convites Pendentes
+                </h3>
+                <p style="color: #15803d; margin: 4px 0 0; font-size: 0.88rem;">Você foi convidado para fazer parte das seguintes organizações de saúde:</p>
+            </div>
+        </div>
+        <div class="member-list" style="margin-top: 12px; padding: 0 24px 24px;">
+            @for (invite of pendingInvites(); track invite.id) {
+            <div class="member-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 12px; gap: 16px;">
+                <div class="member-info" style="flex: 1;">
+                    <strong style="font-size: 1rem; color: #1e293b; display: block;">🏢 {{ invite.organization_name }}</strong>
+                    <span style="display: block; font-size: 0.85rem; color: #64748b; margin-top: 4px;">Função: {{ invite.role }}</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn-primary" (click)="aceitarConvite(invite.token)" style="padding: 8px 16px; font-size: 0.88rem; cursor: pointer; border-radius: 6px;">
+                        Aceitar Convite
+                    </button>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+    }
 
     @if (!clinica() || editandoClinica()) {
     <!-- WIZARD CLÍNICA -->
@@ -866,7 +962,7 @@
     <div class="section-card">
         <div class="section-card-header">
             <div>
-                <h3>{{ clinica()!.nome }}</h3>
+                <h3>Dados do Estabelecimento</h3>
                 <p class="clinic-type-badge">{{ clinica()!.tipo }}</p>
             </div>
             <div style="display:flex; gap:8px; align-items:center;">
