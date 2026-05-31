@@ -19,8 +19,13 @@ import { RouterLink } from '@angular/router';
 export class LandingPageComponent implements AfterViewInit {
     isScrolled = signal(false);
     menuOpen = signal(false);
+    entered = signal(false);
 
-    constructor(@Inject(PLATFORM_ID) private platformId: object) { }
+    constructor(@Inject(PLATFORM_ID) private platformId: object) {
+        if (!isPlatformBrowser(this.platformId)) {
+            this.entered.set(true);
+        }
+    }
 
     @HostListener('window:scroll')
     onScroll(): void {
@@ -36,22 +41,23 @@ export class LandingPageComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         if (!isPlatformBrowser(this.platformId)) return;
 
-        // Pequeno delay para garantir que o Angular renderizou os elementos
-        setTimeout(() => {
-            const observer = new IntersectionObserver(
-                (entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('visible');
-                        }
-                    });
-                },
-                { threshold: 0.1, rootMargin: '50px' }
-            );
+        requestAnimationFrame(() => {
+            this.entered.set(true);
+        });
 
-            document.querySelectorAll('.fade-in').forEach(el => {
-                observer.observe(el);
-            });
-        }, 300);
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            },
+            { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+        );
+
+        document.querySelectorAll('.fade-in-scroll').forEach(el => {
+            observer.observe(el);
+        });
     }
 }

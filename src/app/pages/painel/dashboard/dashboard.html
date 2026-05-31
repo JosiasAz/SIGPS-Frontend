@@ -83,7 +83,8 @@
                 @for (patient of recentPatients(); track patient.id) {
                 <div class="patient-row-item">
                     <div class="patient-avatar-wrapper">
-                        <img [src]="patient.foto" [alt]="patient.nome" class="patient-avatar-img">
+                        <img [src]="patient.foto | avatarUrl:patient.nome:80" [avatarFallback]="patient.nome" [avatarSize]="80"
+                            [alt]="patient.nome" class="patient-avatar-img">
                         <span class="status-indicator" [class.online]="patient.status === 'online'"></span>
                     </div>
                     <div class="patient-metadata">

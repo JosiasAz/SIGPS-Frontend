@@ -20,6 +20,8 @@ import { AppRefreshService } from '../../services/app-refresh.service';
 
 import { EspecialistasService } from '../../services/especialistas/especialistas.service';
 import { PrefetchService } from '../../services/prefetch.service';
+import { AvatarUrlPipe } from '../../pipes/avatar-url.pipe';
+import { AvatarFallbackDirective } from '../../directives/avatar-fallback.directive';
 
 import { UserRole } from '../../models/auth.model';
 
@@ -49,7 +51,7 @@ interface SearchResult {
 
   standalone: true,
 
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, AvatarUrlPipe, AvatarFallbackDirective],
 
   templateUrl: './painel.html',
 

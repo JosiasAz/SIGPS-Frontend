@@ -5,7 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
 import { environment } from '../../../env/environment';
-import { resolveMediaUrl } from '../../../utils/media-url';
+import { AvatarUrlPipe } from '../../../pipes/avatar-url.pipe';
+import { AvatarFallbackDirective } from '../../../directives/avatar-fallback.directive';
 import { PerfilService } from '../../../services/perfil/perfil.service';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
@@ -140,7 +141,7 @@ function cnpjValidator(ctrl: AbstractControl): ValidationErrors | null {
 @Component({
   selector: 'app-meu-perfil',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, AvatarUrlPipe, AvatarFallbackDirective],
   templateUrl: './meu-perfil.html',
   styleUrls: ['./meu-perfil.scss']
 })
@@ -176,22 +177,6 @@ export class MeuPerfilComponent implements OnInit {
   get podeGerirClinica() { return this.isEspecialista || this.isGestor; }
   get statusVerif() { return this.perfil()?.statusVerificacao || 'nao_verificado'; }
   get podeReceberAgendamentos() { return this.statusVerif === 'verificado'; }
-
-  fotoPerfil = computed(() => {
-    const p = this.perfil();
-    const url = resolveMediaUrl(p?.foto);
-    if (url) return url;
-    const nome = encodeURIComponent(p?.nome || 'U');
-    return `https://ui-avatars.com/api/?name=${nome}&background=166534&color=fff&size=200`;
-  });
-
-  fotoClinica = computed(() => {
-    const c = this.clinica();
-    const url = resolveMediaUrl(c?.foto);
-    if (url) return url;
-    const nome = encodeURIComponent(c?.nome || 'Clinica');
-    return `https://ui-avatars.com/api/?name=${nome}&background=419640&color=fff&size=256&bold=true`;
-  });
 
   // ── Abas ──────────────────────────────────────────────────────────────────
   abaAtiva = signal<'profissional' | 'clinica' | 'paciente'>('profissional');

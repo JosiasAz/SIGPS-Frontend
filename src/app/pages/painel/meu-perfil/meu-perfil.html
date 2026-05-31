@@ -18,7 +18,8 @@
         <div class="hero-left">
             <div class="hero-avatar hero-avatar--clinica">
                 <label style="cursor: pointer; display: block; position: relative;" title="Clique para alterar a foto da clínica">
-                    <img [src]="fotoClinica()" [alt]="clinica()?.nome || 'Clínica'" [style.opacity]="enviandoFotoClinica() ? '0.5' : '1'">
+                    <img [src]="clinica()?.foto | avatarUrl:clinica()?.nome:256" [avatarFallback]="clinica()?.nome || 'Clínica'" [avatarSize]="256"
+                        [alt]="clinica()?.nome || 'Clínica'" [style.opacity]="enviandoFotoClinica() ? '0.5' : '1'">
                     @if (enviandoFotoClinica()) {
                     <div class="avatar-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 12px;">
                         <span class="btn-spinner" style="border-color: rgba(255,255,255,0.3); border-top-color: white;"></span>
@@ -53,7 +54,8 @@
         <div class="hero-left">
             <div class="hero-avatar">
                 <label style="cursor: pointer; display: block; position: relative;" title="Clique para alterar a foto de perfil">
-                    <img [src]="fotoPerfil()" [alt]="perfil()?.nome" [style.opacity]="enviandoFoto() ? '0.5' : '1'">
+                    <img [src]="perfil()?.foto | avatarUrl:perfil()?.nome:200" [avatarFallback]="perfil()?.nome || 'Usuário'"
+                        [alt]="perfil()?.nome" [style.opacity]="enviandoFoto() ? '0.5' : '1'">
                     @if (enviandoFoto()) {
                     <div class="avatar-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border-radius: 50%;">
                         <span class="btn-spinner" style="border-color: rgba(255,255,255,0.3); border-top-color: white;"></span>
@@ -185,7 +187,7 @@
     }
 
     <!-- ══════════ ABA: PERFIL PROFISSIONAL / ADMIN ═══════════════════════ -->
-    @if ((perfil()?.perfil === 'Admin' || perfil()?.perfil === 'Visualizador' || (perfil()?.perfil === 'Gestor' && abaAtiva() !== 'clinica')) || (abaAtiva() === 'profissional' && isEspecialista)) {
+    @if ((perfil()?.perfil === 'Admin' || perfil()?.perfil === 'Visualizador' || (perfil()?.perfil === 'Gestor' && abaAtiva() !== 'clinica')) || (abaAtiva() === 'profissional' && isEspecialista) || (isPaciente && abaAtiva() === 'profissional')) {
 
     <!-- Se for Admin, Gestor ou Visualizador, exibe dados administrativos do perfil -->
     @if (perfil()?.perfil === 'Admin' || perfil()?.perfil === 'Gestor' || perfil()?.perfil === 'Visualizador') {
@@ -1030,12 +1032,13 @@
     }
     }
 
-    <!-- Paciente na aba clínica ou informações básicas para Paciente -->
-    @if (isPaciente) {
+    <!-- Dica na ficha médica: paciente pode virar profissional -->
+    @if (isPaciente && abaAtiva() === 'paciente') {
     <div class="paciente-upgrade-hint">
-        <div class="paciente-upgrade-icon">🏥</div>
-        <h3>Quer gerenciar uma clínica?</h3>
-        <p>Primeiro complete seu cadastro como profissional de saúde. Após verificado, você poderá criar e gerenciar sua clínica ou consultório.</p>
+        <div class="paciente-upgrade-icon">🩺</div>
+        <h3>Quer atuar como profissional de saúde?</h3>
+        <p>Cadastre seu conselho, especialidade e documentos na aba <strong>Seja um Profissional</strong> para liberar agendamentos e, depois da verificação, gerenciar uma clínica.</p>
+        <button type="button" class="btn-primary" (click)="selecionarAba('profissional')">Ir para cadastro profissional</button>
     </div>
     }
 

@@ -4,11 +4,13 @@ import { Router } from '@angular/router';
 import { AbstractDashboardService } from '../../../services/dashboard/abstract-dashboard.service';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
 import { DashboardService } from '../../../services/dashboard/dashboard.service';
+import { AvatarUrlPipe } from '../../../pipes/avatar-url.pipe';
+import { AvatarFallbackDirective } from '../../../directives/avatar-fallback.directive';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AvatarUrlPipe, AvatarFallbackDirective],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss', '../painel.scss'],
 })

@@ -6,12 +6,13 @@ import { AbstractAuthService } from '../../../services/auth/abstract-auth.servic
 import { AbstractEspecialistasService } from '../../../services/especialistas/abstract-especialistas.service';
 import { EspecialistasService } from '../../../services/especialistas/especialistas.service';
 
-import { MediaUrlPipe } from '../../../pipes/media-url.pipe';
+import { AvatarUrlPipe } from '../../../pipes/avatar-url.pipe';
+import { AvatarFallbackDirective } from '../../../directives/avatar-fallback.directive';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule, RouterLink, MediaUrlPipe],
+  imports: [CommonModule, RouterLink, AvatarUrlPipe, AvatarFallbackDirective],
   templateUrl: './chat.html',
   styleUrls: ['../painel.scss', './chat.scss']
 })
@@ -117,22 +118,6 @@ export class ChatComponent implements AfterViewChecked, OnInit {
   irParaPerfil(conv: Conversation | null) {
     if (!conv || !this.isPaciente()) return;
     this.router.navigate(['/painel/perfil-profissional', conv.userId]);
-  }
-
-  inicialAvatar(nome: string): string {
-    return nome ? nome.charAt(0).toUpperCase() : '?';
-  }
-
-  onFotoErro(event: Event) {
-    const img = event.target as HTMLImageElement;
-    img.style.display = 'none';
-    const parent = img.parentElement;
-    if (parent && !parent.querySelector('span')) {
-      const nome = img.alt || '?';
-      const span = document.createElement('span');
-      span.textContent = this.inicialAvatar(nome);
-      parent.appendChild(span);
-    }
   }
 
   private scrollToBottom(): void {

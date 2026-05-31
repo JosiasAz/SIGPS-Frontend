@@ -37,16 +37,8 @@
                 </div>
                 <div class="profile-header-info">
                     <div class="profile-avatar">
-                        @if (profissional()?.foto) {
-                            <img [src]="profissional()?.foto | mediaUrl" alt="Foto do Médico">
-                        } @else {
-                            <div class="pro-avatar-placeholder">
-                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                            </div>
-                        }
+                        <img [src]="profissional()?.foto | avatarUrl:profissional()?.nome:200"
+                            [avatarFallback]="profissional()?.nome || 'Profissional'" alt="Foto do profissional">
                         <span class="online-dot" [class.offline]="calcularStatusVisao(profissional()?.last_seen, profissional()?.status) === 'Offline'"></span>
                     </div>
                     <div class="profile-titles">
@@ -243,16 +235,8 @@
         <div class="pro-header">
             <div class="pro-welcome">
                 <div class="pro-avatar-lg">
-                    @if (profissional()?.foto) {
-                        <img [src]="profissional()?.foto | mediaUrl" alt="Foto">
-                    } @else {
-                        <div class="pro-avatar-placeholder">
-                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg>
-                        </div>
-                    }
+                    <img [src]="profissional()?.foto | avatarUrl:profissional()?.nome:200"
+                        [avatarFallback]="profissional()?.nome || 'Profissional'" alt="Foto">
                 </div>
                 <div>
                     <h1>{{ profissional()?.nome }}</h1>

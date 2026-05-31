@@ -25,11 +25,7 @@
                 @for (conv of conversations(); track conv.userId) {
                 <button class="conv-item" [class.active]="activeConversation()?.userId === conv.userId" (click)="abrirConversa(conv.userId)">
                     <div class="conv-avatar">
-                        @if (conv.userFoto) {
-                        <img [src]="conv.userFoto | mediaUrl" [alt]="conv.userName" (error)="onFotoErro($event)">
-                        } @else {
-                        <span>{{ inicialAvatar(conv.userName) }}</span>
-                        }
+                        <img [src]="conv.userFoto | avatarUrl:conv.userName:200" [avatarFallback]="conv.userName" [alt]="conv.userName">
                     </div>
                     <div class="conv-info">
                         <div class="conv-name-row">
@@ -69,11 +65,8 @@
                 </button>
                 <button class="header-profile-link" (click)="irParaPerfil(activeConversation())" [disabled]="!isPaciente()">
                     <div class="header-avatar">
-                        @if (activeConversation()?.userFoto) {
-                        <img [src]="activeConversation()?.userFoto | mediaUrl" [alt]="activeConversation()?.userName" (error)="onFotoErro($event)">
-                        } @else {
-                        <span>{{ inicialAvatar(activeConversation()?.userName || '') }}</span>
-                        }
+                        <img [src]="activeConversation()?.userFoto | avatarUrl:activeConversation()?.userName:200"
+                            [avatarFallback]="activeConversation()?.userName || 'Usuário'" [alt]="activeConversation()?.userName">
                     </div>
                     <div class="header-info">
                         <h3>{{ activeConversation()?.userName }}</h3>

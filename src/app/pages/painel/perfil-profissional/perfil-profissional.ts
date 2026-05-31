@@ -6,7 +6,8 @@ import { AbstractEspecialistasService, Profissional } from '../../../services/es
 import { AbstractAgendasService } from '../../../services/agendas/abstract-agendas.service';
 import { AgendasService } from '../../../services/agendas/agendas.service';
 import { Agenda } from '../../../models/agenda.model';
-import { MediaUrlPipe } from '../../../pipes/media-url.pipe';
+import { AvatarUrlPipe } from '../../../pipes/avatar-url.pipe';
+import { AvatarFallbackDirective } from '../../../directives/avatar-fallback.directive';
 import { labelVerificacao, isProfissionalPublico } from '../../../utils/verificacao.util';
 
 interface SlotDisponivel {
@@ -23,7 +24,7 @@ interface DiaDisponivel {
 @Component({
   selector: 'app-perfil-profissional',
   standalone: true,
-  imports: [CommonModule, RouterLink, MediaUrlPipe],
+  imports: [CommonModule, RouterLink, AvatarUrlPipe, AvatarFallbackDirective],
   templateUrl: './perfil-profissional.html',
   styleUrls: ['./perfil-profissional.scss'],
 })

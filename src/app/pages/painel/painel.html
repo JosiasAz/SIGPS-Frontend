@@ -207,7 +207,7 @@
                         <span class="role">{{ userRoleLabel() }}</span>
                     </div>
                     <div class="avatar">
-                        <img [src]="'https://ui-avatars.com/api/?name=' + (currentUser()?.name || 'User') + '&background=419640&color=fff'"
+                        <img [src]="null | avatarUrl:currentUser()?.name:200" [avatarFallback]="currentUser()?.name || 'Usuário'"
                             alt="Avatar" />
                     </div>
                 </div>
@@ -247,7 +247,7 @@
                         <span class="role">Paciente</span>
                     </div>
                     <div class="avatar">
-                        <img [src]="'https://ui-avatars.com/api/?name=' + (currentUser()?.name || 'User') + '&background=419640&color=fff'" alt="Avatar" />
+                        <img [src]="null | avatarUrl:currentUser()?.name:200" [avatarFallback]="currentUser()?.name || 'Usuário'" alt="Avatar" />
                     </div>
                 </div>
                 

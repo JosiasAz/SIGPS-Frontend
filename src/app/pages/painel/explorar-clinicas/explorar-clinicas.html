@@ -46,8 +46,7 @@
     @for (c of clinica(); track c.id) {
     <article class="clinic-card">
       <div class="clinic-cover">
-        <img [src]="(c.foto | mediaUrl) || fotoFallback(c.nome)" [alt]="c.nome" class="clinic-photo"
-          (error)="onFotoErro($event, c.nome)">
+        <img [src]="c.foto | avatarUrl:c.nome:256" [avatarFallback]="c.nome" [avatarSize]="256" [alt]="c.nome" class="clinic-photo">
         <span class="clinic-type">{{ tipoLabel(c.tipo) }}</span>
       </div>
       <div class="clinic-body">

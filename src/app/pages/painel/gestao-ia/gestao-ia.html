@@ -67,6 +67,34 @@
         </div>
     </div>
 
+    @if (semClinica()) {
+    <div class="card" style="padding: 24px; margin-bottom: 24px; border: 1px dashed var(--border-color, #d1d5db);">
+        <h3 style="margin: 0 0 8px;">Selecione uma clínica</h3>
+        <p style="margin: 0; color: var(--text-muted);">
+            No topo do painel, escolha uma clínica específica (não use "Todas as clínicas").
+            A IA só processa a fila quando há pacientes aguardando nessa organização.
+        </p>
+    </div>
+    } @else if (!carregando() && fila().length === 0) {
+    <div class="card" style="padding: 24px; margin-bottom: 24px; border: 1px dashed var(--border-color, #d1d5db);">
+        <h3 style="margin: 0 0 8px;">Fila vazia — ML ainda não foi acionado</h3>
+        <p style="margin: 0; color: var(--text-muted);">
+            O serviço de Machine Learning (porta 8000) só recebe requisições quando um paciente entra na fila
+            (check-in ou consulta agendada). Cadastre comorbidades na ficha médica e faça check-in na fila para testar.
+        </p>
+        @if (analiseIA()?.ml_online === false) {
+        <p style="margin: 12px 0 0; color: #b45309; font-weight: 600;">
+            ⚠ Serviço ML offline — inicie com: <code>python -m uvicorn api:app --reload --port 8000</code> em SIGPS-Machine-Learning
+        </p>
+        }
+    </div>
+    } @else if (analiseIA()?.ml_online === false) {
+    <div class="card" style="padding: 16px 24px; margin-bottom: 24px; background: #fffbeb; border: 1px solid #fcd34d;">
+        <strong>ML offline</strong> — prioridades estão sendo calculadas por regras locais no backend.
+        Suba a API em <code>SIGPS-Machine-Learning</code> na porta 8000.
+    </div>
+    }
+
     <!-- Tabela Principal Estilizada -->
     <div class="card">
         <div class="card-header" style="margin-bottom: 24px;">

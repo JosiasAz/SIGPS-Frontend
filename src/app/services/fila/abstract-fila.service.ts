@@ -8,6 +8,8 @@ export interface AnaliseFilaIA {
     total_na_fila: number;
     em_atendimento: number;
     atualizado_em?: string;
+    ml_online?: boolean;
+    ml_api_url?: string;
 }
 
 export interface PacienteFila {

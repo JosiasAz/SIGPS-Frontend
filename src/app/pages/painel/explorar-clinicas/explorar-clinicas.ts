@@ -5,12 +5,13 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { OrganizationsService } from '../../../services/organizations/organizations.service';
 import { ClinicaExplorar } from '../../../models/clinica.model';
 import { labelVerificacao } from '../../../utils/verificacao.util';
-import { MediaUrlPipe } from '../../../pipes/media-url.pipe';
+import { AvatarUrlPipe } from '../../../pipes/avatar-url.pipe';
+import { AvatarFallbackDirective } from '../../../directives/avatar-fallback.directive';
 
 @Component({
   selector: 'app-explorar-clinicas',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive, MediaUrlPipe],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive, AvatarUrlPipe, AvatarFallbackDirective],
   templateUrl: './explorar-clinicas.html',
   styleUrls: ['./explorar-clinicas.scss'],
 })
@@ -77,14 +78,5 @@ export class ExplorarClinicasComponent implements OnInit, OnDestroy {
       AUTONOMO: 'Autônomo',
     };
     return map[tipo] || tipo;
-  }
-
-  fotoFallback(nome: string): string {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(nome || 'Clinica')}&background=419640&color=fff&size=256&bold=true`;
-  }
-
-  onFotoErro(event: Event, nome: string) {
-    const img = event.target as HTMLImageElement;
-    img.src = this.fotoFallback(nome);
   }
 }

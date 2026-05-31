@@ -4,13 +4,14 @@ import { Router, RouterLink, RouterLinkActive, ActivatedRoute } from '@angular/r
 import { FormsModule } from '@angular/forms';
 import { AbstractEspecialistasService } from '../../../services/especialistas/abstract-especialistas.service';
 import { EspecialistasService } from '../../../services/especialistas/especialistas.service';
-import { MediaUrlPipe } from '../../../pipes/media-url.pipe';
+import { AvatarUrlPipe } from '../../../pipes/avatar-url.pipe';
+import { AvatarFallbackDirective } from '../../../directives/avatar-fallback.directive';
 import { labelVerificacao } from '../../../utils/verificacao.util';
 
 @Component({
   selector: 'app-busca-profissionais',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, MediaUrlPipe],
+  imports: [CommonModule, RouterLink, RouterLinkActive, FormsModule, AvatarUrlPipe, AvatarFallbackDirective],
   templateUrl: './busca-profissionais.html',
   styleUrls: ['./busca-profissionais.scss']
 })

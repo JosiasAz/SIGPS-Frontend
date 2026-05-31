@@ -1,6 +1,7 @@
 import { Component, inject, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractFilaService } from '../../../services/fila/abstract-fila.service';
+import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
 
 @Component({
   selector: 'app-gestao-ia',
@@ -11,9 +12,16 @@ import { AbstractFilaService } from '../../../services/fila/abstract-fila.servic
 })
 export class GestaoIAComponent implements OnInit {
   private filaService = inject(AbstractFilaService);
+  private authService = inject(AbstractAuthService);
 
   fila = this.filaService.fila;
   analiseIA = this.filaService.analiseIA;
+  carregando = this.filaService.carregando;
+
+  semClinica = computed(() => {
+    const org = this.authService.activeOrganizationId();
+    return org === null || org === undefined || org === 0;
+  });
 
   altaPrioridade = computed(() => {
     return this.fila().filter(p => p.prioridade === 'Extrema' || p.prioridade === 'Alta').length;
