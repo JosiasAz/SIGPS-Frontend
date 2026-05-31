@@ -62,3 +62,22 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+---
+
+## Equipe
+
+Projeto desenvolvido como **Trabalho de Conclusão de Curso (TCC)** pela **Faculdade Metropolitana de Manaus**.
+
+| Integrante | Papel |
+|------------|-------|
+| Josias Azevedo da Silva | Product Owner & Desenvolvedor Full-Stack |
+| Kaio Oliveira Pantoja | Scrum Master & Tech Lead |
+| Wagner Eduardo | Documentação |
+| Matheus Akabane Brazão | Desenvolvedor Back-end |
+| Ólliver de Aquino Freitas | Front-end UX/UI |
+| Alan Nicolas Santos Maragua | QA — Quality Assurance |
+
+### Orientação
+
+**Professora orientadora:** Luana Magalhães Leal
