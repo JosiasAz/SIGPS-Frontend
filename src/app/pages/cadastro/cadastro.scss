@@ -385,6 +385,11 @@
             color: var(--green-dark);
             font-weight: 600;
             text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            font: inherit;
 
             &:hover {
                 text-decoration: underline;
@@ -464,6 +469,87 @@
     }
 }
 
+/* Modal de termos — fora do form para position:fixed funcionar */
+.terms-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.terms-modal {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 520px;
+    width: 100%;
+    padding: 28px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    position: relative;
+
+    h3 {
+        margin: 0 0 12px;
+        color: #0f172a;
+    }
+
+    p {
+        color: #475569;
+        line-height: 1.6;
+        font-size: 0.95rem;
+        margin: 0 0 12px;
+    }
+
+    .btn-primary-registration {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 16px;
+        background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(46, 171, 110, .35);
+        transition: transform .2s, box-shadow .2s;
+        margin-top: 20px;
+        width: 100%;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(46, 171, 110, .45);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+}
+
+.terms-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+
+    &:hover {
+        background: #f1f5f9;
+        color: #0f172a;
+    }
+}
+
 /* Custom Checkbox */
 .checkbox-container {
     display: block;
@@ -527,4 +613,25 @@
 @keyframes dropdownFade {
     from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+    .registration-form-area {
+        padding: 16px;
+        
+        .form-card {
+            padding: 24px 20px;
+            border-radius: 20px;
+            
+            .form-header {
+                h2 {
+                    font-size: 1.5rem;
+                }
+            }
+        }
+
+        .input-group .input-wrapper input {
+            font-size: 16px; /* Prevents iOS zoom */
+        }
+    }
 }

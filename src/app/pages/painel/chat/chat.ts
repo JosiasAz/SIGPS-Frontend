@@ -1,14 +1,18 @@
 import { Component, inject, ElementRef, ViewChild, AfterViewChecked, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AbstractChatService, Conversation } from '../../../services/chat/abstract-chat.service';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
 import { AbstractEspecialistasService } from '../../../services/especialistas/abstract-especialistas.service';
+import { EspecialistasService } from '../../../services/especialistas/especialistas.service';
+
+import { AvatarUrlPipe } from '../../../pipes/avatar-url.pipe';
+import { AvatarFallbackDirective } from '../../../directives/avatar-fallback.directive';
 
 @Component({
   selector: 'app-chat',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, AvatarUrlPipe, AvatarFallbackDirective],
   templateUrl: './chat.html',
   styleUrls: ['../painel.scss', './chat.scss']
 })
@@ -17,18 +21,22 @@ export class ChatComponent implements AfterViewChecked, OnInit {
   private authService = inject(AbstractAuthService);
   private especialistasService = inject(AbstractEspecialistasService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   conversations = this.chatService.conversations;
   messages = this.chatService.messages;
   activeConversation = this.chatService.activeConversation;
+  isPaciente = () => this.authService.userRole() === 'paciente';
 
   @ViewChild('chatContainer') private chatContainer!: ElementRef;
   @ViewChild('msgInput') private msgInput!: ElementRef<HTMLInputElement>;
 
   private shouldScroll = false;
+  private shouldFocusInput = false;
 
   ngOnInit() {
     this.chatService.loadConversations();
+    (this.especialistasService as EspecialistasService).loadEspecialistas();
 
     this.route.queryParams.subscribe(params => {
       const withUserId = Number(params['with']);
@@ -43,21 +51,50 @@ export class ChatComponent implements AfterViewChecked, OnInit {
       this.scrollToBottom();
       this.shouldScroll = false;
     }
+    if (this.shouldFocusInput && this.msgInput) {
+      this.msgInput.nativeElement.focus();
+      this.shouldFocusInput = false;
+    }
   }
 
   abrirConversa(userId: number) {
-    // Busca info do parceiro no serviço de especialistas para conversas novas
     const esp = this.especialistasService.getProfissionalById(userId);
-    const partnerInfo = esp
-      ? { userName: esp.nome, userRole: esp.especialidade || 'Especialista', userFoto: esp.foto }
-      : undefined;
+    if (esp) {
+      this.abrirComParceiro(userId, {
+        userName: esp.nome,
+        userRole: esp.especialidade || 'Especialista',
+        userFoto: esp.foto,
+      });
+      return;
+    }
 
+    const realService = this.especialistasService as EspecialistasService;
+    realService.getProfissionalByIdFromApi(userId).subscribe({
+      next: (prof) => {
+        this.abrirComParceiro(userId, {
+          userName: prof.nome,
+          userRole: prof.especialidade || 'Especialista',
+          userFoto: prof.foto,
+        });
+      },
+      error: () => {
+        this.abrirComParceiro(userId, {
+          userName: 'Contato',
+          userRole: 'Usuário',
+        });
+      },
+    });
+  }
+
+  private abrirComParceiro(userId: number, partnerInfo: { userName: string; userRole: string; userFoto?: string }) {
     this.chatService.openConversation(userId, partnerInfo);
     this.shouldScroll = true;
+    this.shouldFocusInput = true;
   }
 
   fecharConversa() {
     this.chatService.closeConversation();
+    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
   }
 
   sendMessage(text: string) {
@@ -78,8 +115,9 @@ export class ChatComponent implements AfterViewChecked, OnInit {
     }
   }
 
-  inicialAvatar(nome: string): string {
-    return nome ? nome.charAt(0).toUpperCase() : '?';
+  irParaPerfil(conv: Conversation | null) {
+    if (!conv || !this.isPaciente()) return;
+    this.router.navigate(['/painel/perfil-profissional', conv.userId]);
   }
 
   private scrollToBottom(): void {

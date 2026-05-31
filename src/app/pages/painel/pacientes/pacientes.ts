@@ -1,155 +1,143 @@
-import { Component, inject, ViewChild, ElementRef, computed } from '@angular/core';
+import { Component, inject, ViewChild, ElementRef, computed, effect, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { AbstractPacientesService, Paciente } from '../../../services/pacientes/abstract-pacientes.service';
 import { AbstractAgendasService } from '../../../services/agendas/abstract-agendas.service';
+import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
+import { PacientesService } from '../../../services/pacientes/pacientes.service';
+import { AgendasService } from '../../../services/agendas/agendas.service';
+import { AppRefreshService } from '../../../services/app-refresh.service';
+
+type PacienteLista = Paciente & { temAgendamento: boolean };
 
 @Component({
   selector: 'app-pacientes',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './pacientes.html',
-  styleUrls: ['../painel.scss'],
+  styleUrls: ['./pacientes.scss', '../painel.scss'],
 })
-export class PacientesComponent {
+export class PacientesComponent implements OnInit, OnDestroy {
   private pacientesService = inject(AbstractPacientesService);
   private agendasService = inject(AbstractAgendasService);
-  private fb = inject(FormBuilder);
+  private authService = inject(AbstractAuthService);
+  private appRefresh = inject(AppRefreshService);
 
-  @ViewChild('addModal') addModal!: ElementRef<HTMLDialogElement>;
   @ViewChild('deleteModal') deleteModal!: ElementRef<HTMLDialogElement>;
 
-  // Lista mesclada: pacientes cadastrados + derivados das consultas da agenda
-  pacientes = computed(() => {
-    const cadastrados = this.pacientesService.pacientes();
-    const consultas = this.agendasService.consultas();
+  filtroNome = signal('');
+  filtroCpf = signal('');
+  private searchTimer?: ReturnType<typeof setTimeout>;
 
-    // Gera pacientes "automáticos" a partir das consultas agendadas
-    const daCAgenda: (Paciente & { origem: string })[] = consultas
-      .filter(c => c.pacienteNome) // Só mostra se tiver nome
-      .map((c, i) => ({
-        id: c.pacienteId || (9000 + i),
-        nome: c.pacienteNome!,
-        cpf: '—',
-        ultimaConsulta: c.data,
-        especialidade: c.especialidade,
-        origem: 'agenda'
-      }));
+  isAdmin = computed(() => this.authService.userRole() === 'admin');
+  organizations = this.authService.organizations;
+  activeOrganizationId = this.authService.activeOrganizationId;
+  mostrarColunaClinica = computed(() => this.isAdmin() && this.activeOrganizationId() === 0);
 
-    // Combina, removendo duplicatas por nome (mock simples)
-    const cadastradosComOrigem = cadastrados.map(p => ({ ...p, origem: 'manual' }));
-    return [...cadastradosComOrigem, ...daCAgenda];
+  clinicaAtivaLabel = computed(() => {
+    const orgId = this.activeOrganizationId();
+    if (orgId === 0) return 'Todas as clínicas';
+    return this.organizations().find(o => o.id === orgId)?.nome ?? 'Clínica selecionada';
   });
 
-  // Manter referência separada para o service CRUD (só pacientes manuais)
-  pacientesManuais = this.pacientesService.pacientes;
+  pacientes = computed(() => this.enriquecerPacientesComAgenda());
 
   deletingPacienteId: number | null = null;
   deletingPacienteNome: string = '';
-  pacienteForm: FormGroup;
-  editingPacienteId: number | null = null;
+  private ultimaOrgCarregada: number | null | undefined = undefined;
 
   constructor() {
-    this.pacienteForm = this.fb.group({
-      nome: ['', [Validators.required, Validators.minLength(2)]],
-      cpf: ['', [Validators.required, Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/)]],
-      especialidade: ['', Validators.required]
-    });
-
-    // Setup formatação automática de CPF
-    this.pacienteForm.get('cpf')?.valueChanges.subscribe(value => {
-      this.onCpfInput(value);
-    });
-  }
-
-  /**
-   * Formata o CPF automaticamente enquanto o usuário digita apenas números
-   * Exemplo: 12345678900 -> 123.456.789-00
-   */
-  private formatCPF(value: string): string {
-    // Remove tudo que não é número
-    const numeros = value.replace(/\D/g, '');
-
-    // Limita a 11 dígitos
-    const limitado = numeros.slice(0, 11);
-
-    // Formata no padrão XXX.XXX.XXX-XX
-    if (limitado.length <= 3) {
-      return limitado;
-    } else if (limitado.length <= 6) {
-      return limitado.replace(/(\d{3})(\d+)/, '$1.$2');
-    } else if (limitado.length <= 9) {
-      return limitado.replace(/(\d{3})(\d{3})(\d+)/, '$1.$2.$3');
-    } else {
-      return limitado.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-    }
-  }
-
-  /**
-   * Manipula o evento de input do CPF
-   */
-  onCpfInput(value: string): void {
-    if (!value) return;
-
-    const formatted = this.formatCPF(value);
-
-    // Apenas atualiza se o valor formatado é diferente
-    if (formatted !== value) {
-      // Usa setValue com emitEvent: false para evitar loop infinito
-      this.pacienteForm.get('cpf')?.setValue(formatted, { emitEvent: false });
-    }
-  }
-
-  abrirModal(): void {
-    this.addModal.nativeElement.showModal();
-  }
-
-  fecharModal(): void {
-    this.addModal.nativeElement.close();
-    this.pacienteForm.reset();
-    this.editingPacienteId = null;
-  }
-
-  salvarPaciente(): void {
-    if (this.pacienteForm.valid) {
-      const formValue = this.pacienteForm.value;
-      
-      if (this.editingPacienteId !== null) {
-        // Atualiza paciente existente
-        const pacienteAtualizado: Partial<Paciente> = {
-          nome: formValue.nome,
-          cpf: formValue.cpf,
-          especialidade: formValue.especialidade
-        };
-        this.pacientesService.atualizarPaciente(this.editingPacienteId, pacienteAtualizado);
-      } else {
-        // Adiciona novo paciente
-        const novoPaciente = {
-          nome: formValue.nome,
-          cpf: formValue.cpf,
-          ultimaConsulta: 'Nunca', // Novo paciente ainda não teve consulta
-          especialidade: formValue.especialidade
-        };
-        this.pacientesService.adicionarPaciente(novoPaciente);
+    effect(() => {
+      const orgId = this.authService.activeOrganizationId();
+      if (orgId === null || orgId === undefined) return;
+      if (this.ultimaOrgCarregada !== undefined && this.ultimaOrgCarregada !== orgId) {
+        (this.pacientesService as PacientesService).invalidateCache();
+        (this.pacientesService as PacientesService).loadPacientes();
+        (this.agendasService as AgendasService).loadAll();
       }
-      
-      this.fecharModal();
-    } else {
-      // Marcar todos os campos como touched para mostrar erros
-      Object.keys(this.pacienteForm.controls).forEach(key => {
-        this.pacienteForm.get(key)?.markAsTouched();
-      });
-    }
+      this.ultimaOrgCarregada = orgId;
+    });
   }
 
-  editarPaciente(paciente: Paciente): void {
-    this.editingPacienteId = paciente.id;
-    this.pacienteForm.patchValue({
-      nome: paciente.nome,
-      cpf: paciente.cpf,
-      especialidade: paciente.especialidade
-    });
-    this.abrirModal();
+  private enriquecerPacientesComAgenda(): PacienteLista[] {
+    const cadastrados = this.pacientesService.pacientes();
+    const consultas = this.agendasService.consultas().filter(c => c.status !== 'cancelada');
+
+    const consultasPorPaciente = new Map<number, typeof consultas>();
+    for (const c of consultas) {
+      if (c.pacienteId == null) continue;
+      const lista = consultasPorPaciente.get(c.pacienteId) ?? [];
+      lista.push(c);
+      consultasPorPaciente.set(c.pacienteId, lista);
+    }
+
+    return cadastrados
+      .map(p => {
+        const doPaciente = consultasPorPaciente.get(p.id) ?? [];
+        const ultima = doPaciente.reduce<string | undefined>((acc, c) => {
+          if (!c.data) return acc;
+          if (!acc) return c.data;
+          return this.parseDataBr(c.data) >= this.parseDataBr(acc) ? c.data : acc;
+        }, undefined);
+        const especialidade = doPaciente.find(c => c.especialidade)?.especialidade ?? p.especialidade;
+
+        return {
+          ...p,
+          ultimaConsulta: ultima ?? p.ultimaConsulta ?? '—',
+          especialidade: especialidade || '—',
+          temAgendamento: doPaciente.length > 0,
+        };
+      })
+      .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+  }
+
+  private parseDataBr(data: string): number {
+    const partes = data.split('/');
+    if (partes.length !== 3) return 0;
+    const [dia, mes, ano] = partes.map(Number);
+    return new Date(ano, mes - 1, dia).getTime();
+  }
+
+  ngOnInit() {
+    (this.pacientesService as PacientesService).loadPacientes();
+    (this.agendasService as AgendasService).loadAll();
+  }
+
+  ngOnDestroy() {
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+  }
+
+  onClinicaChange(orgIdVal: string | number) {
+    const orgId = typeof orgIdVal === 'number' ? orgIdVal : parseInt(orgIdVal, 10);
+    if (isNaN(orgId)) return;
+    this.authService.setActiveOrganization(orgId);
+    this.appRefresh.onOrganizationChanged();
+  }
+
+  onFiltroChange() {
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => {
+      (this.pacientesService as PacientesService).loadPacientes({
+        nome: this.filtroNome(),
+        cpf: this.filtroCpf(),
+      });
+    }, 300);
+  }
+
+  onCpfChange(valor: string) {
+    const digits = valor.replace(/\D/g, '').slice(0, 11);
+    let formatado = digits;
+    if (digits.length > 3) formatado = `${digits.slice(0, 3)}.${digits.slice(3)}`;
+    if (digits.length > 6) formatado = `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+    if (digits.length > 9) formatado = `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+    this.filtroCpf.set(formatado);
+    this.onFiltroChange();
+  }
+
+  limparFiltros() {
+    this.filtroNome.set('');
+    this.filtroCpf.set('');
+    (this.pacientesService as PacientesService).loadPacientes();
   }
 
   excluirPaciente(id: number, nome: string): void {
@@ -169,10 +157,5 @@ export class PacientesComponent {
       this.pacientesService.excluirPaciente(this.deletingPacienteId);
       this.fecharModalExclusao();
     }
-  }
-
-  // Método antigo mantido para compatibilidade, mas agora abre o modal
-  adicionarPaciente(): void {
-    this.abrirModal();
   }
 }

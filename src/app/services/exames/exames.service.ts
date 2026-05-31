@@ -2,6 +2,9 @@ import { Injectable, signal, inject, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AbstractExamesService, Exame } from './abstract-exames.service';
 import { environment } from '../../env/environment';
+import { cacheGet, cacheSet, cacheInvalidate } from '../../utils/api-cache';
+
+const TTL_MS = 3 * 60 * 1000;
 
 @Injectable({
   providedIn: 'root'
@@ -16,20 +19,48 @@ export class ExamesService extends AbstractExamesService {
 
   constructor() {
     super();
-    this.loadExames();
   }
 
-  private loadExames() {
-    // Example endpoint - change to match real API
-    this.http.get<Exame[]>(`${this.apiUrl}/api/v1/exams/`).subscribe({
-      next: (data) => this.exames.set(data),
+  loadExames(force = false) {
+    const key = 'exames:me';
+    const cached = !force ? cacheGet<Exame[]>(key, { session: true }) : null;
+    if (cached) {
+      this.exames.set(cached);
+      return;
+    }
+    this.http.get<any[]>(`${this.apiUrl}/api/v1/exams/me`).subscribe({
+      next: (data) => {
+        const mapped = data.map(e => ({
+          id: e.id,
+          title: e.nome_exame,
+          date: e.data_upload,
+          doctor: 'Anexo Próprio',
+          specialty: 'Triagem / Comprovação',
+          status: 'disponível',
+          type: 'documento',
+          arquivo: e.arquivo
+        } as Exame));
+        cacheSet(key, mapped, TTL_MS, { session: true });
+        this.exames.set(mapped);
+      },
       error: (err) => console.error('Erro ao buscar exames:', err)
     });
   }
 
+  uploadExame(file: File, nome_exame: string) {
+    const formData = new FormData();
+    formData.append('arquivo', file);
+    formData.append('nome_exame', nome_exame);
+
+    return this.http.post<{message: string, caminho: string}>(`${this.apiUrl}/api/v1/exams/upload`, formData);
+  }
+
   excluirExame(id: number): void {
-    this.http.delete(`${this.apiUrl}/api/v1/exams/${id}/`).subscribe({
-      next: () => this.exames.update(prev => prev.filter(e => e.id !== id)),
+    this.http.delete(`${this.apiUrl}/api/v1/exams/${id}`).subscribe({
+      next: () => {
+        cacheInvalidate('exames:');
+        this.exames.update(prev => prev.filter(e => e.id !== id));
+      },
       error: (err) => console.error('Erro ao excluir exame:', err)
     });
   }

@@ -198,10 +198,12 @@
 
                 <div class="form-options">
                     <label class="checkbox-container">
-                        <input type="checkbox" required />
+                        <input type="checkbox" [checked]="aceitouTermos()" (change)="aceitouTermos.set($any($event.target).checked)" />
                         <span class="checkmark"></span>
-                        Eu concordo com os <a href="#" class="terms-link">Termos de Uso</a> e <a href="#"
-                            class="terms-link">Política de Privacidade</a>
+                        Eu concordo com os
+                        <button type="button" class="terms-link" (click)="mostrarTermos.set(true)">Termos de Uso</button>
+                        e
+                        <button type="button" class="terms-link" (click)="mostrarTermos.set(true)">Política de Privacidade</button>
                     </label>
                 </div>
 
@@ -223,5 +225,17 @@
         </div>
 
         <p class="copyright">© 2026 SIGPS - Todos os direitos reservados.</p>
+    </div>
+</div>
+
+<div class="terms-overlay" *ngIf="mostrarTermos()" (click)="mostrarTermos.set(false)">
+    <div class="terms-modal" (click)="$event.stopPropagation()" role="dialog" aria-labelledby="terms-title">
+        <button type="button" class="terms-close" (click)="mostrarTermos.set(false)" aria-label="Fechar">×</button>
+        <h3 id="terms-title">Termos de Uso e Privacidade</h3>
+        <p>Ao utilizar o SIGPS, você concorda em fornecer dados verídicos, manter sua senha em sigilo e usar a plataforma apenas para fins de gestão e acesso à saúde.</p>
+        <p>Seus dados pessoais são tratados conforme a LGPD, com acesso restrito à equipe autorizada da clínica e finalidade de prestação de serviços de saúde.</p>
+        <button type="button" class="btn-primary-registration" (click)="aceitouTermos.set(true); mostrarTermos.set(false)">
+            Li e aceito
+        </button>
     </div>
 </div>

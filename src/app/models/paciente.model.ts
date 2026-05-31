@@ -4,5 +4,6 @@ export interface Paciente {
     cpf: string;
     ultimaConsulta: string;
     especialidade: string;
+    organizacao?: string;
     avatar?: string;
 }

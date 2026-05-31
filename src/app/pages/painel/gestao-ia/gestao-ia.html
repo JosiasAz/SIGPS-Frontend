@@ -28,8 +28,8 @@
             <div class="stat-details">
                 <span class="stat-label">Saturação da Fila</span>
                 <div class="stat-value-group">
-                    <span class="stat-value">{{ fila().length }}</span>
-                    <span class="stat-badge up">Monitorado</span>
+                    <span class="stat-value">{{ analiseIA()?.total_na_fila ?? fila().length }}</span>
+                    <span class="stat-badge up">Do banco</span>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
             <div class="stat-details">
                 <span class="stat-label">Urgências Críticas</span>
                 <div class="stat-value-group">
-                    <span class="stat-value" style="color: #ef4444;">{{ altaPrioridade() }} Case</span>
+                    <span class="stat-value" style="color: #ef4444;">{{ analiseIA()?.pacientes_criticos ?? altaPrioridade() }}</span>
                     <span class="stat-badge down">Imediato</span>
                 </div>
             </div>
@@ -58,7 +58,7 @@
                 </svg>
             </div>
             <div class="stat-details">
-                <span class="stat-label">Precisão do Score</span>
+                <span class="stat-label">Precisão da Prioridade</span>
                 <div class="stat-value-group">
                     <span class="stat-value">99.2%</span>
                     <span class="stat-badge up">IA Ativa</span>
@@ -66,6 +66,34 @@
             </div>
         </div>
     </div>
+
+    @if (semClinica()) {
+    <div class="card" style="padding: 24px; margin-bottom: 24px; border: 1px dashed var(--border-color, #d1d5db);">
+        <h3 style="margin: 0 0 8px;">Selecione uma clínica</h3>
+        <p style="margin: 0; color: var(--text-muted);">
+            No topo do painel, escolha uma clínica específica (não use "Todas as clínicas").
+            A IA só processa a fila quando há pacientes aguardando nessa organização.
+        </p>
+    </div>
+    } @else if (!carregando() && fila().length === 0) {
+    <div class="card" style="padding: 24px; margin-bottom: 24px; border: 1px dashed var(--border-color, #d1d5db);">
+        <h3 style="margin: 0 0 8px;">Fila vazia — ML ainda não foi acionado</h3>
+        <p style="margin: 0; color: var(--text-muted);">
+            O serviço de Machine Learning (porta 8000) só recebe requisições quando um paciente entra na fila
+            (check-in ou consulta agendada). Cadastre comorbidades na ficha médica e faça check-in na fila para testar.
+        </p>
+        @if (analiseIA()?.ml_online === false) {
+        <p style="margin: 12px 0 0; color: #b45309; font-weight: 600;">
+            ⚠ Serviço ML offline — inicie com: <code>python -m uvicorn api:app --reload --port 8000</code> em SIGPS-Machine-Learning
+        </p>
+        }
+    </div>
+    } @else if (analiseIA()?.ml_online === false) {
+    <div class="card" style="padding: 16px 24px; margin-bottom: 24px; background: #fffbeb; border: 1px solid #fcd34d;">
+        <strong>ML offline</strong> — prioridades estão sendo calculadas por regras locais no backend.
+        Suba a API em <code>SIGPS-Machine-Learning</code> na porta 8000.
+    </div>
+    }
 
     <!-- Tabela Principal Estilizada -->
     <div class="card">
@@ -77,10 +105,9 @@
             <table class="dashboard-table">
                 <thead>
                     <tr>
-                        <th width="25%">Paciente / Especialidade</th>
+                        <th width="30%">Paciente / Especialidade</th>
                         <th width="15%">Nível de Urgência</th>
-                        <th width="15%">Score de Risco (%)</th>
-                        <th width="30%">Raciocínio Analítico da IA</th>
+                        <th width="40%">Raciocínio Analítico da IA</th>
                         <th width="15%" class="text-right">Ação</th>
                     </tr>
                 </thead>
@@ -107,22 +134,12 @@
                             </div>
                         </td>
                         <td>
-                            <div class="ia-score-item">
-                                <span [style.color]="p.aiScore > 80 ? '#ef4444' : '#1a7a4e'" style="font-weight: 800; font-size: 1.1rem;">
-                                    {{ p.aiScore }}%
-                                </span>
-                                <div class="progress-mini">
-                                    <div class="progress-fill" [style.width.%]="p.aiScore" [class.danger]="p.aiScore > 80"></div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
                             <p class="ai-reasoning-bubble" [title]="p.aiReasoning">
                                 {{ p.aiReasoning }}
                             </p>
                         </td>
                         <td class="text-right">
-                            <button class="btn-outline-dashboard" (click)="atender(p.paciente)" style="padding: 8px 16px; font-size: 0.85rem;">
+                            <button class="btn-outline-dashboard" (click)="atender(p)" style="padding: 8px 16px; font-size: 0.85rem;">
                                 Atender
                             </button>
                         </td>

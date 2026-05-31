@@ -6,6 +6,7 @@ export interface User {
     email: string;
     role: UserRole;
     is_active?: boolean;
+    organization_ids?: number[];
 }
 
 export interface AuthResponse {

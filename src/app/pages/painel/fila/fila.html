@@ -1,70 +1,150 @@
-<section class="page-container">
-    <div class="content-header" style="display: flex; justify-content: space-between; align-items:flex-end;">
+<section class="page-container fila-page">
+    <div class="content-header fila-header">
         <div>
             <h1>Fila de Espera Inteligente</h1>
-            <p>Monitoramento em tempo real com priorização por IA.</p>
+            <p>Pacientes ordenados automaticamente por machine learning com base no perfil clínico.</p>
         </div>
-        <div class="header-actions" style="display: flex; gap: 12px;">
-            <button class="btn-secondary" style="padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--surface-color); cursor: pointer;" (click)="reordenar()">
-                Reordenar Fila
-            </button>
-            <button class="btn-primary-dashboard" (click)="analisarIA()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                </svg>
-                Análise de Urgência por IA
+        <div class="header-actions">
+            <span class="ia-auto-badge">
+                <span class="ia-pulse"></span>
+                IA automática
+                @if (analiseIA()?.atualizado_em) {
+                · {{ analiseIA()!.atualizado_em }}
+                }
+            </span>
+            <button type="button" class="btn-secondary fila-btn" (click)="reordenar()" [disabled]="carregando()">
+                Atualizar agora
             </button>
         </div>
     </div>
 
-    <div class="card">
+    @if (analiseIA()) {
+    <div class="analise-ia-card" [class]="analiseNivelClass()">
+        <div class="analise-ia-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </svg>
+        </div>
+        <div class="analise-ia-content">
+            <span class="analise-ia-label">Análise da fila</span>
+            <p>{{ analiseIA()!.analise }}</p>
+        </div>
+        <div class="analise-ia-stats">
+            <span><strong>{{ analiseIA()!.total_na_fila }}</strong> aguardando</span>
+            <span><strong>{{ analiseIA()!.em_atendimento }}</strong> em atendimento</span>
+            <span class="critico-count"><strong>{{ analiseIA()!.pacientes_criticos }}</strong> críticos</span>
+        </div>
+    </div>
+    }
+
+    <div class="fila-stats-grid">
+        <div class="fila-stat-card">
+            <span class="fila-stat-label">Aguardando</span>
+            <span class="fila-stat-value">{{ aguardando().length }}</span>
+        </div>
+        <div class="fila-stat-card">
+            <span class="fila-stat-label">Em atendimento</span>
+            <span class="fila-stat-value em-atendimento">{{ emAtendimento().length }}</span>
+        </div>
+        <div class="fila-stat-card">
+            <span class="fila-stat-label">Prioridade alta/extrema</span>
+            <span class="fila-stat-value critico">{{ criticos().length }}</span>
+        </div>
+        <div class="fila-stat-card">
+            <span class="fila-stat-label">Total visível</span>
+            <span class="fila-stat-value">{{ fila().length }}</span>
+        </div>
+    </div>
+
+    <div class="card fila-table-card">
+        @if (carregando() && fila().length === 0) {
+        <div class="fila-empty">
+            <p>Carregando fila...</p>
+        </div>
+        } @else if (fila().length === 0) {
+        <div class="fila-empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            <p>Nenhum paciente na fila no momento.</p>
+            <span>Consultas agendadas entram automaticamente aqui.</span>
+        </div>
+        } @else {
         <div class="table-container">
-            <table class="dashboard-table">
+            <table class="dashboard-table fila-table">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>Prioridade</th>
                         <th>Paciente</th>
-                        <th>Tempo de Espera</th>
+                        <th>Consulta</th>
                         <th>Especialidade</th>
+                        <th>Espera</th>
                         <th>Status</th>
-                        <th style="text-align: right">Ações</th>
+                        <th>Triagem IA</th>
+                        @if (podeAtender()) {
+                        <th class="text-right">Ações</th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
-                    @for (item of fila(); track item.paciente) {
-                    <tr>
+                    @for (item of fila(); track item.id) {
+                    <tr [class.row-em-atendimento]="item.status === 'Em Atendimento'">
+                        <td><span class="posicao-badge">{{ item.posicao }}</span></td>
                         <td>
-                            <span class="status-badge" 
-                                [class.critical]="item.prioridade === 'Alta' || item.prioridade === 'Extrema'"
-                                [class.active]="item.prioridade === 'Normal'"
-                                [class.waiting]="item.prioridade === 'Baixa'">
+                            <span class="prio-badge" [class]="prioridadeClass(item.prioridade)">
                                 {{ item.prioridade }}
+                                @if (item.riskTrend === 'up') { <span class="trend-up">▲</span> }
                             </span>
                         </td>
-                        <td><strong>{{ item.paciente }}</strong></td>
-                        <td>{{ item.tempoEspera }}</td>
-                        <td>{{ item.especialidade }}</td>
                         <td>
-                            <span class="status-badge" [class.waiting]="item.status === 'Aguardando'"
+                            <strong>{{ item.paciente }}</strong>
+                            @if (item.chegada) {
+                            <small class="cell-sub">Chegada {{ item.chegada }}</small>
+                            }
+                        </td>
+                        <td>
+                            @if (item.consultaData && item.consultaHorario) {
+                            <span class="consulta-chip">{{ item.consultaData }} · {{ item.consultaHorario }}</span>
+                            @if (item.especialista) {
+                            <small class="cell-sub">{{ item.especialista }}</small>
+                            }
+                            } @else {
+                            <span class="cell-muted">Check-in sem consulta</span>
+                            }
+                        </td>
+                        <td>{{ item.especialidade }}</td>
+                        <td>{{ item.tempoEspera }}</td>
+                        <td>
+                            <span class="status-badge"
+                                [class.waiting]="item.status === 'Aguardando'"
                                 [class.active]="item.status === 'Em Atendimento'">
                                 {{ item.status }}
                             </span>
                         </td>
-                        <td style="text-align: right">
-                            <button *ngIf="item.status === 'Aguardando'" 
-                                class="btn-secondary" 
-                                style="padding: 6px 12px; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--primary-color); color: var(--primary-color); background: transparent; cursor: pointer; font-weight: 500;"
-                                (click)="atender(item.paciente)">
-                                Atender
-                            </button>
-                            <span *ngIf="item.status === 'Em Atendimento'" style="font-size: 0.85rem; color: #666; font-style: italic;">
-                                Em análise...
-                            </span>
+                        <td>
+                            <p class="ai-reasoning" [title]="item.aiReasoning">{{ item.aiReasoning }}</p>
                         </td>
+                        @if (podeAtender()) {
+                        <td class="text-right fila-actions">
+                            @if (item.status === 'Aguardando') {
+                            <button type="button" class="btn-atender" (click)="atender(item)">Atender</button>
+                            }
+                            @if (item.status === 'Em Atendimento') {
+                            <button type="button" class="btn-finalizar" (click)="finalizar(item)">Finalizar</button>
+                            }
+                        </td>
+                        }
                     </tr>
                     }
                 </tbody>
             </table>
         </div>
+        }
     </div>
 </section>

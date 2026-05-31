@@ -30,6 +30,10 @@ body {
     color: var(--text);
 }
 
+body.modal-open {
+    overflow: hidden;
+}
+
 * {
     padding: 0;
     margin: 0;
@@ -40,11 +44,9 @@ body {
 @keyframes pageEntryFadeUp {
     0% {
         opacity: 0;
-        transform: translateY(12px);
     }
     100% {
         opacity: 1;
-        transform: translateY(0);
     }
 }
 
@@ -52,7 +54,7 @@ body {
 .portal-container,
 .login-container,
 .registration-container {
-    animation: pageEntryFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: pageEntryFadeUp 0.15s ease-out forwards;
 }
 
 /* ── Custom Scrollbar Global (SIGPS Premium) ── */

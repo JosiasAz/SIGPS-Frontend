@@ -2,29 +2,53 @@
     <div class="content-header">
         <div>
             <h1>Gestão de Pacientes</h1>
-            <p>Lista sincronizada automaticamente com as agendas dos especialistas. Pacientes com consulta ativa aparecem aqui em tempo real.</p>
+            <p>Pacientes com conta no portal vinculados à organização. Novos pacientes se cadastram pelo fluxo de registro e login.</p>
         </div>
-        <button class="btn-primary-dashboard" (click)="adicionarPaciente()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <line x1="19" y1="8" x2="19" y2="14"></line>
-                <line x1="16" y1="11" x2="22" y2="11"></line>
-            </svg>
-            Adicionar Paciente
-        </button>
     </div>
 
-    <!-- Banner de sincronização -->
-    <div style="display: flex; align-items: center; gap: 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;">
+    <div class="info-banner-portal">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
-            <polyline points="23 4 23 10 17 10"></polyline>
-            <polyline points="1 20 1 14 7 14"></polyline>
-            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            <path d="M20 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M16 11l2 2 4-4"></path>
         </svg>
-        <span style="font-size: 0.88rem; color: #1d4ed8;">
-            <strong>Sincronização automática.</strong> Pacientes com agendamento aparecem automaticamente. O gestor pode cadastrar manualmente pacientes sem acesso ao portal.
+        <span>
+            <strong>Cadastro via portal.</strong> Todo paciente possui login próprio. Esta lista exibe quem já está vinculado à clínica; consultas agendadas atualizam automaticamente a última visita e a especialidade.
         </span>
+    </div>
+
+    <div class="card mb-4 pacientes-filtros">
+        <div class="filtros-row" [class.com-clinica]="isAdmin()">
+            @if (isAdmin() && organizations().length > 0) {
+            <div class="filtro-field">
+                <label for="filtro-clinica">Clínica</label>
+                <select id="filtro-clinica" class="form-input"
+                    [ngModel]="activeOrganizationId() ?? 0"
+                    (ngModelChange)="onClinicaChange($event)">
+                    <option [ngValue]="0">Todas as clínicas</option>
+                    @for (org of organizations(); track org.id) {
+                    <option [ngValue]="org.id">{{ org.nome }}</option>
+                    }
+                </select>
+            </div>
+            }
+            <div class="filtro-field">
+                <label for="filtro-nome">Buscar por nome</label>
+                <input id="filtro-nome" type="search" class="form-input" autocomplete="off"
+                    [ngModel]="filtroNome()" (ngModelChange)="filtroNome.set($event); onFiltroChange()"
+                    placeholder="Digite o nome do paciente...">
+            </div>
+            <div class="filtro-field">
+                <label for="filtro-cpf">Buscar por CPF</label>
+                <input id="filtro-cpf" type="text" class="form-input" inputmode="numeric" autocomplete="off"
+                    maxlength="14" [ngModel]="filtroCpf()" (ngModelChange)="onCpfChange($event)"
+                    placeholder="000.000.000-00">
+            </div>
+            <button type="button" class="btn-limpar-filtros" (click)="limparFiltros()">Limpar filtros</button>
+        </div>
+        @if (isAdmin()) {
+        <p class="filtro-contexto">Exibindo pacientes de: <strong>{{ clinicaAtivaLabel() }}</strong></p>
+        }
     </div>
 
     <div class="card">
@@ -34,9 +58,12 @@
                     <tr>
                         <th>Nome</th>
                         <th>CPF</th>
+                        @if (mostrarColunaClinica()) {
+                        <th>Clínica</th>
+                        }
                         <th>Última Consulta</th>
                         <th>Especialidade</th>
-                        <th>Origem</th>
+                        <th>Status</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -49,36 +76,41 @@
                                 <span>{{ paciente.nome }}</span>
                             </div>
                         </td>
-                        <td>{{ paciente.cpf }}</td>
+                        <td>{{ paciente.cpf || '—' }}</td>
+                        @if (mostrarColunaClinica()) {
+                        <td>{{ paciente.organizacao || '—' }}</td>
+                        }
                         <td>{{ paciente.ultimaConsulta }}</td>
                         <td>{{ paciente.especialidade }}</td>
                         <td>
-                            @if ($any(paciente).origem === 'agenda') {
-                            <span class="status-badge active" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 0.75rem;">
-                                Agenda Automática
+                            @if (paciente.temAgendamento) {
+                            <span class="status-badge active badge-agendamento">
+                                Com agendamento
                             </span>
                             } @else {
-                            <span class="status-badge" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; font-size: 0.75rem;">
-                                Cadastro Manual
+                            <span class="status-badge badge-portal">
+                                Cadastro no portal
                             </span>
                             }
                         </td>
                         <td>
-                            <!-- @if ($any(paciente).origem !== 'agenda') { -->
-                            <button class="icon-btn-sm" title="Editar" (click)="editarPaciente(paciente)">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                </svg>
-                            </button>
-                            <button class="icon-btn-sm text-danger" title="Excluir" (click)="excluirPaciente(paciente.id, paciente.nome)" style="color: #ef4444; margin-left: 8px;">
+                            <button class="icon-btn-sm text-danger" title="Remover vínculo" (click)="excluirPaciente(paciente.id, paciente.nome)" style="color: #ef4444;">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M3 6h18"></path>
                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                 </svg>
                             </button>
-                            <!-- } @else { -->
-                            <!-- } -->
+                        </td>
+                    </tr>
+                    }
+                    @if (pacientes().length === 0) {
+                    <tr>
+                        <td [attr.colspan]="mostrarColunaClinica() ? 7 : 6" style="text-align: center; padding: 48px 24px; color: var(--text-muted);">
+                            @if (isAdmin() && activeOrganizationId() === 0) {
+                            Nenhum paciente vinculado a clínicas ainda.
+                            } @else {
+                            Nenhum paciente vinculado à organização ainda. Pacientes aparecem aqui após se registrarem no portal e agendarem ou serem associados à clínica.
+                            }
                         </td>
                     </tr>
                     }
@@ -87,96 +119,6 @@
         </div>
     </div>
 
-    <!-- Modal para adicionar paciente -->
-    <dialog #addModal class="native-modal" (click)="fecharModal()">
-        <div class="modal-content" (click)="$event.stopPropagation()">
-            <div class="modal-header">
-                <h2>{{ editingPacienteId !== null ? 'Editar Paciente' : 'Adicionar Novo Paciente' }}</h2>
-                <button class="modal-close" (click)="fecharModal()" title="Fechar">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-
-            <form [formGroup]="pacienteForm" (ngSubmit)="salvarPaciente()" class="modal-body">
-                <div class="form-group">
-                    <label for="nome">Nome Completo *</label>
-                    <input
-                        id="nome"
-                        type="text"
-                        formControlName="nome"
-                        placeholder="Digite o nome completo do paciente"
-                        class="form-input"
-                        [class.error]="pacienteForm.get('nome')?.invalid && pacienteForm.get('nome')?.touched">
-                    @if (pacienteForm.get('nome')?.invalid && pacienteForm.get('nome')?.touched) {
-                        <span class="error-message">
-                            @if (pacienteForm.get('nome')?.errors?.['required']) {
-                                Nome é obrigatório
-                            } @else if (pacienteForm.get('nome')?.errors?.['minlength']) {
-                                Nome deve ter pelo menos 2 caracteres
-                            }
-                        </span>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="cpf">CPF * <span class="label-hint">(apenas números)</span></label>
-                    <input
-                        id="cpf"
-                        type="text"
-                        formControlName="cpf"
-                        placeholder="11999999999"
-                        maxlength="14"
-                        inputmode="numeric"
-                        class="form-input"
-                        [class.error]="pacienteForm.get('cpf')?.invalid && pacienteForm.get('cpf')?.touched">
-                    @if (pacienteForm.get('cpf')?.invalid && pacienteForm.get('cpf')?.touched) {
-                        <span class="error-message">
-                            @if (pacienteForm.get('cpf')?.errors?.['required']) {
-                                CPF é obrigatório
-                            } @else if (pacienteForm.get('cpf')?.errors?.['pattern']) {
-                                Formato de CPF inválido (000.000.000-00)
-                            }
-                        </span>
-                    }
-                    @if (pacienteForm.get('cpf')?.valid && pacienteForm.get('cpf')?.value) {
-                        <span class="success-message">✓ CPF formatado corretamente</span>
-                    }
-                </div>
-
-                <div class="form-group">
-                    <label for="especialidade">Especialidade *</label>
-                    <select
-                        id="especialidade"
-                        formControlName="especialidade"
-                        class="form-input"
-                        [class.error]="pacienteForm.get('especialidade')?.invalid && pacienteForm.get('especialidade')?.touched">
-                        <option value="">Selecione uma especialidade</option>
-                        <option value="Psicologia">Psicologia</option>
-                        <option value="Cardiologia">Cardiologia</option>
-                        <option value="Fisioterapia">Fisioterapia</option>
-                        <option value="Nutrição">Nutrição</option>
-                        <option value="Psiquiatria">Psiquiatria</option>
-                        <option value="Clínica Geral">Clínica Geral</option>
-                        <option value="Dermatologia">Dermatologia</option>
-                        <option value="Oftalmologia">Oftalmologia</option>
-                    </select>
-                    @if (pacienteForm.get('especialidade')?.invalid && pacienteForm.get('especialidade')?.touched) {
-                        <span class="error-message">Especialidade é obrigatória</span>
-                    }
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" (click)="fecharModal()">Cancelar</button>
-                    <button type="submit" class="btn-primary" [disabled]="pacienteForm.invalid">{{ editingPacienteId !== null ? 'Atualizar Paciente' : 'Salvar Paciente' }}</button>
-                </div>
-            </form>
-        </div>
-    </dialog>
-
-    <!-- Modal para exclusão de paciente -->
     <dialog #deleteModal class="native-modal" (click)="fecharModalExclusao()">
         <div class="modal-content" style="max-width: 420px; text-align: center; padding: 32px 24px;" (click)="$event.stopPropagation()">
             <div class="modal-header" style="justify-content: center; border: none; padding: 0 0 24px 0;">
@@ -190,13 +132,13 @@
                 </div>
             </div>
             <div class="modal-body" style="padding: 0;">
-                <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 12px; color: var(--text);">Excluir Paciente?</h2>
+                <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 12px; color: var(--text);">Remover paciente?</h2>
                 <p style="color: #64748b; line-height: 1.6; margin-bottom: 32px; font-size: 0.95rem;">
-                    Esta ação excluirá permanentemente o paciente <strong style="color: #0f172a;">{{ deletingPacienteNome }}</strong> e todo seu histórico. Esta ação não poderá ser desfeita.
+                    Isso remove o cadastro clínico de <strong style="color: #0f172a;">{{ deletingPacienteNome }}</strong> do sistema. A conta de login não é afetada por esta ação.
                 </p>
                 <div class="modal-footer" style="padding: 0; background: transparent; border: none; justify-content: center; gap: 16px;">
                     <button class="btn-secondary" (click)="fecharModalExclusao()" style="flex: 1; padding: 14px 0;">Cancelar</button>
-                    <button class="btn-primary" style="flex: 1; background: #ef4444; border-color: #ef4444; padding: 14px 0; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);" (click)="confirmarExclusao()">Sim, excluir</button>
+                    <button class="btn-primary" style="flex: 1; background: #ef4444; border-color: #ef4444; padding: 14px 0; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);" (click)="confirmarExclusao()">Sim, remover</button>
                 </div>
             </div>
         </div>

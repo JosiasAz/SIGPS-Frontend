@@ -42,4 +42,59 @@ export class ExamesComponent {
       this.examesService.excluirExame(id);
     }
   }
+
+  // --- LOGICA DE UPLOAD ---
+  uploading = signal(false);
+  fileToUpload = signal<File | null>(null);
+  nomeExame = signal<string>('');
+  showUploadModal = signal(false);
+
+  openUploadModal() {
+    this.showUploadModal.set(true);
+  }
+
+  closeUploadModal() {
+    this.showUploadModal.set(false);
+    this.fileToUpload.set(null);
+    this.nomeExame.set('');
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.fileToUpload.set(input.files[0]);
+    }
+  }
+
+  onNomeChange(event: Event) {
+    this.nomeExame.set((event.target as HTMLInputElement).value);
+  }
+
+  enviarExame() {
+    const file = this.fileToUpload();
+    if (!file) return;
+
+    this.uploading.set(true);
+    // Any is used because we don't know the exact service implementation in runtime (mock vs real)
+    const service: any = this.examesService;
+    
+    if (service.uploadExame) {
+      service.uploadExame(file, this.nomeExame() || file.name).subscribe({
+        next: () => {
+          this.uploading.set(false);
+          this.closeUploadModal();
+          // reload if possible
+          if (service.loadExames) service.loadExames();
+          alert('Exame/Comprovante enviado com sucesso!');
+        },
+        error: (err: any) => {
+          this.uploading.set(false);
+          alert('Erro ao enviar exame: ' + (err.error?.message || err.message));
+        }
+      });
+    } else {
+      this.uploading.set(false);
+      alert('Upload não suportado neste ambiente (Mock).');
+    }
+  }
 }

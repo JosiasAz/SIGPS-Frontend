@@ -1,108 +1,217 @@
-import { Routes, Router } from '@angular/router';
-import { inject } from '@angular/core';
+import { Routes } from '@angular/router';
+
 import { LandingPageComponent } from '../pages/landing-page/landing-page.component';
+
 import { Login } from '../pages/login/login';
+
 import { Cadastro } from '../pages/cadastro/cadastro';
+
+import { EsqueciSenhaComponent } from '../pages/esqueci-senha/esqueci-senha';
+
+import { RedefinirSenhaComponent } from '../pages/redefinir-senha/redefinir-senha';
+
 import { Painel } from '../pages/painel/painel';
-import { DashboardComponent } from '../pages/painel/dashboard/dashboard';
-import { PacientesComponent } from '../pages/painel/pacientes/pacientes';
-import { AgendasComponent } from '../pages/painel/agendas/agendas';
-import { EspecialistasComponent } from '../pages/painel/especialistas/especialistas';
-import { FilaComponent } from '../pages/painel/fila/fila';
-import { RelatoriosComponent } from '../pages/painel/relatorios/relatorios';
-import { ConfigComponent } from '../pages/painel/config/config';
+
 import { authGuard } from '../core/guards/auth.guard';
+
 import { roleGuard } from '../core/guards/role.guard';
-import { AbstractAuthService } from '../services/auth/abstract-auth.service';
-import { PortalPacienteComponent } from '../pages/painel/portal-paciente/portal-paciente';
-import { ExamesComponent } from '../pages/painel/exames/exames';
-import { ChatComponent } from '../pages/painel/chat/chat';
-import { PerfilProfissionalComponent } from '../pages/painel/perfil-profissional/perfil-profissional';
-import { BuscaProfissionaisComponent } from '../pages/painel/busca-profissionais/busca-profissionais';
-import { GestaoIAComponent } from '../pages/painel/gestao-ia/gestao-ia';
-import { MeuPerfilComponent } from '../pages/painel/meu-perfil/meu-perfil';
+
+import { EquipeComponent } from '../pages/equipe/equipe';
+
+
 
 export const routes: Routes = [
+
     { path: '', component: LandingPageComponent },
+
     { path: 'login', component: Login },
+
     { path: 'cadastro', component: Cadastro },
+
+    { path: 'esqueci-senha', component: EsqueciSenhaComponent },
+
+    { path: 'redefinir-senha', component: RedefinirSenhaComponent },
+
+    { path: 'equipe', component: EquipeComponent },
+
     {
+
         path: 'painel',
+
         component: Painel,
+
         canActivate: [authGuard],
+
         children: [
+
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+
             {
+
                 path: 'portal-paciente',
-                component: PortalPacienteComponent,
+
+                loadComponent: () => import('../pages/painel/portal-paciente/portal-paciente').then(m => m.PortalPacienteComponent),
+
                 canActivate: [roleGuard(['paciente'])]
+
             },
+
             {
+
                 path: 'exames',
-                component: ExamesComponent,
+
+                loadComponent: () => import('../pages/painel/exames/exames').then(m => m.ExamesComponent),
+
                 canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'especialista', 'visualizador'])]
+
             },
+
             {
+
                 path: 'chat',
-                component: ChatComponent,
+
+                loadComponent: () => import('../pages/painel/chat/chat').then(m => m.ChatComponent),
+
                 canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'especialista', 'visualizador'])]
+
             },
+
             {
+
                 path: 'meu-perfil',
-                component: MeuPerfilComponent,
+
+                loadComponent: () => import('../pages/painel/meu-perfil/meu-perfil').then(m => m.MeuPerfilComponent),
+
                 canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'especialista', 'visualizador'])]
+
             },
+
             {
+
                 path: 'perfil-profissional/:id',
-                component: PerfilProfissionalComponent,
+
+                loadComponent: () => import('../pages/painel/perfil-profissional/perfil-profissional').then(m => m.PerfilProfissionalComponent),
+
                 canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'visualizador', 'especialista'])]
+
             },
+
             {
+
                 path: 'busca-profissionais',
-                component: BuscaProfissionaisComponent,
+
+                loadComponent: () => import('../pages/painel/busca-profissionais/busca-profissionais').then(m => m.BuscaProfissionaisComponent),
+
                 canActivate: [roleGuard(['paciente', 'admin', 'gestor', 'visualizador', 'especialista'])]
+
             },
-            { 
-                path: 'dashboard', 
-                component: DashboardComponent,
-                canActivate: [roleGuard(['admin', 'gestor', 'especialista', 'visualizador'])]
-            },
+
             {
+
+                path: 'explorar-clinicas',
+
+                loadComponent: () => import('../pages/painel/explorar-clinicas/explorar-clinicas').then(m => m.ExplorarClinicasComponent),
+
+                canActivate: [roleGuard(['paciente'])]
+
+            },
+
+            {
+
+                path: 'dashboard',
+
+                loadComponent: () => import('../pages/painel/dashboard/dashboard').then(m => m.DashboardComponent),
+
+                canActivate: [roleGuard(['admin', 'gestor', 'especialista', 'visualizador'])]
+
+            },
+
+            {
+
                 path: 'pacientes',
-                component: PacientesComponent,
+
+                loadComponent: () => import('../pages/painel/pacientes/pacientes').then(m => m.PacientesComponent),
+
                 canActivate: [roleGuard(['admin', 'gestor', 'especialista', 'visualizador'])]
+
             },
+
             {
+
                 path: 'agendas',
-                component: AgendasComponent,
+
+                loadComponent: () => import('../pages/painel/agendas/agendas').then(m => m.AgendasComponent),
+
                 canActivate: [roleGuard(['admin', 'gestor', 'especialista', 'paciente'])]
+
             },
+
             {
+
                 path: 'especialistas',
-                component: EspecialistasComponent,
+
+                loadComponent: () => import('../pages/painel/especialistas/especialistas').then(m => m.EspecialistasComponent),
+
                 canActivate: [roleGuard(['admin', 'gestor'])]
+
             },
+
             {
+
                 path: 'fila',
-                component: FilaComponent,
-                canActivate: [roleGuard(['admin', 'gestor', 'especialista', 'visualizador'])]
+
+                loadComponent: () => import('../pages/painel/fila/fila').then(m => m.FilaComponent),
+
+                canActivate: [roleGuard(['gestor', 'especialista', 'visualizador'])]
+
             },
+
             {
+
                 path: 'gestao-ia',
-                component: GestaoIAComponent,
-                canActivate: [roleGuard(['admin', 'gestor', 'especialista'])]
+
+                loadComponent: () => import('../pages/painel/gestao-ia/gestao-ia').then(m => m.GestaoIAComponent),
+
+                canActivate: [roleGuard(['gestor', 'especialista'])]
+
             },
+
             {
+
                 path: 'relatorios',
-                component: RelatoriosComponent,
+
+                loadComponent: () => import('../pages/painel/relatorios/relatorios').then(m => m.RelatoriosComponent),
+
                 canActivate: [roleGuard(['admin', 'gestor'])]
+
             },
+
             {
+
                 path: 'config',
-                component: ConfigComponent,
+
+                loadComponent: () => import('../pages/painel/config/config').then(m => m.ConfigComponent),
+
                 canActivate: [roleGuard(['admin'])]
+
             },
+
+            {
+
+                path: 'documentacao',
+
+                loadComponent: () => import('../pages/painel/documentacao/documentacao').then(m => m.DocumentacaoComponent),
+
+                canActivate: [roleGuard(['admin', 'gestor', 'especialista', 'visualizador', 'paciente'])]
+
+            },
+
         ]
+
     },
+
     { path: '**', redirectTo: '' },
+
 ];
+
+

@@ -71,6 +71,9 @@
                 <div class="error-feedback" *ngIf="errorMessage()">
                     {{ errorMessage() }}
                 </div>
+                <div class="success-feedback" *ngIf="successMessage()" style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:14px 16px;border-radius:10px;margin-bottom:16px;">
+                    {{ successMessage() }}
+                </div>
 
                 <div class="input-group">
                     <label for="email">E-mail ou Usuário</label>
@@ -112,11 +115,11 @@
 
                 <div class="form-options">
                     <label class="checkbox-container">
-                        <input type="checkbox" />
+                        <input type="checkbox" [checked]="rememberMe()" (change)="rememberMe.set($any($event.target).checked)" />
                         <span class="checkmark"></span>
                         Lembrar de mim
                     </label>
-                    <a href="#" class="forgot-link">Esqueci minha senha</a>
+                    <a routerLink="/esqueci-senha" class="forgot-link">Esqueci minha senha</a>
                 </div>
 
                 <button type="submit" class="btn-primary-login" [disabled]="isLoading()">

@@ -3,6 +3,9 @@ export const API_ENDPOINTS = {
     LOGIN: '/api/v1/auth/login',
     REGISTER: '/api/v1/auth/register',
     ME: '/api/v1/auth/me',
+    FORGOT_PASSWORD: '/api/v1/auth/forgot-password',
+    RESET_PASSWORD: '/api/v1/auth/reset-password',
+    RESET_PASSWORD_VALIDATE: '/api/v1/auth/reset-password/validate',
   },
   PACIENTES: {
     BASE: '/api/v1/patients',
@@ -36,7 +39,10 @@ export const API_ENDPOINTS = {
     UPLOAD: '/api/v1/exams/upload',
   },
   RELATORIOS: {
-    KPIS: '/api/v1/relatorios/kpis',
+    RESUMO: '/api/v1/relatorios/resumo',
+  },
+  ORGANIZATIONS: {
+    EXPLORAR: '/api/v1/organizations/explorar',
   },
   CONFIG: '/api/v1/config',
 };

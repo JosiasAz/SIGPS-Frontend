@@ -7,6 +7,10 @@
     max-width: 1200px;
     margin: 0 auto;
     animation: fadeInPage 0.4s ease;
+
+    @media (max-width: 1024px) {
+        padding-bottom: 96px;
+    }
 }
 
 @keyframes fadeInPage {
@@ -343,9 +347,9 @@
     width: 100%;
     padding: 13px;
     margin-bottom: 12px;
-    background: white;
-    color: var(--green-dark);
-    border: 1.5px solid var(--green);
+    background: var(--green);
+    color: white;
+    border: none;
     border-radius: 12px;
     font-size: 0.95rem;
     font-weight: 600;
@@ -353,9 +357,58 @@
     transition: all 0.2s;
 
     &:hover {
-        background: var(--green-soft);
+        opacity: 0.92;
         transform: translateY(-1px);
     }
+}
+
+.schedule-disabled {
+    opacity: 0.92;
+}
+
+.perfil-verif-banner {
+    margin-bottom: 20px;
+    border-radius: 14px;
+}
+
+.status-banner.warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #fefce8;
+    border: 1px solid #fde68a;
+    color: #713f12;
+
+    p { margin: 4px 0 0; font-size: 0.88rem; opacity: 0.9; }
+}
+
+.sticky-message-bar {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.96);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08);
+
+    @media (max-width: 1024px) {
+        display: block;
+    }
+
+    .btn-message-sticky {
+        margin-bottom: 0;
+    }
+}
+
+.badge-verif {
+    &.verificado { background: #dcfce7; color: #166534; }
+    &.nao_verificado { background: #f3f4f6; color: #374151; }
+    &.em_analise { background: #eff6ff; color: #1d4ed8; }
+    &.rejeitado { background: #fef2f2; color: #b91c1c; }
 }
 
 /* ── Schedule Card (Sidebar) ── */
@@ -385,8 +438,44 @@
     .schedule-subtitle {
         font-size: 0.88rem;
         color: var(--text-muted);
-        margin: 0 0 24px 0;
+        margin: 0 0 8px 0;
         line-height: 1.4;
+    }
+
+    .schedule-meta {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--green-dark);
+        margin: 0 0 8px 0;
+    }
+
+    .schedule-legend {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .legend-livre .legend-dot {
+            background: var(--green);
+        }
+
+        .legend-ocupado .legend-dot {
+            background: #bdbdbd;
+        }
     }
 }
 
@@ -394,6 +483,9 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 4px;
 
     .day-group {
         .day-header {
@@ -424,14 +516,32 @@
                 background: transparent;
                 border: 1.5px solid var(--border);
                 color: var(--text);
-                padding: 10px 0;
+                padding: 8px 4px;
                 border-radius: 10px;
                 font-weight: 600;
                 font-size: 0.88rem;
                 cursor: pointer;
                 transition: all 0.2s;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 2px;
+                min-height: 52px;
+                justify-content: center;
 
-                &:hover {
+                .slot-time {
+                    line-height: 1.2;
+                }
+
+                .slot-status {
+                    font-size: 0.65rem;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 0.02em;
+                    color: #9e9e9e;
+                }
+
+                &:hover:not(:disabled) {
                     background: var(--green-soft, #e8f5e9);
                     border-color: var(--green);
                     color: var(--green-dark);
@@ -443,9 +553,40 @@
                     color: white;
                     transform: scale(1.05);
                     box-shadow: 0 4px 16px rgba(65, 150, 64, 0.25);
+
+                    .slot-status {
+                        color: rgba(255, 255, 255, 0.85);
+                    }
+                }
+
+                &.ocupado,
+                &:disabled {
+                    background: #f5f5f5;
+                    border-color: #e0e0e0;
+                    color: #9e9e9e;
+                    cursor: not-allowed;
+                    opacity: 0.85;
                 }
             }
         }
+    }
+}
+
+.btn-load-more-days {
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: white;
+    border: 1.5px dashed var(--green);
+    border-radius: 12px;
+    color: var(--green-dark);
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: var(--green-soft);
     }
 }
 
@@ -587,7 +728,47 @@
     }
 }
 
-/* ── KPI Stats ── */
+.pro-info-essencial {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 20px 24px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.pro-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &.pro-info-full {
+        grid-column: 1 / -1;
+    }
+}
+
+.pro-info-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+.pro-info-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+}
+
+.pro-card-full {
+    margin-bottom: 28px;
+}
+
+/* ── KPI Stats (legado) ── */
 .pro-stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -744,5 +925,21 @@
             &.confirmado { background: #f0fdf4; color: #16a34a; }
             &.aguardando { background: #fffbeb; color: #d97706; }
         }
+    }
+}
+
+.pro-avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        color: #94a3b8;
+        display: block;
     }
 }

@@ -25,6 +25,9 @@ export class Cadastro {
     confirmPassword: ''
   };
 
+  aceitouTermos = signal(false);
+  mostrarTermos = signal(false);
+
   showPassword = signal(false);
   showConfirmPassword = signal(false);
   showDatePicker = signal(false);
@@ -181,11 +184,16 @@ export class Cadastro {
       return;
     }
 
+    if (!this.aceitouTermos()) {
+      this.errorMessage.set('Você precisa aceitar os Termos de Uso e a Política de Privacidade.');
+      return;
+    }
+
     const [dia, mes, ano] = this.userData.dataNascimento.split('/');
     const dataNascimentoISO = `${ano}-${mes}-${dia}`;
 
     const { confirmPassword, dataNascimento, ...rest } = this.userData;
-    const payload = { ...rest, data_nascimento: dataNascimentoISO };
+    const payload = { ...rest, data_nascimento: dataNascimentoISO, aceitou_termos: true };
 
     this.isLoading.set(true);
 
@@ -194,7 +202,7 @@ export class Cadastro {
         this.router.navigate(['/login'], { queryParams: { registered: 'true' } });
       },
       error: (err) => {
-        this.errorMessage.set('Erro ao criar conta. Tente novamente.');
+        this.errorMessage.set(err.error?.message || 'Erro ao criar conta. Tente novamente.');
         this.isLoading.set(false);
       }
     });

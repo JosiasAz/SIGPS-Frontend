@@ -1,0 +1,336 @@
+<div class="doc-page">
+  <!-- Sidebar de navegação do documento -->
+  <aside class="doc-sidebar">
+    <h3 class="doc-sidebar-title">📖 Documentação</h3>
+    <nav class="doc-nav">
+      @for (section of sections; track section.id) {
+        <button
+          [class.active]="activeSection === section.id"
+          (click)="setActiveSection(section.id)">
+          <span class="nav-icon">{{ section.icon }}</span>
+          {{ section.label }}
+        </button>
+      }
+    </nav>
+  </aside>
+
+  <!-- Conteúdo -->
+  <main class="doc-content">
+
+    <!-- VISÃO GERAL -->
+    <section *ngIf="activeSection === 'visao-geral'" class="doc-section">
+      <h1>Visão Geral do Projeto</h1>
+      <div class="doc-card highlight">
+        <h2>SIGPS — Sistema Inteligente de Gestão e Priorização em Saúde</h2>
+        <p>O SIGPS é uma plataforma web desenvolvida como Trabalho de Conclusão de Curso (TCC), com o objetivo de transformar a gestão de filas e agendamentos em clínicas de saúde através de inteligência artificial.</p>
+      </div>
+
+      <div class="doc-grid">
+        <div class="doc-card">
+          <h3>🎯 Objetivo</h3>
+          <p>Desenvolver um sistema que utilize machine learning para priorizar automaticamente pacientes em filas de espera, considerando critérios clínicos como urgência, histórico e gravidade.</p>
+        </div>
+        <div class="doc-card">
+          <h3>📌 Escopo</h3>
+          <ul>
+            <li>Autenticação com perfis de acesso (Admin, Gestor, Especialista, Paciente)</li>
+            <li>Gestão de pacientes e prontuários</li>
+            <li>Sistema de agendamento online</li>
+            <li>Fila de espera com priorização por IA</li>
+            <li>Dashboard analítico com KPIs</li>
+            <li>Chat em tempo real entre profissionais</li>
+          </ul>
+        </div>
+        <div class="doc-card">
+          <h3>🏥 Problema</h3>
+          <p>Clínicas de saúde enfrentam filas desorganizadas, agendamentos manuais e falta de critérios objetivos para priorização de atendimentos, resultando em tempo de espera excessivo e ineficiência operacional.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARQUITETURA -->
+    <section *ngIf="activeSection === 'arquitetura'" class="doc-section">
+      <h1>Arquitetura do Sistema</h1>
+      <div class="doc-card highlight">
+        <h2>Arquitetura em Camadas (MVC + API REST)</h2>
+        <p>O sistema segue uma arquitetura desacoplada com frontend SPA (Single Page Application) e backend RESTful, comunicando-se via JSON sobre HTTPS.</p>
+      </div>
+
+      <div class="arch-diagram">
+        <div class="arch-layer">
+          <div class="arch-label">Frontend (Angular 19)</div>
+          <div class="arch-boxes">
+            <span>Componentes</span><span>Serviços</span><span>Guards</span><span>Interceptors</span>
+          </div>
+        </div>
+        <div class="arch-arrow">↕ HTTP / REST (Porta 5000)</div>
+        <div class="arch-layer">
+          <div class="arch-label">Backend (Python / Flask)</div>
+          <div class="arch-boxes">
+            <span>Rotas</span><span>Controllers</span><span>Models</span><span>Auth JWT</span>
+          </div>
+        </div>
+        <div class="arch-arrow">↕ HTTP POST /predict (Porta 8000)</div>
+        <div class="arch-layer">
+          <div class="arch-label">Machine Learning API (FastAPI)</div>
+          <div class="arch-boxes">
+            <span>Features</span><span>RandomForest</span><span>Uvicorn</span>
+          </div>
+        </div>
+        <div class="arch-arrow">↕ SQLAlchemy ORM</div>
+        <div class="arch-layer">
+          <div class="arch-label">Banco de Dados (PostgreSQL)</div>
+          <div class="arch-boxes">
+            <span>Tabelas</span><span>Índices</span><span>Migrations</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TECNOLOGIAS -->
+    <section *ngIf="activeSection === 'tecnologias'" class="doc-section">
+      <h1>Stack Tecnológica</h1>
+
+      <div class="doc-grid three">
+        <div class="doc-card">
+          <h3>🅰️ Angular 19</h3>
+          <span class="badge">Frontend</span>
+          <p>Framework SPA com componentes standalone, signals para reatividade, SSR para SEO e lazy loading para performance.</p>
+        </div>
+        <div class="doc-card">
+          <h3>🐍 Python + Flask</h3>
+          <span class="badge">Backend</span>
+          <p>Micro-framework leve para API RESTful, com SQLAlchemy como ORM e Flask-JWT-Extended para autenticação segura.</p>
+        </div>
+        <div class="doc-card">
+          <h3>🐘 PostgreSQL</h3>
+          <span class="badge">Banco de Dados</span>
+          <p>Banco relacional robusto para armazenamento de dados clínicos, com suporte a transações ACID e consultas complexas.</p>
+        </div>
+        <div class="doc-card">
+          <h3>🤖 Scikit-learn</h3>
+          <span class="badge">Machine Learning</span>
+          <p>Biblioteca Python para implementação do modelo de classificação de prioridade baseado em Random Forest.</p>
+        </div>
+        <div class="doc-card">
+          <h3>🐳 Docker</h3>
+          <span class="badge">DevOps</span>
+          <p>Containerização do ambiente de desenvolvimento e produção, garantindo portabilidade e consistência.</p>
+        </div>
+        <div class="doc-card">
+          <h3>🔐 JWT + RBAC</h3>
+          <span class="badge">Segurança</span>
+          <p>JSON Web Tokens com Role-Based Access Control para autenticação e autorização granular por perfil.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CASOS DE USO -->
+    <section *ngIf="activeSection === 'casos-uso'" class="doc-section">
+      <h1>Casos de Uso Principais</h1>
+
+      <div class="use-case-list">
+        <div class="use-case">
+          <div class="uc-header">
+            <span class="uc-id">UC-01</span>
+            <h3>Autenticação de Usuário</h3>
+          </div>
+          <p><strong>Ator:</strong> Todos os perfis</p>
+          <p><strong>Descrição:</strong> O usuário informa e-mail e senha para acessar o sistema. O backend valida as credenciais e retorna um token JWT com as permissões do perfil.</p>
+        </div>
+        <div class="use-case">
+          <div class="uc-header">
+            <span class="uc-id">UC-02</span>
+            <h3>Cadastro de Paciente</h3>
+          </div>
+          <p><strong>Ator:</strong> Admin, Gestor, Recepção</p>
+          <p><strong>Descrição:</strong> Cadastro de novo paciente com dados pessoais, contato, histórico clínico e especialidades necessárias.</p>
+        </div>
+        <div class="use-case">
+          <div class="uc-header">
+            <span class="uc-id">UC-03</span>
+            <h3>Priorização Automática da Fila</h3>
+          </div>
+          <p><strong>Ator:</strong> Sistema (IA)</p>
+          <p><strong>Descrição:</strong> O módulo de ML analisa os dados do paciente (urgência, tempo de espera, histórico) e reordena a fila de atendimento automaticamente.</p>
+        </div>
+        <div class="use-case">
+          <div class="uc-header">
+            <span class="uc-id">UC-04</span>
+            <h3>Agendamento de Consulta</h3>
+          </div>
+          <p><strong>Ator:</strong> Paciente, Gestor</p>
+          <p><strong>Descrição:</strong> O paciente seleciona a especialidade, profissional e horário disponível. O sistema confirma automaticamente e envia notificação.</p>
+        </div>
+        <div class="use-case">
+          <div class="uc-header">
+            <span class="uc-id">UC-05</span>
+            <h3>Visualização de Dashboard</h3>
+          </div>
+          <p><strong>Ator:</strong> Admin, Gestor</p>
+          <p><strong>Descrição:</strong> Painel com KPIs em tempo real: pacientes atendidos, tempo médio de espera, taxa de priorização e métricas por especialidade.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- BANCO DE DADOS -->
+    <section *ngIf="activeSection === 'banco-dados'" class="doc-section">
+      <h1>Modelagem do Banco de Dados</h1>
+      <div class="doc-card highlight">
+        <h2>Entidades Principais</h2>
+        <p>O banco de dados relacional segue a terceira forma normal (3NF) e utiliza PostgreSQL com migrações gerenciadas pelo Alembic.</p>
+      </div>
+
+      <div class="table-schema">
+        <div class="schema-card">
+          <h3>👤 users</h3>
+          <table>
+            <thead><tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td>id</td><td>UUID</td><td>Chave primária</td></tr>
+              <tr><td>name</td><td>VARCHAR</td><td>Nome completo</td></tr>
+              <tr><td>email</td><td>VARCHAR</td><td>E-mail único</td></tr>
+              <tr><td>role</td><td>ENUM</td><td>admin, gestor, especialista, paciente</td></tr>
+              <tr><td>created_at</td><td>TIMESTAMP</td><td>Data de criação</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="schema-card">
+          <h3>📅 appointments</h3>
+          <table>
+            <thead><tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td>id</td><td>UUID</td><td>Chave primária</td></tr>
+              <tr><td>patient_id</td><td>FK → users</td><td>Paciente</td></tr>
+              <tr><td>specialist_id</td><td>FK → users</td><td>Profissional</td></tr>
+              <tr><td>date_time</td><td>TIMESTAMP</td><td>Data/hora do agendamento</td></tr>
+              <tr><td>status</td><td>ENUM</td><td>agendado, confirmado, cancelado</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="schema-card">
+          <h3>📊 queue_entries</h3>
+          <table>
+            <thead><tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr></thead>
+            <tbody>
+              <tr><td>id</td><td>UUID</td><td>Chave primária</td></tr>
+              <tr><td>patient_id</td><td>FK → users</td><td>Paciente na fila</td></tr>
+              <tr><td>prioridade_ia</td><td>INTEGER</td><td>Nível de prioridade gerado pela IA (1, 2 ou 3)</td></tr>
+              <tr><td>ai_reasoning</td><td>TEXT</td><td>Justificativa (explainability) do modelo</td></tr>
+              <tr><td>specialty</td><td>VARCHAR</td><td>Especialidade solicitada</td></tr>
+              <tr><td>status</td><td>ENUM</td><td>esperando, atendendo, finalizado</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- MÓDULO DE IA -->
+    <section *ngIf="activeSection === 'ia'" class="doc-section">
+      <h1>Módulo de Inteligência Artificial</h1>
+      <div class="doc-card highlight">
+        <h2>Priorização com Random Forest</h2>
+        <p>O sistema utiliza um modelo de classificação baseado em Random Forest para calcular o nível de prioridade de cada paciente na fila de espera.</p>
+      </div>
+
+      <div class="doc-grid">
+        <div class="doc-card">
+          <h3>📥 Variáveis de Entrada (Features)</h3>
+          <ul>
+            <li>Idade do paciente (verificação de idoso >= 65 anos)</li>
+            <li>Texto livre de Comorbidades (extração via NLP simples)</li>
+            <li>Texto livre de Alergias</li>
+            <li>Nível de dor reportado e urgência local</li>
+          </ul>
+        </div>
+        <div class="doc-card">
+          <h3>📤 Saída do Modelo</h3>
+          <ul>
+            <li><strong>prioridade_ia:</strong> valor categórico: 1 (Normal), 2 (Alta), 3 (Extrema)</li>
+            <li>A classificação é devolvida de forma síncrona pelo microserviço FastAPI rodando na porta 8000.</li>
+            <li>Pacientes priorizados pulam automaticamente na Fila de Atendimento do painel.</li>
+          </ul>
+        </div>
+        <div class="doc-card">
+          <h3>📂 Integração Paciente-IA</h3>
+          <ul>
+            <li>O paciente preenche sua **Ficha Médica** relatando alergias e doenças crônicas no portal online.</li>
+            <li>O paciente envia **Laudos/Comprovantes** (PDF/JPG) para auditoria médica.</li>
+            <li>A IA avalia em tempo real esses dados na hora do Check-in do agendamento.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENDPOINTS DA API -->
+    <section *ngIf="activeSection === 'api'" class="doc-section">
+      <h1>Endpoints da API REST</h1>
+      <div class="doc-card highlight">
+        <h2>Base URL</h2>
+        <code class="code-block">https://api.sigps.app/api/v1</code>
+      </div>
+
+      <div class="api-group">
+        <h3>🔐 Autenticação</h3>
+        <div class="api-endpoint">
+          <span class="method post">POST</span>
+          <code>/auth/login</code>
+          <span class="api-desc">— Login com e-mail e senha</span>
+        </div>
+        <div class="api-endpoint">
+          <span class="method post">POST</span>
+          <code>/auth/register</code>
+          <span class="api-desc">— Cadastro de novo usuário</span>
+        </div>
+      </div>
+
+      <div class="api-group">
+        <h3>👤 Pacientes</h3>
+        <div class="api-endpoint">
+          <span class="method get">GET</span>
+          <code>/patients</code>
+          <span class="api-desc">— Listar pacientes</span>
+        </div>
+        <div class="api-endpoint">
+          <span class="method post">POST</span>
+          <code>/patients</code>
+          <span class="api-desc">— Cadastrar paciente</span>
+        </div>
+        <div class="api-endpoint">
+          <span class="method get">GET</span>
+          <code>/patients/:id</code>
+          <span class="api-desc">— Detalhes do paciente</span>
+        </div>
+      </div>
+
+      <div class="api-group">
+        <h3>📅 Agendamentos</h3>
+        <div class="api-endpoint">
+          <span class="method get">GET</span>
+          <code>/appointments</code>
+          <span class="api-desc">— Listar agendamentos</span>
+        </div>
+        <div class="api-endpoint">
+          <span class="method post">POST</span>
+          <code>/appointments</code>
+          <span class="api-desc">— Criar agendamento</span>
+        </div>
+      </div>
+
+      <div class="api-group">
+        <h3>🤖 Fila + IA</h3>
+        <div class="api-endpoint">
+          <span class="method get">GET</span>
+          <code>/queue</code>
+          <span class="api-desc">— Fila atual (já priorizada pela IA)</span>
+        </div>
+        <div class="api-endpoint">
+          <span class="method post">POST</span>
+          <code>/queue/prioritize</code>
+          <span class="api-desc">— Forçar recalcular prioridades</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>

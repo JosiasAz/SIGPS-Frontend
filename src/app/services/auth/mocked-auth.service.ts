@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { of, throwError, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AuthResponse, User, UserRole } from '../../models/auth.model';
 import { AbstractAuthService } from './abstract-auth.service';
@@ -25,6 +25,25 @@ export class MockedAuthService extends AbstractAuthService {
     isAuthenticated = computed(() => !!this.tokenState());
     currentUser = computed(() => this.userState());
     userRole = computed(() => this.userState()?.role || null);
+
+    organizationIds = computed(() => this.userState()?.organization_ids || []);
+    activeOrganizationId = signal<number | null>(null);
+    organizations = signal<any[]>([
+        { id: 1, nome: "Clínica Saúde & Vida", tipo: "CLINICA" },
+        { id: 2, nome: "Consultório Dr. Silva", tipo: "CONSULTORIO" }
+    ]);
+
+    constructor() {
+        super();
+        const initialUser = this.userState();
+        if (initialUser && initialUser.organization_ids && initialUser.organization_ids.length > 0) {
+            this.activeOrganizationId.set(initialUser.organization_ids[0]);
+        }
+    }
+
+    loadOrganizations() {
+        return of(this.organizations());
+    }
 
     login(credentials: any) {
         // Tenta encontrar o usuário na base persistente
@@ -63,7 +82,8 @@ export class MockedAuthService extends AbstractAuthService {
             id: simUser.id,
             name: simUser.nome || 'Paciente Alan',
             email: simUser.email,
-            role: simUser.role as UserRole
+            role: simUser.role as UserRole,
+            organization_ids: [1, 2]
         };
 
         return of(mockResponse).pipe(
@@ -79,7 +99,8 @@ export class MockedAuthService extends AbstractAuthService {
             id: 2,
             name: userData.nome,
             email: userData.email,
-            role: 'paciente'
+            role: 'paciente',
+            organization_ids: [1]
         };
 
         return of(mockUser);
@@ -88,6 +109,7 @@ export class MockedAuthService extends AbstractAuthService {
     logout() {
         this.tokenState.set(null);
         this.userState.set(null);
+        this.activeOrganizationId.set(null);
         if (typeof localStorage !== 'undefined') {
             localStorage.removeItem(this.AUTH_KEY);
             localStorage.removeItem(this.USER_KEY);
@@ -108,6 +130,22 @@ export class MockedAuthService extends AbstractAuthService {
         }
     }
 
+    refreshUserProfile(): Observable<User> {
+        const current = this.userState();
+        return current ? of(current) : of({ id: 0, name: '', email: '', role: 'paciente' });
+    }
+
+    updateDisplayName(name: string): void {
+        const current = this.userState();
+        if (current && name) {
+            this.setUser({ ...current, name });
+        }
+    }
+
+    setActiveOrganization(orgId: number): void {
+        this.activeOrganizationId.set(orgId);
+    }
+
     private setAuth(token: string) {
         this.tokenState.set(token);
         if (typeof localStorage !== 'undefined') localStorage.setItem(this.AUTH_KEY, token);
@@ -115,6 +153,11 @@ export class MockedAuthService extends AbstractAuthService {
 
     private setUser(user: User) {
         this.userState.set(user);
+        if (user && user.organization_ids && user.organization_ids.length > 0) {
+            this.activeOrganizationId.set(user.organization_ids[0]);
+        } else {
+            this.activeOrganizationId.set(null);
+        }
         if (typeof localStorage !== 'undefined') localStorage.setItem(this.USER_KEY, JSON.stringify(user));
     }
 

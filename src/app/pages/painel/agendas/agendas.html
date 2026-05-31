@@ -1,20 +1,25 @@
 <section class="page-container">
-    <div class="content-header">
+    @if (temVisaoDupla()) {
+    <div class="view-toggles agenda-mode-switch">
+        <button type="button" class="view-toggle" [class.active]="modoAgenda() === 'clinica'" (click)="alternarModoAgenda('clinica')">
+            Agendamentos da clínica
+        </button>
+        <button type="button" class="view-toggle" [class.active]="modoAgenda() === 'minha'" (click)="alternarModoAgenda('minha')">
+            Minha agenda
+        </button>
+    </div>
+    }
+
+    <div class="content-header" *ngIf="isPaciente() || mostrarVisaoClinica()">
         <div>
-            <h1>{{ isPaciente() ? 'Meus Agendamentos' : 'Agendas Médicas' }}</h1>
-            <p>{{ isPaciente() ? 'Confira suas consultas marcadas.' : isEspecialista() ? 'Configure seus dias e horários de atendimento.' : 'Gerencie os horários dos especialistas.' }}</p>
+            <h1>{{ isPaciente() ? 'Meus Agendamentos' : 'Agendamentos' }}</h1>
+            <p>{{ isPaciente() ? 'Confira suas consultas marcadas.' : 'Acompanhe os horários e consultas de todos os profissionais da clínica.' }}</p>
         </div>
         <div class="header-actions">
-            @if (isEspecialista()) {
-            <button class="btn-outline-dashboard" (click)="abrirPerfilModal()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                Meu Local de Atendimento
-            </button>
-            }
             @if (podeConfigurarAgenda()) {
             <button class="btn-primary-dashboard" (click)="abrirConfiguracao()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
-                {{ isEspecialista() ? 'Novo Dia Disponível' : 'Nova Agenda' }}
+                Nova Agenda
             </button>
             }
             @if (isPaciente()) {
@@ -73,154 +78,269 @@
     </div>
     }
 
-    <!-- ══ ESPECIALISTA ══ -->
-    @else if (isEspecialista()) {
-
-    <!-- Dias disponíveis configurados -->
-    @if (agendasDoEspecialista().length > 0) {
-    <div class="card" style="margin-bottom:24px;">
-        <div style="padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
-            <h3 style="margin:0; font-size:1rem; font-weight:700;">Minha Disponibilidade</h3>
-            <span style="font-size:0.85rem; color:var(--text-muted);">{{ agendasDoEspecialista().length }} dia(s) configurado(s)</span>
+    <!-- ══ ESPECIALISTA / GESTOR-PROFISSIONAL: minha agenda ══ -->
+    @else if (mostrarVisaoProfissional()) {
+    
+    <!-- Novo Header Premium da Agenda -->
+    <div class="agenda-premium-header">
+        <div class="agenda-info">
+            <span class="badge-agenda">● MINHA AGENDA</span>
+            <h1>{{ temVisaoDupla() ? 'Minha agenda' : 'Meus Agendamentos' }}</h1>
+            <p>Crie horários, acompanhe consultas e gerencie sua disponibilidade de atendimento.</p>
         </div>
-        <div class="agenda-dias-grid">
-            @for (agenda of agendasDoEspecialista(); track agenda.id) {
-            <div class="agenda-dia-card">
-                <div class="agenda-dia-header">
-                    <div class="agenda-dia-data">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        <strong>{{ agenda.data }}</strong>
-                    </div>
-                    <div class="agenda-dia-actions">
-                        <button class="icon-btn-sm" (click)="abrirConfiguracao(agenda)" title="Editar">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                        </button>
-                        <button class="icon-btn-sm text-danger" (click)="excluirAgenda(agenda.id, $event)" title="Remover">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
-                    </div>
+        <div class="agenda-stats">
+            <div class="stats-box">
+                <div class="stat-item">
+                    <span class="stat-value">{{ totais().total }}</span>
+                    <span class="stat-label">TOTAL</span>
                 </div>
-                <div class="agenda-slots-row">
-                    @for (h of agenda.horarios; track h) { <span class="slot-chip">{{ h }}</span> }
-                    @if (agenda.horarios.length === 0) { <span style="color:var(--text-muted); font-size:0.8rem;">Sem horários</span> }
+                <div class="stat-item">
+                    <span class="stat-value">{{ totais().pendentes }}</span>
+                    <span class="stat-label">PENDENTES</span>
                 </div>
-                <div class="agenda-vagas-info">{{ agenda.vagas }} vaga(s) disponível(is)</div>
+                <div class="stat-item">
+                    <span class="stat-value">{{ totais().confirmados }}</span>
+                    <span class="stat-label">CONFIRMADOS</span>
+                </div>
             </div>
+            <button class="btn-create-agenda" (click)="abrirConfiguracao()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
+                Criar agendamento
+            </button>
+        </div>
+    </div>
+
+    <!-- Barra de Controles (Toolbar) -->
+    <div class="agenda-toolbar">
+        <div class="toolbar-left">
+            <button class="btn-hoje" (click)="hoje()">
+                <span class="hoje-dot"></span>
+                Hoje
+            </button>
+            <div class="nav-month">
+                <button class="icon-btn-outline" (click)="prevMonth()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"></path></svg>
+                </button>
+                <h2 class="current-month-title">{{ mesFormatado() }}</h2>
+                <button class="icon-btn-outline" (click)="nextMonth()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"></path></svg>
+                </button>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <button class="btn-connect-google">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" width="14" height="14">
+                Conectar Google
+            </button>
+            <div class="view-toggles">
+                <button class="view-toggle active">Mês</button>
+                <button class="view-toggle">Semana</button>
+                <button class="view-toggle">Dia</button>
+                <button class="view-toggle">Programação</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Principal do Calendário -->
+    <div class="calendar-container">
+        <!-- Sidebar Esquerda (Mini calendário e Filtros) -->
+        <div class="calendar-sidebar">
+            <button class="btn-create-side" (click)="abrirConfiguracao()">
+                <div class="btn-create-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12h14"></path></svg></div>
+                Criar
+            </button>
+            
+            <div class="mini-calendar">
+                <div class="mini-header">
+                    <h4>{{ mesFormatado() }}</h4>
+                    <div class="mini-nav">
+                        <button (click)="prevMonth()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"></path></svg></button>
+                        <button (click)="nextMonth()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg></button>
+                    </div>
+                </div>
+                <div class="mini-grid">
+                    @for (ds of ['D','S','T','Q','Q','S','S']; track ds) { <span class="mini-day-label">{{ ds }}</span> }
+                    @for (cell of calendarioGrid(); track $index) {
+                    <span class="mini-cell" [class.current]="cell.isAtual" [class.today]="cell.isHoje" (click)="cell.isAtual && (0)">{{ cell.dia }}</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Grade Mensal -->
+        <div class="calendar-main">
+            <div class="calendar-filters-top">
+                <select class="form-select status-select">
+                    <option>Todos os status</option>
+                    <option>Confirmados</option>
+                    <option>Pendentes</option>
+                </select>
+            </div>
+            <div class="calendar-grid">
+                <!-- Cabeçalho dos dias da semana -->
+                <div class="weekdays-header">
+                    @for (d of diasSemana; track d) { <div class="weekday">{{ d }}</div> }
+                </div>
+                <!-- Células dos dias -->
+                <div class="days-grid">
+                    @for (cell of calendarioGrid(); track $index) {
+                    <div class="day-cell" [class.not-current]="!cell.isAtual" [class.is-today]="cell.isHoje" (click)="cell.isAtual && abrirConfiguracao(null, cell.data)" style="cursor: pointer;">
+                        <div class="day-number">{{ cell.dia }}</div>
+                        <div class="day-content">
+                            <!-- Agendas abertas -->
+                            @for (a of cell.agendas; track a.id) {
+                            <div class="event-chip agenda-chip" (click)="abrirConfiguracao(a); $event.stopPropagation()">
+                                <span class="dot"></span> Agenda: {{ a.vagas }} vagas
+                            </div>
+                            }
+                            <!-- Consultas marcadas -->
+                            @for (c of cell.consultas; track c.id) {
+                            <div class="event-chip consulta-chip" (click)="verDetalhesConsulta(c); $event.stopPropagation()">
+                                <strong>{{ c.horario }}</strong> {{ c.pacienteNome || 'Paciente' }}
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    }
+
+    <!-- ══ GESTOR/ADMIN: visão agrupada por especialista ══ -->
+    @else if (mostrarVisaoClinica()) {
+    <div class="admin-agendas-layout">
+
+        <!-- KPIs -->
+        <div class="admin-agendas-kpis">
+            <div class="kpi-card">
+                <span class="kpi-value">{{ adminResumo().especialistas }}</span>
+                <span class="kpi-label">Especialistas</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-value">{{ adminResumo().dias }}</span>
+                <span class="kpi-label">Dias de atendimento</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-value">{{ adminResumo().vagas }}</span>
+                <span class="kpi-label">Vagas disponíveis</span>
+            </div>
+        </div>
+
+        <!-- Toolbar de filtros -->
+        <div class="admin-agendas-toolbar card">
+            <p class="admin-readonly-hint">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                Somente visualização — o especialista cadastra e gerencia os próprios horários.
+            </p>
+            <div class="toolbar-row">
+            <div class="toolbar-filters">
+                <div class="filter-field search-field">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="search" class="form-input" placeholder="Buscar por nome, especialidade ou data..."
+                        [ngModel]="filtroBusca()" (ngModelChange)="filtroBusca.set($event)" [ngModelOptions]="{standalone: true}">
+                </div>
+                <select class="filter-select" [ngModel]="filtroEspecialistaId()" (ngModelChange)="filtroEspecialistaId.set($event)" [ngModelOptions]="{standalone: true}">
+                    <option [ngValue]="'todos'">Todos os especialistas</option>
+                    @for (esp of especialistasParaFiltro(); track esp.id) {
+                    <option [ngValue]="esp.id">{{ esp.nome }}</option>
+                    }
+                </select>
+                <select class="filter-select" [ngModel]="filtroEspecialidade()" (ngModelChange)="filtroEspecialidade.set($event)" [ngModelOptions]="{standalone: true}">
+                    @for (esp of especialidadesDisponiveis(); track esp) {
+                    <option [value]="esp">{{ esp === 'todas' ? 'Todas especialidades' : esp }}</option>
+                    }
+                </select>
+                <select class="filter-select" [ngModel]="filtroPeriodo()" (ngModelChange)="filtroPeriodo.set($event)" [ngModelOptions]="{standalone: true}">
+                    <option value="futuras">Somente futuras</option>
+                    <option value="passadas">Somente passadas</option>
+                    <option value="todas">Todas as datas</option>
+                </select>
+            </div>
+            <div class="toolbar-actions">
+                @if (temFiltrosAtivos()) {
+                <button type="button" class="btn-text" (click)="limparFiltrosGestor()">Limpar filtros</button>
+                }
+                <div class="toolbar-btn-group" role="group" aria-label="Expandir ou recolher especialistas">
+                    <button type="button" class="toolbar-btn" (click)="expandirTodosGrupos()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+                        Expandir todos
+                    </button>
+                    <button type="button" class="toolbar-btn" (click)="recolherTodosGrupos()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"></path></svg>
+                        Recolher
+                    </button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- Grupos por especialista -->
+        @if (gruposPorEspecialista().length === 0) {
+        <div class="admin-agendas-empty card">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <h3>Nenhuma agenda encontrada</h3>
+            <p>{{ temFiltrosAtivos() ? 'Ajuste os filtros ou limpe a busca para ver mais resultados.' : 'Nenhum especialista cadastrou horários nesta organização.' }}</p>
+            @if (temFiltrosAtivos()) {
+            <button class="btn-outline-sm" (click)="limparFiltrosGestor()">Limpar filtros</button>
             }
         </div>
-    </div>
-    } @else {
-    <div class="empty-state" style="margin-bottom:24px;">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-        <p>Você ainda não configurou nenhum dia de atendimento.</p>
-        <button class="btn-outline-sm" (click)="abrirConfiguracao()">Configurar minha disponibilidade</button>
-    </div>
-    }
+        } @else {
+        <div class="admin-grupos-list">
+            @for (grupo of gruposPorEspecialista(); track grupo.especialistaId) {
+            <article class="admin-grupo-card card" [class.expanded]="isGrupoExpandido(grupo.especialistaId)">
+                <button type="button" class="grupo-header"
+                    (click)="toggleGrupo(grupo.especialistaId)"
+                    [attr.aria-expanded]="isGrupoExpandido(grupo.especialistaId)">
+                    <div class="grupo-avatar">{{ iniciaisNome(grupo.especialista) }}</div>
+                    <div class="grupo-info">
+                        <h3>{{ grupo.especialista }}</h3>
+                        <p>{{ grupo.especialidade }}</p>
+                    </div>
+                    <div class="grupo-stats">
+                        <span class="grupo-stat"><strong>{{ grupo.totalDias }}</strong> dias</span>
+                        <span class="grupo-stat"><strong>{{ grupo.totalVagas }}</strong> vagas</span>
+                    </div>
+                    <svg class="grupo-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+                </button>
 
-    <!-- Pacientes agendados ativos -->
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-        <h3 style="font-size:1rem; font-weight:700; margin:0;">Pacientes Agendados</h3>
-        @if (consultasCanceladas().length > 0) {
-        <button class="btn-link-sm" (click)="mostrarCanceladas.set(!mostrarCanceladas())">
-            {{ mostrarCanceladas() ? 'Ocultar canceladas' : 'Ver canceladas (' + consultasCanceladas().length + ')' }}
-        </button>
-        }
-    </div>
-
-    <div class="consultas-grid">
-        @for (con of consultasAtivas(); track con.id) {
-        <div class="consulta-card" [class.done]="con.status === 'concluida'">
-            <div class="card-status-line" [class]="con.status"></div>
-            <div class="card-body">
-                <div class="card-date-time">
-                    <div class="date">{{ con.data }}</div>
-                    <div class="time">{{ con.horario }}h</div>
-                </div>
-                <div class="card-main">
-                    <h3>{{ con.especialidade }}</h3>
-                    <p>Paciente: <strong>{{ con.pacienteNome || 'Não identificado' }}</strong></p>
-                    @if (con.status === 'concluida') {
-                    <span class="status-badge concluida">Concluída</span>
-                    }
-                </div>
-                <div class="card-actions">
-                    @if (con.status !== 'concluida') {
-                    <button class="btn-primary-dashboard btn-sm" (click)="abrirProntuario(con)" style="flex:1; padding:8px; border-radius:8px;">
-                        Ver Prontuário e Atender
-                    </button>
-                    } @else {
-                    <button class="btn-outline-dashboard btn-sm" (click)="baixarRelatorioPDF(con)" style="flex:1; padding:8px; border-radius:8px; border-color:var(--green); color:var(--green-dark);">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        Baixar Relatório
-                    </button>
-                    }
-                </div>
-            </div>
-        </div>
-        }
-        @if (consultasAtivas().length === 0) {
-        <div class="empty-state"><p>Nenhum paciente agendado no momento.</p></div>
-        }
-    </div>
-
-    <!-- Canceladas (colapsável) -->
-    @if (mostrarCanceladas() && consultasCanceladas().length > 0) {
-    <h3 style="font-size:0.95rem; font-weight:600; margin:24px 0 12px; color:var(--text-muted);">Agendamentos Cancelados</h3>
-    <div class="consultas-grid">
-        @for (con of consultasCanceladas(); track con.id) {
-        <div class="consulta-card cancelada" style="opacity:0.7;">
-            <div class="card-status-line cancelada"></div>
-            <div class="card-body">
-                <div class="card-date-time">
-                    <div class="date">{{ con.data }}</div>
-                    <div class="time">{{ con.horario }}h</div>
-                </div>
-                <div class="card-main">
-                    <h3>{{ con.especialidade }}</h3>
-                    <p>Paciente: <strong>{{ con.pacienteNome || 'Não identificado' }}</strong></p>
-                    <span class="status-badge cancelada">Cancelado pelo paciente</span>
-                </div>
-            </div>
-        </div>
-        }
-    </div>
-    }
-    }
-
-    <!-- ══ GESTOR/ADMIN: tabela ══ -->
-    @else {
-    <div class="card">
-        <div class="table-container">
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>Especialista</th><th>Especialidade</th><th>Data</th><th>Horários</th><th>Vagas</th><th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (agenda of agendas(); track agenda.id) {
-                    <tr>
-                        <td><strong>{{ agenda.especialista }}</strong></td>
-                        <td>{{ agenda.especialidade }}</td>
-                        <td>{{ agenda.data }}</td>
-                        <td><div class="horarios-grid">@for (h of agenda.horarios; track h) {<span class="badge-mini">{{ h }}</span>}</div></td>
-                        <td>{{ agenda.vagas }}</td>
-                        <td>
-                            <div class="actions-group">
-                                <button class="icon-btn-sm" (click)="abrirConfiguracao(agenda)" title="Editar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></button>
-                                <button class="icon-btn-sm text-danger" (click)="excluirAgenda(agenda.id, $event)" title="Excluir"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                @if (isGrupoExpandido(grupo.especialistaId)) {
+                <div class="grupo-body">
+                    @for (bloco of grupo.agendasPorMes; track bloco.mesLabel) {
+                    <div class="mes-bloco">
+                        <h4 class="mes-titulo">{{ bloco.mesLabel }}</h4>
+                        <div class="agenda-dias-grid">
+                            @for (agenda of bloco.agendas; track agenda.id) {
+                            <div class="agenda-dia-card" [class.passada]="isAgendaPassada(agenda.data)">
+                                <div class="agenda-dia-top">
+                                    <span class="agenda-data">{{ agenda.data }}</span>
+                                    <span class="agenda-vagas-badge">{{ agenda.vagas }} {{ agenda.vagas === 1 ? 'vaga' : 'vagas' }}</span>
+                                </div>
+                                <div class="horarios-grid compact">
+                                    @for (h of agenda.horarios; track h) {
+                                    <span class="badge-mini">{{ h }}</span>
+                                    }
+                                    @if (!agenda.horarios.length) {
+                                    <span class="sem-horarios">Sem horários livres</span>
+                                    }
+                                </div>
                             </div>
-                        </td>
-                    </tr>
+                            }
+                        </div>
+                    </div>
                     }
-                    @if (agendas().length === 0) {
-                    <tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-muted);">Nenhuma agenda cadastrada.</td></tr>
-                    }
-                </tbody>
-            </table>
+                </div>
+                }
+            </article>
+            }
         </div>
+        }
     </div>
     }
+
+</section>
 
     <!-- ══ MODAL: Local de Atendimento / Perfil do Especialista ══ -->
     @if (isPerfilModalAberto()) {
@@ -265,42 +385,68 @@
 
     <!-- ══ MODAL: Configurar Agenda ══ -->
     @if (currentAgenda() !== null || isNovaAgenda()) {
-    <div class="modal-overlay active" (click)="fecharModal()">
-        <div class="modal-content" (click)="$event.stopPropagation()" style="max-width:520px;">
+    <dialog #agendaDialog class="native-modal agenda-modal" (click)="fecharModal()" (cancel)="$event.preventDefault(); fecharModal()">
+        <div class="modal-content agenda-modal-content" (click)="$event.stopPropagation()">
             <div class="modal-header">
-                <h2>{{ isNovaAgenda() ? 'Novo Dia de Atendimento' : 'Editar Disponibilidade' }}</h2>
-                <button class="modal-close" (click)="fecharModal()">
+                <div class="modal-header-text">
+                    <h2>{{ isNovaAgenda() ? 'Novo Dia de Atendimento' : 'Editar Disponibilidade' }}</h2>
+                    <p>{{ isNovaAgenda() ? 'Defina a data e os horários disponíveis para consultas.' : 'Atualize os horários deste dia.' }}</p>
+                </div>
+                <button type="button" class="modal-close" (click)="fecharModal()" aria-label="Fechar">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
             <form [formGroup]="agendaForm" (ngSubmit)="salvarAgenda()">
-                <div class="modal-body" style="display:flex; flex-direction:column; gap:20px;">
+                <div class="modal-body agenda-modal-body">
                     <div class="form-group">
-                        <label>Data do Atendimento</label>
-                        <input type="date" formControlName="data" class="form-input">
+                        <label for="agenda-data">Data do Atendimento</label>
+                        <input id="agenda-data" type="date" formControlName="data" class="form-input"
+                            [attr.min]="isNovaAgenda() ? dataMinimaInput : null">
                         @if (agendaForm.get('data')?.invalid && agendaForm.get('data')?.touched) {
                         <span class="form-error">Selecione uma data.</span>
                         }
+                        @if (isNovaAgenda()) {
+                        <span class="form-hint">Somente datas futuras aparecem no perfil para agendamento.</span>
+                        }
                     </div>
-                    <div class="form-group">
-                        <label>Horários de Atendimento</label>
-                        <div class="horarios-chips" [class.has-error]="erroHorarios()">
+
+                    <div class="form-group horarios-section">
+                        <div class="horarios-section-header">
+                            <label>Horários de Atendimento</label>
+                            @if (horariosLista().length > 0) {
+                            <span class="horarios-count">{{ horariosLista().length }} {{ horariosLista().length === 1 ? 'horário' : 'horários' }}</span>
+                            }
+                        </div>
+
+                        <div class="horarios-chips" [class.has-error]="erroHorarios()" [class.is-empty]="horariosLista().length === 0">
                             @for (hora of horariosLista(); track hora) {
-                            <span class="horario-chip">{{ hora }}<button type="button" class="chip-remove" (click)="removerHorario(hora)">×</button></span>
+                            <span class="horario-chip">
+                                <svg class="chip-clock" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <span class="chip-time">{{ hora }}</span>
+                                <button type="button" class="chip-remove" (click)="removerHorario(hora)" [attr.aria-label]="'Remover horário ' + hora">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                </button>
+                            </span>
                             }
                             @if (horariosLista().length === 0) {
-                            <span class="chip-placeholder">Nenhum horário adicionado ainda</span>
+                            <div class="chip-empty-state">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                <span>Nenhum horário adicionado ainda</span>
+                            </div>
                             }
                         </div>
                         @if (erroHorarios()) { <span class="form-error">Adicione ao menos um horário.</span> }
-                        <div class="horario-input-row">
-                            <input #horaInput type="time" class="form-input time-pick" value="08:00" step="1800">
-                            <button type="button" class="btn-add-hora" (click)="adicionarHorario(horaInput)">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"></path></svg>
-                                Adicionar horário
-                            </button>
+
+                        <div class="horario-add-panel">
+                            <div class="horario-input-row">
+                                <input #horaInput type="time" class="form-input time-pick" value="08:00" step="1800" aria-label="Selecionar horário">
+                                <button type="button" class="btn-add-hora" (click)="adicionarHorario(horaInput)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"></path></svg>
+                                    Adicionar horário
+                                </button>
+                            </div>
+                            <p class="hint">Após adicionar, o campo avança 1h automaticamente.</p>
                         </div>
-                        <p class="hint">Após adicionar, o campo avança 1h automaticamente.</p>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -309,7 +455,7 @@
                 </div>
             </form>
         </div>
-    </div>
+    </dialog>
     }
 
     <!-- ══ MODAL: Detalhes (Paciente) ══ -->
@@ -399,4 +545,3 @@
         </div>
     </div>
     }
-</section>

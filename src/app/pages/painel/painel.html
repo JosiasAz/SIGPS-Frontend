@@ -1,7 +1,11 @@
 <div class="dashboard-container" [class.paciente-theme]="userRoleLabel() === 'Paciente'" [class.collapsed]="isSidebarCollapsed()">
+    @if (navigating()) {
+    <div class="route-progress" aria-hidden="true"></div>
+    }
     <!-- ══════════════════════════ SIDEBAR ADMIN -->
     @if (userRoleLabel() !== 'Paciente') {
-    <aside class="sidebar">
+    <div class="sidebar-overlay" *ngIf="isMobileMenuOpen()" (click)="closeMobileMenu()"></div>
+    <aside class="sidebar" [class.mobile-open]="isMobileMenuOpen()">
         <div class="sidebar-header">
             <div class="logo-area">
                 <span class="logo-icon">
@@ -21,8 +25,9 @@
             <ul>
                 @for (item of menuItems(); track item.route) {
                 <li>
-                    <a [routerLink]="item.route" routerLinkActive="active" [title]="item.label"
-                        [routerLinkActiveOptions]="{exact: true}">
+                    <a [routerLink]="item.route" [queryParams]="item.queryParams || null" routerLinkActive="active" [title]="item.label"
+                        [routerLinkActiveOptions]="{exact: !item.queryParams}"
+                        (mouseenter)="preloadRoute(item.route)">
                         <span class="nav-icon">
                             <!-- Placeholder icons based on name -->
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -46,6 +51,9 @@
 
                                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" *ngIf="item.icon === 'activity'">
                                 </polyline>
+
+                                <rect x="2" y="7" width="20" height="14" rx="2" *ngIf="item.icon === 'building'"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" *ngIf="item.icon === 'building'"></path>
 
                                 <line x1="8" y1="6" x2="21" y2="6" *ngIf="item.icon === 'list'"></line>
                                 <line x1="8" y1="12" x2="21" y2="12" *ngIf="item.icon === 'list'"></line>
@@ -96,13 +104,20 @@
         <!-- Top Navbar Admin -->
         @if (userRoleLabel() !== 'Paciente') {
         <header class="top-navbar">
+            <button class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Abrir menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
             <div class="search-area">
                 <div class="search-box">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="text" #searchInput (keyup)="onSearch(searchInput.value)" (focus)="isSearchActive = true" (blur)="onSearchBlur()" placeholder="Buscar pacientes, especialidades..." />
+                    <input type="text" #searchInput (keyup)="onSearch(searchInput.value)" (focus)="isSearchActive = true" (blur)="onSearchBlur()" placeholder="Buscar pacientes, profissionais, especialidades..." />
                 </div>
                 
                 <div class="search-results-dropdown" *ngIf="isSearchActive && searchInput.value.length > 0">
@@ -110,7 +125,7 @@
                         Nenhum resultado encontrado para "{{ searchInput.value }}"
                     </div>
                     @for (result of searchResults(); track result.id) {
-                    <div class="search-result-item" (click)="goToResult(result.route)">
+                    <div class="search-result-item" (click)="goToResult(result)">
                         <div class="res-icon">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="9 18 15 12 9 6"></polyline>
@@ -159,6 +174,31 @@
                     </div>
                 </div>
 
+                <!-- Organization Selector -->
+                @if (isAdmin() && organizations().length > 0) {
+                <div class="org-selector-wrapper">
+                    <select class="org-select" [value]="activeOrganizationId() ?? 0" (change)="onOrganizationChange($any($event.target).value)">
+                        <option [value]="0">🌐 Todas as clínicas</option>
+                        @for (org of organizations(); track org.id) {
+                        <option [value]="org.id">🏢 {{ org.nome }}</option>
+                        }
+                    </select>
+                </div>
+                } @else if (isAdmin()) {
+                <div class="org-badge" title="Visão global do sistema">
+                    <span class="org-badge-icon" aria-hidden="true">🌐</span>
+                    Administração Geral
+                </div>
+                } @else if (organizations().length > 0) {
+                <div class="org-selector-wrapper">
+                    <select class="org-select" [value]="activeOrganizationId() ?? ''" (change)="onOrganizationChange($any($event.target).value)">
+                        @for (org of organizations(); track org.id) {
+                        <option [value]="org.id">🏢 {{ org.nome }}</option>
+                        }
+                    </select>
+                </div>
+                }
+
                 <div class="divider"></div>
 
                 <div class="user-profile" routerLink="/painel/meu-perfil" style="cursor:pointer;" title="Meu Perfil">
@@ -167,7 +207,7 @@
                         <span class="role">{{ userRoleLabel() }}</span>
                     </div>
                     <div class="avatar">
-                        <img [src]="'https://ui-avatars.com/api/?name=' + (currentUser()?.name || 'User') + '&background=419640&color=fff'"
+                        <img [src]="null | avatarUrl:currentUser()?.name:200" [avatarFallback]="currentUser()?.name || 'Usuário'"
                             alt="Avatar" />
                     </div>
                 </div>
@@ -180,25 +220,34 @@
         <header class="top-navbar paciente-navbar">
             <div class="logo-area" style="display: flex; align-items: center; gap: 12px; cursor: pointer;" routerLink="/painel/portal-paciente">
                 <img src="/logo.svg" alt="Logo SIGPS" style="height: 48px;" />
-                <span style="font-weight: 800; font-size: 1.25rem; color: var(--green-dark);">SIGPS</span>
+                <span style="font-weight: 800; font-size: 1.25rem; color: var(--green-dark);" class="hide-mobile">SIGPS</span>
             </div>
 
-            <nav class="paciente-horizontal-nav" style="display: flex; gap: 32px; margin-left: 48px;">
-                <a routerLink="/painel/portal-paciente" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Meu Portal</a>
-                <a routerLink="/painel/agendas" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Minhas Consultas</a>
-                <a routerLink="/painel/busca-profissionais" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Explorar Profissionais</a>
-                <a routerLink="/painel/chat" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Mensagens</a>
-                <a routerLink="/painel/meu-perfil" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Meu Perfil</a>
+            <button class="mobile-menu-btn" (click)="toggleMobileMenu()" aria-label="Abrir menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <nav class="paciente-horizontal-nav" [class.mobile-open]="isMobileMenuOpen()">
+                <button class="close-mobile-nav" (click)="closeMobileMenu()">×</button>
+                <a (click)="closeMobileMenu()" routerLink="/painel/portal-paciente" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Meu Portal</a>
+                <a (click)="closeMobileMenu()" routerLink="/painel/agendas" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Minhas Consultas</a>
+                <a (click)="closeMobileMenu()" routerLink="/painel/explorar-clinicas" [class.active]="isExplorarActive()" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Explorar</a>
+                <a (click)="closeMobileMenu()" routerLink="/painel/chat" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Mensagens</a>
+                <a (click)="closeMobileMenu()" routerLink="/painel/meu-perfil" routerLinkActive="active" style="color: var(--text-muted); text-decoration: none; font-weight: 600; padding: 12px 0;">Meu Perfil</a>
             </nav>
 
-            <div class="user-actions" style="margin-left: auto;">
+            <div class="user-actions user-actions-paciente">
                 <div class="user-profile">
                     <div class="user-info" style="text-align: right;">
                         <span class="name">{{ currentUser()?.name || 'Paciente' }}</span>
                         <span class="role">Paciente</span>
                     </div>
                     <div class="avatar">
-                        <img [src]="'https://ui-avatars.com/api/?name=' + (currentUser()?.name || 'User') + '&background=419640&color=fff'" alt="Avatar" />
+                        <img [src]="null | avatarUrl:currentUser()?.name:200" [avatarFallback]="currentUser()?.name || 'Usuário'" alt="Avatar" />
                     </div>
                 </div>
                 

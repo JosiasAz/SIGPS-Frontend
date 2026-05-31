@@ -1,18 +1,23 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { AbstractDashboardService } from '../../../services/dashboard/abstract-dashboard.service';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
+import { DashboardService } from '../../../services/dashboard/dashboard.service';
+import { AvatarUrlPipe } from '../../../pipes/avatar-url.pipe';
+import { AvatarFallbackDirective } from '../../../directives/avatar-fallback.directive';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AvatarUrlPipe, AvatarFallbackDirective],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss', '../painel.scss'],
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   private dashboardService = inject(AbstractDashboardService);
   private authService = inject(AbstractAuthService);
+  private router = inject(Router);
 
   stats = this.dashboardService.stats;
   recentActivities = this.dashboardService.recentActivities;
@@ -76,7 +81,12 @@ export class DashboardComponent {
 
   filtrarPeriodo(periodo: string) {
     this.periodoSelecionado.set(periodo);
+    (this.dashboardService as DashboardService).invalidateCache();
     this.dashboardService.loadData(periodo);
+  }
+
+  ngOnInit() {
+    this.dashboardService.loadData(this.periodoSelecionado());
   }
 
   isGestorOrAdmin = computed(() => {
@@ -84,9 +94,16 @@ export class DashboardComponent {
     return role === 'admin' || role === 'gestor';
   });
 
+  isAdmin = computed(() => this.userRole() === 'admin');
+
+  /** Banner de triagem e fila operacional — só clínica (gestor/especialista). */
+  mostrarTriagemIA = computed(() => {
+    const role = this.userRole();
+    return role === 'gestor' || role === 'especialista' || role === 'visualizador';
+  });
+
   headerAction = computed(() => {
     const role = this.userRole();
-    if (role === 'admin') return { label: 'Novo Colaborador' };
     if (role === 'gestor') return { label: 'Novo Agendamento' };
     if (role === 'especialista') return { label: 'Nova Prescrição' };
     return null;
@@ -100,7 +117,7 @@ export class DashboardComponent {
   }
 
   verDetalhesIA(): void {
-    alert("Redirecionando para detalhes de inteligência artificial da fila...");
+    this.router.navigate(['/painel/fila']);
   }
 
   calcularOffsetFila(total: number): number {

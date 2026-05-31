@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AbstractAuthService } from '../../services/auth/abstract-auth.service';
+import { loadRememberPreferences } from '../../utils/auth-storage';
 
 @Component({
   selector: 'app-login',
@@ -22,6 +23,7 @@ export class Login implements OnInit {
   };
 
   showPassword = signal(false);
+  rememberMe = signal(false);
   isLoading = signal(false);
   errorMessage = signal('');
   successMessage = signal('');
@@ -29,6 +31,12 @@ export class Login implements OnInit {
   blockedAccountName = signal('');
 
   ngOnInit() {
+    const prefs = loadRememberPreferences();
+    this.rememberMe.set(prefs.rememberMe);
+    if (prefs.savedEmail) {
+      this.credentials.email = prefs.savedEmail;
+    }
+
     this.route.queryParamMap.subscribe(params => {
       if (params.get('registered') === 'true') {
         this.successMessage.set('Conta criada com sucesso! Faça login para continuar.');
@@ -63,7 +71,11 @@ export class Login implements OnInit {
     this.successMessage.set('');
     this.isAccountDisabled.set(false);
 
-    this.authService.login(this.credentials).subscribe({
+    this.authService.login({
+      email: this.credentials.email.trim(),
+      password: this.credentials.password,
+      rememberMe: this.rememberMe(),
+    }).subscribe({
       next: () => {
         this.router.navigate(['/painel']);
       },
@@ -73,7 +85,7 @@ export class Login implements OnInit {
           this.isAccountDisabled.set(true);
           this.blockedAccountName.set(err.nome || 'seu perfil');
         } else {
-          this.errorMessage.set('Falha ao entrar. Verifique seus dados.');
+          this.errorMessage.set(err.error?.message || 'Falha ao entrar. Verifique seus dados.');
         }
       }
     });

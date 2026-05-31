@@ -6,5 +6,5 @@ import { environment } from '../../env/environment';
 
 export const RelatoriosProvider: Provider = {
     provide: AbstractRelatoriosService,
-    useClass: true || environment.useMock ? MockedRelatoriosService : RelatoriosService // TODO: Remove true || once backend is ready
+    useClass: environment.useMock ? MockedRelatoriosService : RelatoriosService
 };

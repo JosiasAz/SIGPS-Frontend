@@ -1,0 +1,65 @@
+<div class="auth-layout">
+  <nav class="auth-navbar">
+    <a routerLink="/" class="navbar-brand">
+      <span class="logo-icon">
+        <img src="/logo.svg" alt="Logo SIGPS" style="height: 50px; width: auto; display: block;" />
+      </span>
+      <span class="nav-title">SIGPS</span>
+    </a>
+    <a routerLink="/login" class="back-link">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span class="back-text">Voltar ao login</span>
+    </a>
+  </nav>
+
+  <div class="login-container">
+    <div class="login-visual">
+      <div class="visual-content">
+        <div class="hero-text">
+          <h1>Recupere o acesso<br />à sua conta.</h1>
+          <p>Enviaremos um link seguro para redefinir sua senha.</p>
+        </div>
+      </div>
+      <div class="visual-overlay"></div>
+    </div>
+
+    <div class="login-form-area">
+      <div class="form-card">
+        <header class="form-header">
+          <h2>Esqueci minha senha</h2>
+          <p>Informe o e-mail cadastrado na plataforma.</p>
+        </header>
+
+        <div class="success-feedback" *ngIf="successMessage()">{{ successMessage() }}</div>
+        <div class="error-feedback" *ngIf="errorMessage()">{{ errorMessage() }}</div>
+
+        <form class="login-form" (submit)="onSubmit($event)" *ngIf="!successMessage()">
+          <div class="input-group">
+            <label for="email">E-mail</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+              <input type="email" id="email" name="email" [ngModel]="email()" (ngModelChange)="email.set($event)"
+                placeholder="nome@exemplo.com" required />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary-login" [disabled]="isLoading()">
+            <span *ngIf="!isLoading()">Enviar link de recuperação</span>
+            <span *ngIf="isLoading()">Enviando...</span>
+          </button>
+        </form>
+
+        <div class="form-footer">
+          <p>Lembrou a senha? <a routerLink="/login">Fazer login</a></p>
+        </div>
+      </div>
+      <p class="copyright">© 2026 SIGPS - Todos os direitos reservados.</p>
+    </div>
+  </div>
+</div>

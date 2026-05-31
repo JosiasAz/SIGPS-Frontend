@@ -17,7 +17,8 @@
         }
     </div>
 
-    <!-- Banner de Inteligência Artificial (Triagem Inteligente) -->
+    <!-- Banner de Inteligência Artificial (Triagem Inteligente) — por clínica -->
+    @if (mostrarTriagemIA()) {
     <div class="ai-banner-container">
         <div class="ai-banner">
             <div class="ai-banner-icon">
@@ -27,12 +28,13 @@
                 </svg>
             </div>
             <div class="ai-banner-content">
-                <span class="ai-badge">Futura Implementação</span>
-                <p class="ai-banner-text">O módulo de <strong>Triagem Inteligente com IA</strong> é uma futura implementação planejada para o SIGPS. Em breve, a inteligência artificial analisará queixas e comorbidades para organizar as prioridades clínicas na fila automaticamente.</p>
+                <span class="ai-badge">Triagem Inteligente</span>
+                <p class="ai-banner-text">A fila da <strong>sua clínica</strong> é ordenada com base no cadastro clínico e nas consultas agendadas. Abra a fila para ver a priorização em tempo real.</p>
             </div>
-            <button class="ai-banner-btn" (click)="verDetalhesIA()">Saiba Mais</button>
+            <button type="button" class="ai-banner-btn" (click)="verDetalhesIA()">Ver Fila de Espera</button>
         </div>
     </div>
+    }
 
     <!-- Grid Superior: KPIs, Pacientes Recentes e Sala de Espera -->
     <div class="dashboard-top-grid">
@@ -81,7 +83,8 @@
                 @for (patient of recentPatients(); track patient.id) {
                 <div class="patient-row-item">
                     <div class="patient-avatar-wrapper">
-                        <img [src]="patient.foto" [alt]="patient.nome" class="patient-avatar-img">
+                        <img [src]="patient.foto | avatarUrl:patient.nome:80" [avatarFallback]="patient.nome" [avatarSize]="80"
+                            [alt]="patient.nome" class="patient-avatar-img">
                         <span class="status-indicator" [class.online]="patient.status === 'online'"></span>
                     </div>
                     <div class="patient-metadata">
@@ -106,7 +109,8 @@
             </div>
         </div>
 
-        <!-- Coluna 3: Sala de Espera (Indicador Visual Progressivo) -->
+        <!-- Coluna 3: Sala de Espera — operacional por clínica (não admin global) -->
+        @if (!isAdmin()) {
         <div class="card waiting-room-card">
             <div class="card-header-centered">
                 <h3>Sala de Espera</h3>
@@ -142,6 +146,17 @@
                 </div>
             </div>
         </div>
+        } @else {
+        <div class="card admin-dashboard-hint-card">
+            <div class="card-header-centered">
+                <h3>Operação por clínica</h3>
+                <p>Triagem e fila de espera são gerenciadas em cada unidade</p>
+            </div>
+            <div class="admin-dashboard-hint-body">
+                <p>O administrador geral acompanha indicadores consolidados. A fila inteligente e o atendimento ficam no contexto de cada clínica (gestor ou especialista).</p>
+            </div>
+        </div>
+        }
     </div>
 
     <!-- Grid Inferior: Gráficos de Agendamentos e Distribuição de Convênios -->
@@ -252,11 +267,8 @@
                         }
                         }
                         @if (stats()[0]?.value === '0') {
-                        <!-- Anel cinza escuro vazio padrão se não houver pacientes no BD -->
-                        <circle cx="50" cy="50" r="30" fill="transparent" stroke="rgba(255, 255, 255, 0.05)" stroke-width="10" class="donut-slice"></circle>
+                        <circle cx="50" cy="50" r="30" fill="transparent" stroke="#e2e8f0" stroke-width="10" class="donut-slice donut-slice--empty"></circle>
                         }
-                        <!-- Furo interno escuro combinando com o card -->
-                        <circle cx="50" cy="50" r="24" fill="#090e17"></circle>
                     </svg>
                     <div class="donut-chart-inner">
                         <span class="donut-total">{{ stats()[0]?.value || 0 }}</span>
