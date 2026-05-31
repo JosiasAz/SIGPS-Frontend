@@ -45,6 +45,18 @@ export class Cadastro {
     { value: 'prefiro-nao', label: 'Prefiro não informar' },
   ];
 
+  fieldErrors = {
+    nome: signal(''),
+    email: signal(''),
+    cpf: signal(''),
+    genero: signal(''),
+    dataNascimento: signal(''),
+    password: signal(''),
+    confirmPassword: signal('')
+  };
+
+  private touched: Record<string, boolean> = {};
+
   toggleGeneroDropdown() {
     this.isGeneroDropdownOpen.set(!this.isGeneroDropdownOpen());
   }
@@ -52,12 +64,13 @@ export class Cadastro {
   selecionarGenero(valor: string) {
     this.userData.genero = valor;
     this.isGeneroDropdownOpen.set(false);
+    this.onBlur('genero');
   }
 
   getGeneroLabel(): string {
     const selecionado = this.opcoesGenero.find(o => o.value === this.userData.genero);
     if (!selecionado) return 'Selecione';
-    
+
     switch (selecionado.value) {
       case 'masculino': return 'Masculino';
       case 'feminino': return 'Feminino';
@@ -102,7 +115,7 @@ export class Cadastro {
   formatCpf(event: Event) {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/\D/g, '');
-    
+
     if (value.length > 11) {
       value = value.substring(0, 11);
     }
@@ -124,7 +137,7 @@ export class Cadastro {
     if (cpf === '' || cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
       return false;
     }
-    
+
     let add = 0;
     for (let i = 0; i < 9; i++) {
         add += parseInt(cpf.charAt(i)) * (10 - i);
@@ -132,7 +145,7 @@ export class Cadastro {
     let rev = 11 - (add % 11);
     if (rev === 10 || rev === 11) rev = 0;
     if (rev !== parseInt(cpf.charAt(9))) return false;
-    
+
     add = 0;
     for (let i = 0; i < 10; i++) {
         add += parseInt(cpf.charAt(i)) * (11 - i);
@@ -140,49 +153,90 @@ export class Cadastro {
     rev = 11 - (add % 11);
     if (rev === 10 || rev === 11) rev = 0;
     if (rev !== parseInt(cpf.charAt(10))) return false;
-    
+
     return true;
+  }
+
+  onBlur(field: string) {
+    this.touched[field] = true;
+    this.runValidation(field);
+  }
+
+  onPasswordInput() {
+    if (this.touched['confirmPassword']) {
+      this.runValidation('confirmPassword');
+    }
+  }
+
+  onConfirmPasswordInput() {
+    if (this.touched['confirmPassword']) {
+      this.runValidation('confirmPassword');
+    }
+  }
+
+  private runValidation(field: string) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    switch (field) {
+      case 'nome':
+        this.fieldErrors.nome.set(
+          this.userData.nome.trim().split(' ').filter(Boolean).length < 2
+            ? 'Insira seu nome completo.' : ''
+        );
+        break;
+      case 'email':
+        this.fieldErrors.email.set(
+          !this.userData.email || !emailRegex.test(this.userData.email)
+            ? 'Insira um e-mail válido.' : ''
+        );
+        break;
+      case 'cpf':
+        this.fieldErrors.cpf.set(
+          !this.validateCPF(this.userData.cpf) ? 'CPF inválido.' : ''
+        );
+        break;
+      case 'genero':
+        this.fieldErrors.genero.set(
+          !this.userData.genero ? 'Selecione seu gênero.' : ''
+        );
+        break;
+      case 'dataNascimento':
+        this.fieldErrors.dataNascimento.set(
+          !this.userData.dataNascimento || this.userData.dataNascimento.length < 10
+            ? 'Insira sua data de nascimento.' : ''
+        );
+        break;
+      case 'password':
+        this.fieldErrors.password.set(
+          !this.userData.password ? 'A senha não pode estar vazia.' :
+          this.userData.password.length < 6 ? 'Mínimo 6 caracteres.' : ''
+        );
+        if (this.touched['confirmPassword']) {
+          this.runValidation('confirmPassword');
+        }
+        break;
+      case 'confirmPassword':
+        this.fieldErrors.confirmPassword.set(
+          !this.userData.confirmPassword ? 'Confirme sua senha.' :
+          this.userData.password !== this.userData.confirmPassword
+            ? 'As senhas não coincidem.' : ''
+        );
+        break;
+    }
   }
 
   onRegister(event: Event) {
     event.preventDefault();
     this.errorMessage.set('');
 
-    const nomeCompleto = this.userData.nome.trim();
-    if (nomeCompleto.split(' ').length < 2) {
-      this.errorMessage.set('Por favor, insira seu nome completo.');
-      return;
-    }
+    const fields = ['nome', 'email', 'cpf', 'genero', 'dataNascimento', 'password', 'confirmPassword'];
+    fields.forEach(f => {
+      this.touched[f] = true;
+      this.runValidation(f);
+    });
 
-    if (!this.userData.cpf || !this.validateCPF(this.userData.cpf)) {
-      this.errorMessage.set('CPF inválido. Insira um CPF válido.');
-      return;
-    }
-
-    if (!this.userData.password) {
-      this.errorMessage.set('A senha não pode estar vazia.');
-      return;
-    }
-
-    if (this.userData.password.length < 6) {
-      this.errorMessage.set('A senha deve ter no mínimo 6 caracteres.');
-      return;
-    }
-
-    if (this.userData.password !== this.userData.confirmPassword) {
-      this.errorMessage.set('As senhas não coincidem.');
-      return;
-    }
-
-    if (!this.userData.genero) {
-      this.errorMessage.set('Por favor, selecione seu gênero.');
-      return;
-    }
-
-    if (!this.userData.dataNascimento || this.userData.dataNascimento.length < 10) {
-      this.errorMessage.set('Por favor, insira sua data de nascimento.');
-      return;
-    }
+    const hasErrors = Object.values(this.fieldErrors).some(s => s() !== '');
+    if (hasErrors) return;
 
     if (!this.aceitouTermos()) {
       this.errorMessage.set('Você precisa aceitar os Termos de Uso e a Política de Privacidade.');
