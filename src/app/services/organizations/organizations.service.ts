@@ -8,6 +8,48 @@ import { cacheGet, cacheSet, cacheInvalidate, cacheKey } from '../../utils/api-c
 
 const TTL_MS = 5 * 60 * 1000;
 
+const DEMO_CLINICAS_EXPLORAR: ClinicaExplorar[] = [
+  {
+    id: 1,
+    nome: 'Clínica Saúde & Vida',
+    tipo: 'CLINICA',
+    foto: 'https://ui-avatars.com/api/?name=Saude+Vida&background=419640&color=fff&size=256&bold=true',
+    cidade: 'São Paulo',
+    estado: 'SP',
+    enderecoFormatado: 'Av. Paulista, 1000 — Bela Vista',
+    telefone: '(11) 3000-0000',
+    totalProfissionais: 8,
+    especialidades: ['Cardiologia', 'Clínico Geral', 'Pediatria'],
+    statusVerificacao: 'verificado',
+  },
+  {
+    id: 2,
+    nome: 'Consultório Dr. Silva',
+    tipo: 'CONSULTORIO',
+    foto: 'https://ui-avatars.com/api/?name=Dr+Silva&background=2d6a4f&color=fff&size=256&bold=true',
+    cidade: 'Campinas',
+    estado: 'SP',
+    enderecoFormatado: 'Rua das Flores, 220 — Centro',
+    telefone: '(19) 3200-0000',
+    totalProfissionais: 3,
+    especialidades: ['Dermatologia', 'Nutrição'],
+    statusVerificacao: 'verificado',
+  },
+  {
+    id: 3,
+    nome: 'Centro Médico Horizonte',
+    tipo: 'CLINICA',
+    foto: 'https://ui-avatars.com/api/?name=Horizonte&background=1b4332&color=fff&size=256&bold=true',
+    cidade: 'Santos',
+    estado: 'SP',
+    enderecoFormatado: 'Av. Ana Costa, 55 — Gonzaga',
+    telefone: '(13) 3100-0000',
+    totalProfissionais: 12,
+    especialidades: ['Ortopedia', 'Fisioterapia', 'Psicologia'],
+    statusVerificacao: 'pendente',
+  },
+];
+
 export interface ExplorarClinicasFiltros {
   nome?: string;
   cidade?: string;
@@ -20,6 +62,15 @@ export class OrganizationsService {
   private apiUrl = environment.apiUrl;
 
   explorarClinicas(filtros: ExplorarClinicasFiltros = {}, force = false): Observable<ClinicaExplorar[]> {
+    if (environment.useMock) {
+      let lista = [...DEMO_CLINICAS_EXPLORAR];
+      const nome = filtros.nome?.trim().toLowerCase();
+      const cidade = filtros.cidade?.trim().toLowerCase();
+      if (nome) lista = lista.filter(c => c.nome.toLowerCase().includes(nome));
+      if (cidade) lista = lista.filter(c => (c.cidade || '').toLowerCase().includes(cidade));
+      return of(lista);
+    }
+
     let params = new HttpParams();
     if (filtros.nome?.trim()) params = params.set('nome', filtros.nome.trim());
     if (filtros.cidade?.trim()) params = params.set('cidade', filtros.cidade.trim());
