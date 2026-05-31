@@ -34,17 +34,23 @@
       </div>
       <div class="about-grid">
         <div class="about-card">
-          <div class="about-icon">🎯</div>
+          <div class="icon-badge icon-badge--soft">
+            <app-equipe-icon name="objective" [size]="28" />
+          </div>
           <h3>Objetivo</h3>
           <p>Desenvolver uma plataforma web para gestão inteligente de filas e agendamentos em clínicas, utilizando machine learning para priorização automatizada de atendimentos com base em urgência clínica.</p>
         </div>
         <div class="about-card">
-          <div class="about-icon">📋</div>
+          <div class="icon-badge icon-badge--soft">
+            <app-equipe-icon name="methodology" [size]="28" />
+          </div>
           <h3>Metodologia</h3>
           <p>O projeto segue uma abordagem ágil com sprints iterativos, priorizando a entrega de valor funcional incremental e testes contínuos com cenários clínicos simulados.</p>
         </div>
         <div class="about-card">
-          <div class="about-icon">💡</div>
+          <div class="icon-badge icon-badge--soft">
+            <app-equipe-icon name="rationale" [size]="28" />
+          </div>
           <h3>Justificativa</h3>
           <p>A falta de sistemas inteligentes em clínicas gera filas desorganizadas, atendimentos por ordem de chegada sem considerar urgência, e perda de tempo para profissionais e pacientes.</p>
         </div>
@@ -59,37 +65,31 @@
         <span class="section-tag">Stack Tecnológica</span>
         <h2>Tecnologias Utilizadas</h2>
       </div>
-      <div class="tech-grid">
-        <div class="tech-card">
-          <div class="tech-icon">🅰️</div>
-          <h3>Angular 19</h3>
-          <span>Frontend</span>
-        </div>
-        <div class="tech-card">
-          <div class="tech-icon">🐍</div>
-          <h3>Python / Flask</h3>
-          <span>Backend API</span>
-        </div>
-        <div class="tech-card">
-          <div class="tech-icon">🐘</div>
-          <h3>PostgreSQL</h3>
-          <span>Banco de Dados</span>
-        </div>
-        <div class="tech-card">
-          <div class="tech-icon">🤖</div>
-          <h3>Scikit-learn</h3>
-          <span>Machine Learning</span>
-        </div>
-        <div class="tech-card">
-          <div class="tech-icon">🐳</div>
-          <h3>Docker</h3>
-          <span>Containerização</span>
-        </div>
-        <div class="tech-card">
-          <div class="tech-icon">🔐</div>
-          <h3>JWT</h3>
-          <span>Autenticação</span>
-        </div>
+      <div class="tech-layers">
+        @for (grupo of techGrupos; track grupo.titulo) {
+          <div class="tech-layer">
+            <h3 class="tech-layer-title">{{ grupo.titulo }}</h3>
+            <div class="tech-grid" [class.tech-grid--cols-3]="grupo.itens.length === 3">
+              @for (tech of grupo.itens; track tech.nome) {
+                <div class="tech-card" [class.tech-card--wide]="tech.wide">
+                  <div
+                    class="icon-badge"
+                    [class.icon-badge--duo]="tech.logos.length === 2"
+                    [class.icon-badge--multi]="tech.logos.length > 2"
+                    [class.icon-badge--row]="tech.wide">
+                    @for (logo of tech.logos; track logo.alt) {
+                      <img [src]="logo.src" [alt]="logo.alt" class="tech-brand-logo" loading="lazy" />
+                    }
+                  </div>
+                  <div class="tech-card-body">
+                    <h4>{{ tech.nome }}</h4>
+                    <span>{{ tech.categoria }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
       </div>
     </div>
   </section>
@@ -103,24 +103,19 @@
         <p>Conheça os alunos responsáveis pela idealização e desenvolvimento deste projeto.</p>
       </div>
       <div class="team-grid">
-        <div class="team-card">
-          <div class="team-avatar">👨‍💻</div>
-          <h3>Membro 1</h3>
-          <span class="team-role">Desenvolvedor Full-Stack</span>
-          <p class="team-desc">Responsável pela arquitetura do backend, integração com IA e modelagem do banco de dados.</p>
-        </div>
-        <div class="team-card">
-          <div class="team-avatar">👩‍💻</div>
-          <h3>Membro 2</h3>
-          <span class="team-role">Desenvolvedor Front-end</span>
-          <p class="team-desc">Responsável pelo design e implementação da interface do usuário e experiência mobile.</p>
-        </div>
-        <div class="team-card">
-          <div class="team-avatar">👨‍💻</div>
-          <h3>Membro 3</h3>
-          <span class="team-role">Documentação e Testes</span>
-          <p class="team-desc">Responsável pela documentação acadêmica, testes de usabilidade e validação dos requisitos.</p>
-        </div>
+        @for (membro of membros; track membro.nome) {
+          <div class="team-card">
+            <div class="team-avatar">
+              <span class="team-initials">{{ membro.iniciais }}</span>
+              <span class="team-role-icon" [attr.title]="membro.papel">
+                <app-equipe-icon [name]="membro.icono" [size]="18" />
+              </span>
+            </div>
+            <h3>{{ membro.nome }}</h3>
+            <span class="team-role">{{ membro.papel }}</span>
+            <p class="team-desc">{{ membro.descricao }}</p>
+          </div>
+        }
       </div>
     </div>
   </section>
@@ -129,11 +124,13 @@
   <section class="advisor-section">
     <div class="section-container">
       <div class="advisor-card">
-        <div class="advisor-icon">🎓</div>
+        <div class="advisor-icon">
+          <app-equipe-icon name="advisor" [size]="36" />
+        </div>
         <div class="advisor-info">
           <span class="section-tag">Orientação</span>
           <h3>Professora Orientadora</h3>
-          <p>Luana Magalhães Leal — Faculdade Metropolitana de Manaus</p>
+          <p>{{ orientadora }} — {{ instituicao }}</p>
         </div>
       </div>
     </div>

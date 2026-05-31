@@ -368,13 +368,16 @@ src/app/
 
 ## Equipe
 
-Projeto desenvolvido como **Trabalho de Conclusão de Curso (TCC)** pela **Faculdade Metropolitana de Manaus**, pelos integrantes:
+Projeto desenvolvido como **Trabalho de Conclusão de Curso (TCC)** pela **Faculdade Metropolitana de Manaus**.
 
-- Josias Azevedo da Silva
-- Matheus Akabane Brazão
-- Kaio Oliveira Pantoja
-- Alan Nicolas Santos Maragua
-- Olliver de Aquino Freitas
+| Integrante | Papel |
+|------------|-------|
+| Josias Azevedo da Silva | Product Owner & Desenvolvedor Full-Stack |
+| Kaio Oliveira Pantoja | Scrum Master & Tech Lead |
+| Wagner Eduardo | Documentação |
+| Matheus Akabane Brazão | Desenvolvedor Back-end |
+| Ólliver de Aquino Freitas | Front-end UX/UI |
+| Alan Nicolas Santos Maragua | QA — Quality Assurance |
 
 ### Orientação
 
@@ -382,4 +385,8 @@ Projeto desenvolvido como **Trabalho de Conclusão de Curso (TCC)** pela **Facul
 
 ---
 
-**SIGPS** — Trabalho de Conclusão de Curso · Sistema Inteligente de Gestão e Priorização na Saúde
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+---
+
+
