@@ -10,16 +10,28 @@ export class MockedFilaService extends AbstractFilaService {
 
     private initialFila: PacienteFila[] = [
         {
-            id: '1', posicao: 1, paciente: 'Maria Eduarda Costa', prioridade: 'Alta', tempoEspera: '15 min',
-            chegada: '09:10', especialidade: 'Pediatria', status: 'Aguardando',
-            aiScore: 2, aiReasoning: 'Início súbito de febre alta. Risco elevado.',
-            riskTrend: 'up', consultaData: '30/05/2026', consultaHorario: '09:30'
+            id: '1', posicao: 1, paciente: 'Helena Moura', prioridade: 'Extrema', tempoEspera: '8 min',
+            chegada: '09:22', especialidade: 'Cardiologia', status: 'Em Atendimento',
+            aiScore: 3, aiReasoning: 'Idosa com diabetes e dor torácica. Prioridade máxima.',
+            riskTrend: 'up', consultaData: '31/05/2026', consultaHorario: '09:30'
         },
         {
-            id: '2', posicao: 2, paciente: 'João Pedro Santos', prioridade: 'Normal', tempoEspera: '25 min',
+            id: '2', posicao: 2, paciente: 'Maria Eduarda Costa', prioridade: 'Alta', tempoEspera: '15 min',
+            chegada: '09:10', especialidade: 'Pediatria', status: 'Aguardando',
+            aiScore: 2, aiReasoning: 'Febre alta em criança. Risco elevado.',
+            riskTrend: 'up', consultaData: '31/05/2026', consultaHorario: '09:45'
+        },
+        {
+            id: '3', posicao: 3, paciente: 'João Pedro Santos', prioridade: 'Normal', tempoEspera: '25 min',
             chegada: '09:00', especialidade: 'Clínico Geral', status: 'Aguardando',
             aiScore: 1, aiReasoning: 'Sintomas gripais leves. Estável.',
-            riskTrend: 'stable', consultaData: '30/05/2026', consultaHorario: '10:00'
+            riskTrend: 'stable', consultaData: '31/05/2026', consultaHorario: '10:00'
+        },
+        {
+            id: '4', posicao: 4, paciente: 'Ana Beatriz Lima', prioridade: 'Alta', tempoEspera: '18 min',
+            chegada: '09:05', especialidade: 'Nutrição', status: 'Aguardando',
+            aiScore: 2, aiReasoning: 'Hipertensão descompensada.',
+            riskTrend: 'stable', consultaData: '31/05/2026', consultaHorario: '10:15'
         },
     ];
 
@@ -29,6 +41,7 @@ export class MockedFilaService extends AbstractFilaService {
 
     constructor() {
         super();
+        this.analisarIA();
         effect(() => {
             this.simulationService.save('fila', this.fila());
         });
@@ -36,10 +49,6 @@ export class MockedFilaService extends AbstractFilaService {
 
     invalidateCache(): void {
         // mock — sem cache persistente além do simulation service
-    }
-
-    refreshFila(): void {
-        this.reordenarFila();
     }
 
     reordenarFila(): void {
@@ -53,14 +62,26 @@ export class MockedFilaService extends AbstractFilaService {
     }
 
     analisarIA(): void {
+        const aguardando = this.fila().filter(p => p.status === 'Aguardando');
+        const emAtendimento = this.fila().filter(p => p.status === 'Em Atendimento');
+        const criticos = this.fila().filter(p => p.prioridade === 'Extrema' || p.prioridade === 'Alta');
         this.analiseIA.set({
-            analise: 'Fluxo simulado estável.',
-            nivel: 'normal',
-            pacientes_criticos: 0,
-            pacientes_alta: 1,
-            total_na_fila: this.fila().filter(p => p.status === 'Aguardando').length,
-            em_atendimento: this.fila().filter(p => p.status === 'Em Atendimento').length,
+            analise: criticos.length >= 2
+                ? 'Fila com demanda elevada: priorize casos de risco cardiovascular e pediátrico.'
+                : 'Fluxo estável. Tempo médio de espera dentro do esperado.',
+            nivel: criticos.length >= 3 ? 'critico' : criticos.length >= 1 ? 'alerta' : 'normal',
+            pacientes_criticos: this.fila().filter(p => p.prioridade === 'Extrema').length,
+            pacientes_alta: this.fila().filter(p => p.prioridade === 'Alta').length,
+            total_na_fila: aguardando.length,
+            em_atendimento: emAtendimento.length,
+            atualizado_em: 'agora',
+            ml_online: true,
         });
+    }
+
+    refreshFila(_force?: boolean): void {
+        this.reordenarFila();
+        this.analisarIA();
     }
 
     atenderPaciente(id: string, pacienteNome?: string): void {

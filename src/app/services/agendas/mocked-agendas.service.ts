@@ -11,9 +11,10 @@ export class MockedAgendasService extends AbstractAgendasService {
     private simulationService = inject(SimulationService);
 
     private initialAgendas: Agenda[] = [
-        { id: 1, especialista: 'Dr. Roberto Lins', especialidade: 'Cardiologia', horarios: ['08:00', '09:00', '10:00'], vagas: 3 },
-        { id: 2, especialista: 'Dra. Amanda Silva', especialidade: 'Dermatologia', horarios: ['14:00', '15:00', '16:00'], vagas: 2 },
-        { id: 3, especialista: 'Dr. Carlos Mendes', especialidade: 'Pediatria', horarios: ['10:00', '11:00'], vagas: 1 },
+        { id: 1, especialistaId: 1, especialista: 'Dr. Roberto Lins', especialidade: 'Cardiologia', data: '05/06/2026', horarios: ['08:00', '09:00', '10:00'], vagas: 3 },
+        { id: 2, especialistaId: 1, especialista: 'Dr. Roberto Lins', especialidade: 'Cardiologia', data: '12/06/2026', horarios: ['14:00', '15:00', '16:00'], vagas: 2 },
+        { id: 3, especialistaId: 2, especialista: 'Dra. Amanda Silva', especialidade: 'Dermatologia', data: '08/06/2026', horarios: ['10:00', '11:00'], vagas: 1 },
+        { id: 4, especialistaId: 3, especialista: 'Dr. Carlos Mendes', especialidade: 'Pediatria', data: '20/06/2026', horarios: ['09:00', '10:30'], vagas: 2 },
     ];
 
     private initialConsultas: Consulta[] = [
@@ -34,6 +35,8 @@ export class MockedAgendasService extends AbstractAgendasService {
             this.simulationService.save('consultas', this.consultas());
         });
     }
+
+    loadAll(_force?: boolean): void {}
 
     getProximaConsulta() {
         const scheduled = this.consultas().filter(c => c.status === 'agendada');

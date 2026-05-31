@@ -490,9 +490,12 @@
 }
 
 .circular-progress-svg {
-  transform: rotate(-90deg);
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
 }
 
 .circle-bg {

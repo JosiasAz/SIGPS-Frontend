@@ -7,6 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "screenshots:serve": "ng serve --configuration=screenshots --port 4200",
+    "screenshots": "node scripts/capture-screenshots.mjs",
     "serve:ssr:SIS-Frontend": "node dist/SIS-Frontend/server/server.mjs"
   },
   "prettier": {
@@ -44,6 +46,7 @@
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
     "jsdom": "^27.1.0",
+    "playwright": "^1.60.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
   }

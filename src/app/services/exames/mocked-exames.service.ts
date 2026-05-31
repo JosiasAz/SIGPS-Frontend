@@ -18,4 +18,6 @@ export class MockedExamesService implements AbstractExamesService {
   getExameById(id: number): Exame | undefined {
     return this.exames().find(e => e.id === id);
   }
+
+  loadExames(): void {}
 }
