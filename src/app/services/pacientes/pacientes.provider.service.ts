@@ -6,5 +6,5 @@ import { environment } from '../../env/environment';
 
 export const PacientesProvider: Provider = {
     provide: AbstractPacientesService,
-    useClass: PacientesService
+    useClass: environment.useMock ? MockedPacientesService : PacientesService,
 };

@@ -6,5 +6,5 @@ import { ChatService } from './chat.service';
 
 export const ChatProvider: Provider = {
   provide: AbstractChatService,
-  useClass: ChatService
+  useClass: environment.useMock ? MockedChatService : ChatService,
 };

@@ -28,4 +28,7 @@ export class MockedPacientesService extends AbstractPacientesService {
     excluirPaciente(id: number): void {
         this.pacientes.update(pacientes => pacientes.filter(p => p.id !== id));
     }
+
+    /** Compatível com PacientesService para telas que chamam loadPacientes(). */
+    loadPacientes(_filtros?: { nome?: string; cpf?: string }, _force?: boolean): void {}
 }
