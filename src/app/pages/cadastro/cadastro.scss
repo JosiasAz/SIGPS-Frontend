@@ -4,6 +4,11 @@
   100% { background-position: 0% 50%; }
 }
 
+@keyframes fadeInError {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 :host {
     display: block;
     height: 100vh;
@@ -193,13 +198,52 @@
     .input-group {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
 
         label {
             font-size: 0.9rem;
             font-weight: 600;
             color: var(--green-deep);
             margin-left: 4px;
+        }
+
+        .field-error {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #e53e3e;
+            margin-left: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            animation: fadeInError 0.15s ease;
+
+            &::before {
+                content: '!';
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 14px;
+                height: 14px;
+                background: #e53e3e;
+                color: white;
+                border-radius: 50%;
+                font-size: 0.65rem;
+                font-weight: 800;
+                flex-shrink: 0;
+            }
+        }
+
+        &.has-error {
+            .input-wrapper input,
+            .input-wrapper select {
+                border-color: #e53e3e;
+                background: #fff5f5;
+
+                &:focus {
+                    border-color: #e53e3e;
+                    box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.08);
+                }
+            }
         }
 
         .input-wrapper {

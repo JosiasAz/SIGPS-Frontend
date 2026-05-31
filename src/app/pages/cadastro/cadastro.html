@@ -44,7 +44,7 @@
 
                 <div class="form-grid">
                     <!-- Nome Completo -->
-                    <div class="input-group full-width">
+                    <div class="input-group full-width" [class.has-error]="fieldErrors.nome()">
                         <label for="fullName">Nome Completo</label>
                         <div class="input-wrapper">
                             <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -53,12 +53,14 @@
                                 <circle cx="12" cy="7" r="4" />
                             </svg>
                             <input type="text" id="fullName" name="fullName" [(ngModel)]="userData.nome"
-                                placeholder="Digite seu nome completo" required />
+                                placeholder="Digite seu nome completo" required
+                                (blur)="onBlur('nome')" />
                         </div>
+                        <span class="field-error" *ngIf="fieldErrors.nome()">{{ fieldErrors.nome() }}</span>
                     </div>
 
                     <!-- E-mail -->
-                    <div class="input-group">
+                    <div class="input-group" [class.has-error]="fieldErrors.email()">
                         <label for="email">E-mail</label>
                         <div class="input-wrapper">
                             <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -67,12 +69,14 @@
                                 <polyline points="22,6 12,13 2,6" />
                             </svg>
                             <input type="email" id="email" name="email" [(ngModel)]="userData.email"
-                                placeholder="nome@exemplo.com" required />
+                                placeholder="nome@exemplo.com" required
+                                (blur)="onBlur('email')" />
                         </div>
+                        <span class="field-error" *ngIf="fieldErrors.email()">{{ fieldErrors.email() }}</span>
                     </div>
 
                     <!-- CPF -->
-                    <div class="input-group">
+                    <div class="input-group" [class.has-error]="fieldErrors.cpf()">
                         <label for="cpf">CPF</label>
                         <div class="input-wrapper">
                             <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -83,12 +87,14 @@
                                 <line x1="7" y1="16" x2="13" y2="16" />
                             </svg>
                             <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00"
-                                [(ngModel)]="userData.cpf" (input)="formatCpf($event)" required />
+                                [(ngModel)]="userData.cpf" (input)="formatCpf($event)"
+                                (blur)="onBlur('cpf')" required />
                         </div>
+                        <span class="field-error" *ngIf="fieldErrors.cpf()">{{ fieldErrors.cpf() }}</span>
                     </div>
 
                     <!-- Gênero -->
-                    <div class="input-group">
+                    <div class="input-group" [class.has-error]="fieldErrors.genero()">
                         <label for="genero">Gênero</label>
                         <div class="input-wrapper">
                             <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -96,18 +102,22 @@
                                 <circle cx="12" cy="12" r="4" />
                                 <path d="M12 2v8M12 16v6M6 12H2M16 12h4M7.17 7.17L4.34 4.34M16.83 16.83L19.66 19.66M16.83 7.17L19.66 4.34M7.17 16.83L4.34 19.66" />
                             </svg>
-                            <select id="genero" name="genero" [(ngModel)]="userData.genero" required>
-                                <option value="" disabled selected>Selecione seu gênero</option>
+                            <select id="genero" name="genero" [(ngModel)]="userData.genero" required
+                                tabindex="0"
+                                (change)="onBlur('genero')"
+                                (blur)="onBlur('genero')">
+                                <option value="" disabled selected>Selecione</option>
                                 <option value="masculino">Masculino</option>
                                 <option value="feminino">Feminino</option>
                                 <option value="outro">Outro</option>
                                 <option value="prefiro-nao">Prefiro não informar</option>
                             </select>
                         </div>
+                        <span class="field-error" *ngIf="fieldErrors.genero()">{{ fieldErrors.genero() }}</span>
                     </div>
 
                     <!-- Data de Nascimento -->
-                    <div class="input-group">
+                    <div class="input-group" [class.has-error]="fieldErrors.dataNascimento()">
                         <label for="dataNascimento">Data de Nascimento</label>
                         <div class="input-wrapper">
                             <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -118,7 +128,8 @@
                                 <line x1="3" y1="10" x2="21" y2="10" />
                             </svg>
                             <input type="text" id="dataNascimento" name="dataNascimento" placeholder="dd/mm/aaaa"
-                                [(ngModel)]="userData.dataNascimento" (input)="formatDate($event)" required />
+                                [(ngModel)]="userData.dataNascimento" (input)="formatDate($event)"
+                                (blur)="onBlur('dataNascimento')" required />
                             <button type="button" class="date-toggle" (click)="toggleDatePicker()">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2">
@@ -129,10 +140,11 @@
                                 </svg>
                             </button>
                         </div>
+                        <span class="field-error" *ngIf="fieldErrors.dataNascimento()">{{ fieldErrors.dataNascimento() }}</span>
                     </div>
 
                     <!-- Senha -->
-                    <div class="input-group">
+                    <div class="input-group" [class.has-error]="fieldErrors.password()">
                         <label for="password">Senha</label>
                         <div class="input-wrapper">
                             <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -141,7 +153,9 @@
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                             </svg>
                             <input [type]="showPassword() ? 'text' : 'password'" id="password" name="password"
-                                [(ngModel)]="userData.password" placeholder="••••••••" required />
+                                [(ngModel)]="userData.password" placeholder="••••••••" required
+                                (blur)="onBlur('password')"
+                                (input)="onPasswordInput()" />
                             <button type="button" class="password-toggle" (click)="togglePassword()">
                                 <svg *ngIf="!showPassword()" width="20" height="20" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2">
@@ -155,10 +169,11 @@
                                 </svg>
                             </button>
                         </div>
+                        <span class="field-error" *ngIf="fieldErrors.password()">{{ fieldErrors.password() }}</span>
                     </div>
 
                     <!-- Confirmar Senha -->
-                    <div class="input-group">
+                    <div class="input-group" [class.has-error]="fieldErrors.confirmPassword()">
                         <label for="confirmPassword">Confirmar Senha</label>
                         <div class="input-wrapper">
                             <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -168,7 +183,9 @@
                             </svg>
                             <input [type]="showConfirmPassword() ? 'text' : 'password'" id="confirmPassword"
                                 name="confirmPassword" [(ngModel)]="userData.confirmPassword" placeholder="••••••••"
-                                required />
+                                required
+                                (blur)="onBlur('confirmPassword')"
+                                (input)="onConfirmPasswordInput()" />
                             <button type="button" class="password-toggle" (click)="toggleConfirmPassword()">
                                 <svg *ngIf="!showConfirmPassword()" width="20" height="20" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2">
@@ -182,6 +199,7 @@
                                 </svg>
                             </button>
                         </div>
+                        <span class="field-error" *ngIf="fieldErrors.confirmPassword()">{{ fieldErrors.confirmPassword() }}</span>
                     </div>
                 </div>
 
