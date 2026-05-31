@@ -366,4 +366,20 @@ src/app/
 
 ---
 
+## Equipe
+
+Projeto desenvolvido como **Trabalho de Conclusão de Curso (TCC)** pela **Faculdade Metropolitana de Manaus**, pelos integrantes:
+
+- Josias Azevedo da Silva
+- Matheus Akabane Brazão
+- Kaio Oliveira Pantoja
+- Alan Nicolas Santos Maragua
+- Olliver de Aquino Freitas
+
+### Orientação
+
+**Professora orientadora:** Luana Magalhães Leal
+
+---
+
 **SIGPS** — Trabalho de Conclusão de Curso · Sistema Inteligente de Gestão e Priorização na Saúde
