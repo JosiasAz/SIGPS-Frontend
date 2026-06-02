@@ -1,8 +1,23 @@
-# SIGPS — Frontend
+<div align="center">
 
-Interface web do **SIGPS** (Sistema Inteligente de Gestão e Priorização na Saúde). Aplicação **SPA** em **Angular 21** com rotas protegidas por perfil (**RBAC**), comunicação com o backend via **REST/JSON** e token **JWT**.
+<img src="../docs/logo.svg" alt="Logo SIGPS" width="120">
 
-> Documentação técnica complementar: [DOCS.md](./DOCS.md)
+# SIGPS Front-end
+
+**Interface web do SIGPS - SPA Angular com RBAC, JWT e integração com fila inteligente**
+
+[![Angular](https://img.shields.io/badge/Angular-21-DD0031?logo=angular&logoColor=white)](https://angular.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+
+[README principal](../README.md) · [DOCS.md](./DOCS.md) · [Backend](../SIGPS-Backend/README.md) · [Machine Learning](../SIGPS-Machine-Learning/README.md)
+
+**TCC** - Faculdade Metropolitana de Manaus · Orientadora: Profª Luana Magalhães Leal
+
+</div>
+
+---
+
+Aplicação **SPA** em **Angular 21** com rotas protegidas por perfil (**RBAC**), comunicação com o backend via **REST/JSON** e token **JWT**.
 
 ---
 
@@ -309,17 +324,6 @@ ng serve
 
 Acesse: `http://localhost:4200`
 
-### Gerar capturas para o README
-
-```bash
-npm run screenshots:serve
-# Em outro terminal:
-npm run screenshots
-```
-
-Usa a configuração `screenshots` (`environment.screenshots.ts` com `useMock: true`).
-
-Configure a URL da API em `src/app/env/environment.ts` (ou variáveis do ambiente de build).
 
 ### Build de produção
 
@@ -381,12 +385,17 @@ Projeto desenvolvido como **Trabalho de Conclusão de Curso (TCC)** pela **Facul
 
 ### Orientação
 
-**Professora orientadora:** Luana Magalhães Leal
+**Professora orientadora:** 
+
+    Profª Luana Magalhães Leal - Tech Manager & Profª de Tecnologia
 
 ---
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+<div align="center">
 
----
+**SIGPS** — Trabalho de Conclusão de Curso · Gestão e priorização na saúde
 
+[← Voltar ao README principal](../README.md)
+
+</div>
 
