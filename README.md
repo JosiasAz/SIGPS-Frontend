@@ -315,23 +315,53 @@ flowchart TD
 - Node.js 20+
 - npm 11+
 
-### Desenvolvimento
+### Ambientes
+
+| Arquivo | Quando usa | API |
+|---------|------------|-----|
+| `environment.ts` | **Build produção / Vercel** | `https://api.sigps.online` |
+| `environment.development.ts` | `ng serve` local | `http://127.0.0.1:5000` |
+| `environment.screenshots.ts` | Captura de telas | mock local |
+
+### Desenvolvimento local
 
 ```bash
 npm install
-ng serve
+npm start
 ```
 
-Acesse: `http://localhost:4200`
+Acesse: `http://localhost:4200` (backend local na porta 5000).
 
+Para testar localmente **contra a API de produção**:
+
+```bash
+npm run start:prod-api
+```
 
 ### Build de produção
 
 ```bash
-ng build
+npm run build
 ```
 
-Artefatos em `dist/`.
+Saída: `dist/SIGPS-Frontend/browser` — API embutida: **https://api.sigps.online**, `useMock: false`.
+
+### Deploy na Vercel
+
+1. Importe o repositório na Vercel.
+2. **Root Directory:** `SIGPS-Frontend`
+3. Framework: **Other** (o `vercel.json` já define build e output).
+4. Domínio: `www.sigps.online` (já previsto no CORS do backend).
+
+Comandos (automáticos via `vercel.json`):
+
+- Install: `npm ci`
+- Build: `npm run build`
+- Output: `dist/SIGPS-Frontend/browser`
+
+Após o deploy, faça login com uma conta real do backend em produção.
+
+> **CORS:** o backend deve incluir `https://www.sigps.online` e `https://sigps.online` em `CORS_ORIGINS` (já configurado no `.env` de produção).
 
 ### Testes
 
