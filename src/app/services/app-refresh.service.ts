@@ -33,7 +33,12 @@ export class AppRefreshService {
             (this.agendas as AgendasService).loadAll?.();
         }
         if (route.includes('/pacientes')) {
-            (this.pacientes as PacientesService).loadPacientes?.();
+            const svc = this.pacientes as PacientesService;
+            if (svc.paginated()) {
+                svc.reloadPaginatedFromStart(true);
+            } else {
+                svc.loadPacientes({}, true);
+            }
         }
         if (route.includes('/dashboard')) {
             (this.dashboard as DashboardService).loadData?.();
@@ -42,7 +47,12 @@ export class AppRefreshService {
             (this.fila as FilaService).refreshFila?.(true);
         }
         if (route.includes('/especialistas') || route.includes('/busca-profissionais')) {
-            (this.especialistas as EspecialistasService).loadEspecialistas?.({}, true);
+            const svc = this.especialistas as EspecialistasService;
+            if (svc.paginated()) {
+                svc.reloadPaginatedFromStart(true);
+            } else {
+                svc.loadEspecialistas({}, true);
+            }
         }
     }
 }

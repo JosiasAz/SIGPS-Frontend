@@ -21,15 +21,8 @@
         <div class="filtros-row" [class.com-clinica]="isAdmin()">
             @if (isAdmin() && organizations().length > 0) {
             <div class="filtro-field">
-                <label for="filtro-clinica">Clínica</label>
-                <select id="filtro-clinica" class="form-input"
-                    [ngModel]="activeOrganizationId() ?? 0"
-                    (ngModelChange)="onClinicaChange($event)">
-                    <option [ngValue]="0">Todas as clínicas</option>
-                    @for (org of organizations(); track org.id) {
-                    <option [ngValue]="org.id">{{ org.nome }}</option>
-                    }
-                </select>
+                <label>Clínica</label>
+                <app-org-selector variant="field" [showAllClinics]="true" />
             </div>
             }
             <div class="filtro-field">
@@ -52,6 +45,27 @@
     </div>
 
     <div class="card">
+        <div class="pacientes-toolbar">
+            @if (!isLoadingList()) {
+            <span class="count-badge">{{ totalPacientes() }} pacientes</span>
+            }
+            <div class="users-per-page">
+                <label for="pacPerPage">Por página</label>
+                <select id="pacPerPage" [ngModel]="perPage()" (ngModelChange)="changePerPage(+$event)">
+                    <option [ngValue]="10">10</option>
+                    <option [ngValue]="15">15</option>
+                    <option [ngValue]="25">25</option>
+                    <option [ngValue]="50">50</option>
+                </select>
+            </div>
+        </div>
+
+        @if (isLoadingList()) {
+        <div class="loading-pacientes">
+            <div class="spinner"></div>
+            <p>Carregando pacientes...</p>
+        </div>
+        } @else {
         <div class="table-container">
             <table class="dashboard-table">
                 <thead>
@@ -106,7 +120,9 @@
                     @if (pacientes().length === 0) {
                     <tr>
                         <td [attr.colspan]="mostrarColunaClinica() ? 7 : 6" style="text-align: center; padding: 48px 24px; color: var(--text-muted);">
-                            @if (isAdmin() && activeOrganizationId() === 0) {
+                            @if (filtroNome() || filtroCpf()) {
+                            Nenhum paciente encontrado para os filtros aplicados.
+                            } @else if (isAdmin() && activeOrganizationId() === 0) {
                             Nenhum paciente vinculado a clínicas ainda.
                             } @else {
                             Nenhum paciente vinculado à organização ainda. Pacientes aparecem aqui após se registrarem no portal e agendarem ou serem associados à clínica.
@@ -117,6 +133,28 @@
                 </tbody>
             </table>
         </div>
+
+        @if (totalPages() > 1 || totalPacientes() > 0) {
+        <div class="users-pagination">
+            <span class="pagination-info">{{ rangeLabel() }}</span>
+            @if (totalPages() > 1) {
+            <div class="pagination-controls">
+                <button type="button" class="page-btn" (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1" aria-label="Página anterior">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                @for (page of paginationRange(); track page) {
+                <button type="button" class="page-btn" [class.active]="page === currentPage()" (click)="goToPage(page)">
+                    {{ page }}
+                </button>
+                }
+                <button type="button" class="page-btn" (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()" aria-label="Próxima página">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+            }
+        </div>
+        }
+        }
     </div>
 
     <dialog #deleteModal class="native-modal" (click)="fecharModalExclusao()">

@@ -1,0 +1,107 @@
+<div class="org-picker" [class.open]="isOpen()" [class.variant-field]="variant() === 'field'">
+    <button
+        type="button"
+        class="org-picker-trigger"
+        (click)="togglePanel()"
+        [attr.aria-expanded]="isOpen()"
+        aria-haspopup="listbox"
+    >
+        <span class="org-picker-icon" aria-hidden="true">
+            @if (isAllSelected()) {
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+            } @else {
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 21h18"></path>
+                <path d="M5 21V7l8-4v18"></path>
+                <path d="M19 21V11l-6-4"></path>
+            </svg>
+            }
+        </span>
+        <span class="org-picker-label">{{ selectedLabel() }}</span>
+        <svg class="org-picker-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+    </button>
+
+    @if (isOpen()) {
+    <div class="org-picker-panel" role="listbox">
+        <div class="org-picker-search">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+                type="search"
+                placeholder="Buscar clínica..."
+                [ngModel]="search()"
+                (ngModelChange)="search.set($event)"
+                (click)="$event.stopPropagation()"
+                autofocus
+            />
+            @if (search()) {
+            <button type="button" class="search-clear" (click)="search.set('')" aria-label="Limpar busca">×</button>
+            }
+        </div>
+
+        <ul class="org-picker-list">
+            @if (showAllClinics()) {
+            <li>
+                <button
+                    type="button"
+                    class="org-picker-option"
+                    [class.active]="activeOrganizationId() === 0"
+                    (click)="selectOrganization(0)"
+                >
+                    <span class="option-icon global">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
+                    </span>
+                    <span class="option-text">Todas as clínicas</span>
+                </button>
+            </li>
+            }
+
+            @for (org of filteredOrganizations(); track org.id) {
+            <li>
+                <button
+                    type="button"
+                    class="org-picker-option"
+                    [class.active]="activeOrganizationId() === org.id"
+                    (click)="selectOrganization(org.id)"
+                >
+                    <span class="option-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 21h18"></path>
+                            <path d="M5 21V7l8-4v18"></path>
+                            <path d="M19 21V11l-6-4"></path>
+                        </svg>
+                    </span>
+                    <span class="option-text">{{ org.nome }}</span>
+                </button>
+            </li>
+            } @empty {
+            <li class="org-picker-empty">
+                @if (search()) {
+                Nenhuma clínica encontrada para "{{ search() }}".
+                } @else {
+                Nenhuma clínica disponível.
+                }
+            </li>
+            }
+        </ul>
+
+        @if (organizations().length > 5) {
+        <div class="org-picker-footer">
+            {{ filteredOrganizations().length }} de {{ organizations().length }} clínicas
+        </div>
+        }
+    </div>
+    }
+</div>

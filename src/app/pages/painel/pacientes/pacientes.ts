@@ -1,27 +1,26 @@
 import { Component, inject, ViewChild, ElementRef, computed, effect, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AbstractPacientesService, Paciente } from '../../../services/pacientes/abstract-pacientes.service';
+import { Paciente } from '../../../services/pacientes/abstract-pacientes.service';
 import { AbstractAgendasService } from '../../../services/agendas/abstract-agendas.service';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
 import { PacientesService } from '../../../services/pacientes/pacientes.service';
 import { AgendasService } from '../../../services/agendas/agendas.service';
-import { AppRefreshService } from '../../../services/app-refresh.service';
+import { OrgSelectorComponent } from '../../../shared/org-selector/org-selector.component';
 
 type PacienteLista = Paciente & { temAgendamento: boolean };
 
 @Component({
   selector: 'app-pacientes',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, OrgSelectorComponent],
   templateUrl: './pacientes.html',
   styleUrls: ['./pacientes.scss', '../painel.scss'],
 })
 export class PacientesComponent implements OnInit, OnDestroy {
-  private pacientesService = inject(AbstractPacientesService);
+  private pacientesService = inject(PacientesService);
   private agendasService = inject(AbstractAgendasService);
   private authService = inject(AbstractAuthService);
-  private appRefresh = inject(AppRefreshService);
 
   @ViewChild('deleteModal') deleteModal!: ElementRef<HTMLDialogElement>;
 
@@ -33,6 +32,12 @@ export class PacientesComponent implements OnInit, OnDestroy {
   organizations = this.authService.organizations;
   activeOrganizationId = this.authService.activeOrganizationId;
   mostrarColunaClinica = computed(() => this.isAdmin() && this.activeOrganizationId() === 0);
+
+  currentPage = this.pacientesService.currentPage;
+  totalPages = this.pacientesService.totalPages;
+  totalPacientes = this.pacientesService.totalPacientes;
+  perPage = this.pacientesService.perPage;
+  isLoadingList = this.pacientesService.isLoadingList;
 
   clinicaAtivaLabel = computed(() => {
     const orgId = this.activeOrganizationId();
@@ -51,8 +56,8 @@ export class PacientesComponent implements OnInit, OnDestroy {
       const orgId = this.authService.activeOrganizationId();
       if (orgId === null || orgId === undefined) return;
       if (this.ultimaOrgCarregada !== undefined && this.ultimaOrgCarregada !== orgId) {
-        (this.pacientesService as PacientesService).invalidateCache();
-        (this.pacientesService as PacientesService).loadPacientes();
+        this.pacientesService.invalidateCache();
+        this.loadPage(1);
         (this.agendasService as AgendasService).loadAll();
       }
       this.ultimaOrgCarregada = orgId;
@@ -71,24 +76,22 @@ export class PacientesComponent implements OnInit, OnDestroy {
       consultasPorPaciente.set(c.pacienteId, lista);
     }
 
-    return cadastrados
-      .map(p => {
-        const doPaciente = consultasPorPaciente.get(p.id) ?? [];
-        const ultima = doPaciente.reduce<string | undefined>((acc, c) => {
-          if (!c.data) return acc;
-          if (!acc) return c.data;
-          return this.parseDataBr(c.data) >= this.parseDataBr(acc) ? c.data : acc;
-        }, undefined);
-        const especialidade = doPaciente.find(c => c.especialidade)?.especialidade ?? p.especialidade;
+    return cadastrados.map(p => {
+      const doPaciente = consultasPorPaciente.get(p.id) ?? [];
+      const ultima = doPaciente.reduce<string | undefined>((acc, c) => {
+        if (!c.data) return acc;
+        if (!acc) return c.data;
+        return this.parseDataBr(c.data) >= this.parseDataBr(acc) ? c.data : acc;
+      }, undefined);
+      const especialidade = doPaciente.find(c => c.especialidade)?.especialidade ?? p.especialidade;
 
-        return {
-          ...p,
-          ultimaConsulta: ultima ?? p.ultimaConsulta ?? '—',
-          especialidade: especialidade || '—',
-          temAgendamento: doPaciente.length > 0,
-        };
-      })
-      .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+      return {
+        ...p,
+        ultimaConsulta: ultima ?? p.ultimaConsulta ?? '—',
+        especialidade: especialidade || '—',
+        temAgendamento: doPaciente.length > 0,
+      };
+    });
   }
 
   private parseDataBr(data: string): number {
@@ -99,7 +102,7 @@ export class PacientesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    (this.pacientesService as PacientesService).loadPacientes();
+    this.loadPage(1);
     (this.agendasService as AgendasService).loadAll();
   }
 
@@ -107,21 +110,53 @@ export class PacientesComponent implements OnInit, OnDestroy {
     if (this.searchTimer) clearTimeout(this.searchTimer);
   }
 
-  onClinicaChange(orgIdVal: string | number) {
-    const orgId = typeof orgIdVal === 'number' ? orgIdVal : parseInt(orgIdVal, 10);
-    if (isNaN(orgId)) return;
-    this.authService.setActiveOrganization(orgId);
-    this.appRefresh.onOrganizationChanged();
+  private filtrosAtuais() {
+    return {
+      nome: this.filtroNome().trim() || undefined,
+      cpf: this.filtroCpf().trim() || undefined,
+    };
+  }
+
+  loadPage(page: number) {
+    this.pacientesService.loadPacientes({
+      paginate: true,
+      page,
+      perPage: this.perPage(),
+      ...this.filtrosAtuais(),
+    });
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages() || page === this.currentPage()) return;
+    this.loadPage(page);
+  }
+
+  changePerPage(value: number) {
+    this.perPage.set(value);
+    this.loadPage(1);
+  }
+
+  paginationRange(): number[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const maxButtons = 5;
+    let start = Math.max(1, current - Math.floor(maxButtons / 2));
+    let end = Math.min(total, start + maxButtons - 1);
+    start = Math.max(1, end - maxButtons + 1);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }
+
+  rangeLabel(): string {
+    const total = this.totalPacientes();
+    if (total === 0) return 'Nenhum paciente encontrado';
+    const start = (this.currentPage() - 1) * this.perPage() + 1;
+    const end = Math.min(this.currentPage() * this.perPage(), total);
+    return `Exibindo ${start}–${end} de ${total} pacientes`;
   }
 
   onFiltroChange() {
     if (this.searchTimer) clearTimeout(this.searchTimer);
-    this.searchTimer = setTimeout(() => {
-      (this.pacientesService as PacientesService).loadPacientes({
-        nome: this.filtroNome(),
-        cpf: this.filtroCpf(),
-      });
-    }, 300);
+    this.searchTimer = setTimeout(() => this.loadPage(1), 300);
   }
 
   onCpfChange(valor: string) {
@@ -137,7 +172,7 @@ export class PacientesComponent implements OnInit, OnDestroy {
   limparFiltros() {
     this.filtroNome.set('');
     this.filtroCpf.set('');
-    (this.pacientesService as PacientesService).loadPacientes();
+    this.loadPage(1);
   }
 
   excluirPaciente(id: number, nome: string): void {

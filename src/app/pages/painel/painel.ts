@@ -22,6 +22,7 @@ import { EspecialistasService } from '../../services/especialistas/especialistas
 import { PrefetchService } from '../../services/prefetch.service';
 import { AvatarUrlPipe } from '../../pipes/avatar-url.pipe';
 import { AvatarFallbackDirective } from '../../directives/avatar-fallback.directive';
+import { OrgSelectorComponent } from '../../shared/org-selector/org-selector.component';
 
 import { UserRole } from '../../models/auth.model';
 
@@ -51,7 +52,7 @@ interface SearchResult {
 
   standalone: true,
 
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, AvatarUrlPipe, AvatarFallbackDirective],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, AvatarUrlPipe, AvatarFallbackDirective, OrgSelectorComponent],
 
   templateUrl: './painel.html',
 
@@ -213,22 +214,6 @@ export class Painel implements OnInit, OnDestroy {
   organizations = this.authService.organizations;
 
   activeOrganizationId = this.authService.activeOrganizationId;
-
-
-
-  onOrganizationChange(orgIdVal: string) {
-
-    const orgId = parseInt(orgIdVal);
-
-    if (!isNaN(orgId)) {
-
-      this.authService.setActiveOrganization(orgId);
-
-      this.appRefresh.onOrganizationChanged();
-
-    }
-
-  }
 
 
 

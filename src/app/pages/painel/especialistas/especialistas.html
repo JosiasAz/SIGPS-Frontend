@@ -18,6 +18,44 @@
     </div>
 
     <div class="card">
+        <div class="card-toolbar">
+            <div class="users-search">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input
+                    type="search"
+                    placeholder="Buscar por nome..."
+                    [ngModel]="userSearch()"
+                    (ngModelChange)="onSearchInput($event)"
+                />
+                @if (userSearch()) {
+                <button type="button" class="search-clear" (click)="clearSearch()" aria-label="Limpar busca">×</button>
+                }
+            </div>
+            <div class="toolbar-meta">
+                @if (!isLoadingList()) {
+                <span class="count-badge">{{ totalEspecialistas() }} profissionais</span>
+                }
+                <div class="users-per-page">
+                    <label for="espPerPage">Por página</label>
+                    <select id="espPerPage" [ngModel]="perPage()" (ngModelChange)="changePerPage(+$event)">
+                        <option [ngValue]="10">10</option>
+                        <option [ngValue]="15">15</option>
+                        <option [ngValue]="25">25</option>
+                        <option [ngValue]="50">50</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        @if (isLoadingList()) {
+        <div class="loading-users">
+            <div class="spinner"></div>
+            <p>Carregando especialistas...</p>
+        </div>
+        } @else {
         <div class="table-container">
             <table class="dashboard-table">
                 <thead>
@@ -80,13 +118,39 @@
                     @if (especialistas().length === 0) {
                     <tr>
                         <td colspan="6" style="text-align: center; padding: 48px 24px; color: var(--text-muted);">
-                            Nenhum especialista encontrado para a clínica selecionada.
+                            @if (userSearch()) {
+                                Nenhum especialista encontrado para "{{ userSearch() }}".
+                            } @else {
+                                Nenhum especialista encontrado para a clínica selecionada.
+                            }
                         </td>
                     </tr>
                     }
                 </tbody>
             </table>
         </div>
+
+        @if (totalPages() > 1 || totalEspecialistas() > 0) {
+        <div class="users-pagination">
+            <span class="pagination-info">{{ rangeLabel() }}</span>
+            @if (totalPages() > 1) {
+            <div class="pagination-controls">
+                <button type="button" class="page-btn" (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1" aria-label="Página anterior">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                @for (page of paginationRange(); track page) {
+                <button type="button" class="page-btn" [class.active]="page === currentPage()" (click)="goToPage(page)">
+                    {{ page }}
+                </button>
+                }
+                <button type="button" class="page-btn" (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()" aria-label="Próxima página">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+            </div>
+            }
+        </div>
+        }
+        }
     </div>
 
     <!-- Modal para adicionar especialista -->
