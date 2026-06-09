@@ -49,20 +49,22 @@ export class EspecialistasService extends AbstractEspecialistasService {
         cacheInvalidate('especialistas:');
     }
 
-    private shouldFilterByOrganization(filtros: BuscaProfissionaisFiltros): number | null | undefined {
-        if (filtros.organizationId !== undefined && filtros.organizationId !== null) {
-            return filtros.organizationId;
+    private resolveOrganizationId(filtros: BuscaProfissionaisFiltros): number | undefined {
+        if ('organizationId' in filtros) {
+            const id = filtros.organizationId;
+            return id === null || id === undefined || id === 0 ? undefined : id;
         }
         const role = this.authService.userRole();
         if (role === 'paciente' || role === 'visualizador') {
             return undefined;
         }
-        return this.authService.activeOrganizationId();
+        const active = this.authService.activeOrganizationId();
+        return active === null || active === undefined || active === 0 ? undefined : active;
     }
 
     private buildParams(filtros: BuscaProfissionaisFiltros): HttpParams {
         let params = new HttpParams();
-        const orgId = this.shouldFilterByOrganization(filtros);
+        const orgId = this.resolveOrganizationId(filtros);
         if (orgId !== null && orgId !== undefined) {
             params = params.set('organization_id', orgId.toString());
         }

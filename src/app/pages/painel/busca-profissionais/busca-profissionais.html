@@ -66,8 +66,8 @@
                 
                 <h3 class="pro-name">{{ pro.nome }}</h3>
                 <p class="pro-specialty">{{ pro.especialidade }}</p>
-                @if (pro.organizationNome) {
-                <p class="pro-clinic">🏢 {{ pro.organizationNome }}</p>
+                @if (rotuloLocal(pro); as local) {
+                <p class="pro-clinic">{{ local }}</p>
                 }
                 <p class="pro-crm">{{ pro.crm }}</p>
 
@@ -100,7 +100,7 @@
         }
     </div>
 
-    @if (totalPages() > 1) {
+    @if (totalPages() > 1 && clinicaFiltroId() == null) {
     <div class="busca-pagination">
         <div class="pagination-controls">
             <button type="button" class="page-btn" (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1" aria-label="Página anterior">
