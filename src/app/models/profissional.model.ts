@@ -10,6 +10,7 @@ export interface Profissional {
   localAtendimento?: string;
   organizationId?: number | null;
   organizationNome?: string;
+  organizationTipo?: string;
   documento?: string;
   status?: string; // Mantido por retrocompatibilidade com UI antiga, mas agora computado
   situacao?: 'Ativo' | 'Inativo';

@@ -41,7 +41,12 @@ export class BuscaProfissionaisComponent implements OnInit, OnDestroy {
     return fromPros.length ? ['Todas', ...fromPros] : ['Todas'];
   });
 
-  profissionaisFiltrados = computed(() => this.especialistasService.especialistas());
+  profissionaisFiltrados = computed(() => {
+    const lista = this.especialistasService.especialistas();
+    const clinicaId = this.clinicaFiltroId();
+    if (clinicaId == null) return lista;
+    return lista.filter(p => p.organizationId === clinicaId);
+  });
   currentPage = this.especialistasService.currentPage;
   totalPages = this.especialistasService.totalPages;
   totalEspecialistas = this.especialistasService.totalEspecialistas;
@@ -83,7 +88,8 @@ export class BuscaProfissionaisComponent implements OnInit, OnDestroy {
 
   private aplicarBusca(page = 1) {
     const hadData = this.especialistasService.especialistas().length > 0;
-    this.carregando.set(!hadData);
+    const comClinica = this.clinicaFiltroId() != null;
+    this.carregando.set(!hadData || comClinica);
     this.especialistasService.loadEspecialistas({
       paginate: true,
       page,
@@ -91,7 +97,18 @@ export class BuscaProfissionaisComponent implements OnInit, OnDestroy {
       nome: this.searchQuery(),
       especialidade: this.selectedEspecialidade(),
       organizationId: this.clinicaFiltroId(),
-    }, false, () => this.carregando.set(false));
+    }, comClinica, () => this.carregando.set(false));
+  }
+
+  rotuloLocal(pro: { organizationNome?: string; organizationTipo?: string; localAtendimento?: string; nome?: string }): string | null {
+    if (this.clinicaFiltroId() != null) {
+      if (pro.localAtendimento?.trim()) return pro.localAtendimento.trim();
+      return null;
+    }
+    if (pro.organizationTipo === 'AUTONOMO') {
+      return pro.localAtendimento?.trim() || 'Atendimento autônomo';
+    }
+    return pro.organizationNome?.trim() || null;
   }
 
   goToPage(page: number) {
@@ -110,8 +127,13 @@ export class BuscaProfissionaisComponent implements OnInit, OnDestroy {
   }
 
   rangeLabel(): string {
-    const total = this.totalEspecialistas();
+    const total = this.clinicaFiltroId() != null
+      ? this.profissionaisFiltrados().length
+      : this.totalEspecialistas();
     if (total === 0) return 'Nenhum profissional encontrado';
+    if (this.clinicaFiltroId() != null) {
+      return `${total} profissional(is) nesta clínica`;
+    }
     const start = (this.currentPage() - 1) * this.perPage() + 1;
     const end = Math.min(this.currentPage() * this.perPage(), total);
     return `Exibindo ${start}–${end} de ${total} profissionais`;
