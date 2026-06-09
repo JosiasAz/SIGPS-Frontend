@@ -177,12 +177,7 @@
                 <!-- Organization Selector -->
                 @if (isAdmin() && organizations().length > 0) {
                 <div class="org-selector-wrapper">
-                    <select class="org-select" [value]="activeOrganizationId() ?? 0" (change)="onOrganizationChange($any($event.target).value)">
-                        <option [value]="0">🌐 Todas as clínicas</option>
-                        @for (org of organizations(); track org.id) {
-                        <option [value]="org.id">🏢 {{ org.nome }}</option>
-                        }
-                    </select>
+                    <app-org-selector [showAllClinics]="true" />
                 </div>
                 } @else if (isAdmin()) {
                 <div class="org-badge" title="Visão global do sistema">
@@ -191,11 +186,7 @@
                 </div>
                 } @else if (organizations().length > 0) {
                 <div class="org-selector-wrapper">
-                    <select class="org-select" [value]="activeOrganizationId() ?? ''" (change)="onOrganizationChange($any($event.target).value)">
-                        @for (org of organizations(); track org.id) {
-                        <option [value]="org.id">🏢 {{ org.nome }}</option>
-                        }
-                    </select>
+                    <app-org-selector [showAllClinics]="false" />
                 </div>
                 }
 

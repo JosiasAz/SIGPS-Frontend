@@ -1,19 +1,19 @@
-import { Component, inject, ViewChild, ElementRef, OnInit, computed } from '@angular/core';
+import { Component, inject, ViewChild, ElementRef, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { AbstractEspecialistasService, Profissional } from '../../../services/especialistas/abstract-especialistas.service';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, FormsModule } from '@angular/forms';
+import { Profissional } from '../../../services/especialistas/abstract-especialistas.service';
 import { EspecialistasService } from '../../../services/especialistas/especialistas.service';
 import { AbstractAuthService } from '../../../services/auth/abstract-auth.service';
 
 @Component({
   selector: 'app-especialistas',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './especialistas.html',
-  styleUrls: ['../painel.scss'],
+  styleUrls: ['../painel.scss', './especialistas.scss'],
 })
 export class EspecialistasComponent implements OnInit {
-  private especialistasService = inject(AbstractEspecialistasService);
+  private especialistasService = inject(EspecialistasService);
   private authService = inject(AbstractAuthService);
   private fb = inject(FormBuilder);
 
@@ -26,10 +26,14 @@ export class EspecialistasComponent implements OnInit {
     return this.organizations().find(o => o.id === orgId)?.nome ?? 'Clínica selecionada';
   });
 
-  @ViewChild('addModal') addModal!: ElementRef<HTMLDialogElement>;
-  @ViewChild('deleteModal') deleteModal!: ElementRef<HTMLDialogElement>;
-
   especialistas = this.especialistasService.especialistas;
+  currentPage = this.especialistasService.currentPage;
+  totalPages = this.especialistasService.totalPages;
+  totalEspecialistas = this.especialistasService.totalEspecialistas;
+  perPage = this.especialistasService.perPage;
+  isLoadingList = this.especialistasService.isLoadingList;
+  userSearch = signal('');
+  private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   especialistaForm: FormGroup;
 
   editingEspecialistaId: number | null = null;
@@ -72,8 +76,59 @@ export class EspecialistasComponent implements OnInit {
   }
 
   ngOnInit() {
-    (this.especialistasService as EspecialistasService).loadEspecialistas();
+    this.loadPage(1);
   }
+
+  loadPage(page: number) {
+    this.especialistasService.loadEspecialistas({
+      paginate: true,
+      page,
+      perPage: this.perPage(),
+      nome: this.userSearch().trim() || undefined,
+    });
+  }
+
+  onSearchInput(value: string) {
+    this.userSearch.set(value);
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(() => this.loadPage(1), 350);
+  }
+
+  clearSearch() {
+    this.userSearch.set('');
+    this.loadPage(1);
+  }
+
+  changePerPage(value: number) {
+    this.perPage.set(value);
+    this.loadPage(1);
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages() || page === this.currentPage()) return;
+    this.loadPage(page);
+  }
+
+  paginationRange(): number[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const maxButtons = 5;
+    let start = Math.max(1, current - Math.floor(maxButtons / 2));
+    let end = Math.min(total, start + maxButtons - 1);
+    start = Math.max(1, end - maxButtons + 1);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }
+
+  rangeLabel(): string {
+    const total = this.totalEspecialistas();
+    if (total === 0) return 'Nenhum especialista encontrado';
+    const start = (this.currentPage() - 1) * this.perPage() + 1;
+    const end = Math.min(this.currentPage() * this.perPage(), total);
+    return `Exibindo ${start}–${end} de ${total} especialistas`;
+  }
+
+  @ViewChild('addModal') addModal!: ElementRef<HTMLDialogElement>;
+  @ViewChild('deleteModal') deleteModal!: ElementRef<HTMLDialogElement>;
 
   // Validator: Pelo menos 2 palavras com espaço
   private nomeDuasPalavrasValidator(control: AbstractControl): ValidationErrors | null {
